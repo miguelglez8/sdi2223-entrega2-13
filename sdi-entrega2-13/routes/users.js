@@ -1,4 +1,4 @@
-
+const {ObjectId} = require("mongodb");
 module.exports = function (app, usersRepository) {
 
     /**
@@ -56,6 +56,29 @@ module.exports = function (app, usersRepository) {
     app.get('/users/login', function (req, res) {
         res.render("login.twig");
     });
+    /**
+     * Listado de admin
+     */
+    app.get("/users/admin/list", function (req, res) {
+        let filter = {};
+        let options = {sort: {email: 1}};
+
+        usersRepository.getUsers(filter, options)
+            .then(result => {
+
+                let response = {
+                    users: result.users,
+                    session: req.session,
+                    search: req.query.search
+                }
+                res.render("users/admin/list.twig", response);
+            })
+            .catch( () => {
+                res.redirect("/" +
+                    "?message=Ha ocurrido un error al listar los usuarios." +
+                    "&messageType=alert-danger ");}
+            );
+    });
 
     /**
      * POST de login
@@ -87,6 +110,43 @@ module.exports = function (app, usersRepository) {
         })
     });
 
+
+    /**
+     * Funcionalidad borrado de usuarios
+     */
+    app.get('/users/delete', function (req, res) {
+        var list = [];
+        if (req.query.deleteList != null && req.query.deleteList != undefined) {
+            if (!Array.isArray(req.query.deleteList)) {
+                list[0] = req.query.deleteList;
+            } else {
+                list = req.query.deleteList;
+            }
+
+            for (const listElement of list) {
+                deleteUser(listElement, res);
+            }
+        }
+
+        res.redirect("/users/admin/list");
+    });
+
+
+    /**
+     * Funcion que borra un usuario
+     */
+    function deleteUser(userId, res) {
+        usersRepository.deleteUser({_id: ObjectId(userId)}, {}).then(result => {
+            if (result == null || result.deletedCount == 0) {
+                res.write("No se ha podido eliminar el registro");
+            }
+            res.end();
+        }).catch( () => {
+            res.redirect("/" +
+                "?message=Ha ocurrido un error al eliminar usuarios." +
+                "&messageType=alert-danger ")
+        });
+    }
 
     /**
      * Registro de usuarios GET

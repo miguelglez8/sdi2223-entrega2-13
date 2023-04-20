@@ -111,7 +111,21 @@ module.exports = {
         } catch(error){
             throw error;
         }
-    }
+    },
+
+
+    deleteUser: async function (filter, options) {
+        try {
+            const client = await getConnection(this.mongoClient,this.app.get('connectionStrings'))
+            const database = client.db("entrega2");
+            const collectionName = 'users';
+            const usersCollection = database.collection(collectionName);
+            const result = await usersCollection.deleteOne(filter, options);
+            return result;
+        } catch (error) {
+            throw (error);
+        }
+    },
 
 
 };
