@@ -1,5 +1,6 @@
 
 module.exports = function (app, usersRepository) {
+
     /**
      * Funcionalidad listado de usuarios con busqueda y paginacion
      */

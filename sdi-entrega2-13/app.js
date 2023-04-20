@@ -80,7 +80,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 require("./routes/users.js")(app, usersRepository);
+
+require("./routes/bd.js")(app, usersRepository);
+
 app.use('/', indexRouter);
+
+
 
 /**
  * Manejar errores 404
