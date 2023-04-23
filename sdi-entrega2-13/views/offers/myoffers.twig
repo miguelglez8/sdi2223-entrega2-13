@@ -1,0 +1,34 @@
+{% extends "layout.twig" %}
+{% block title %} Tienda – uoMusic {% endblock %}
+{% block body %}
+    <h2>Mis ofertas</h2>
+    <div class="row text-right">
+        <a href="/offers/add" class="btn btn-info" role="button">Agregar oferta</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>Título</th>
+                <th>Detalle</th>
+                <th>Fecha</th>
+                <th>Precio</th>
+                <th class="col-md-1"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for offer in offers %}
+                <tr>
+                    <td>{{ offer.title }}</td>
+                    <td>{{ offer.detail }}</td>
+                    <td>{{ offer.date }}</td>
+                    <td>{{ offer.price }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="row text-right">
+        <a href="/offers/add" class="btn btn-info" role="button">Agregar oferta</a>
+    </div>
+{% endblock %}
