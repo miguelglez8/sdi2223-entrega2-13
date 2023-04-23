@@ -58,6 +58,8 @@ app.use(expressSession({
  */
 let usersRepository = require("./repositories/usersRepository.js");
 usersRepository.init(app, MongoClient);
+let offersRepository = require("./repositories/offersRepository.js");
+offersRepository.init(app, MongoClient);
 
 /**
  * INDEX
@@ -66,6 +68,9 @@ let indexRouter = require('./routes/index');
 let userSessionRouter = require('./routes/userSessionRouter');
 
 app.use("/users/list", userSessionRouter);
+
+app.use("/offers/add",userSessionRouter);
+app.use("/myoffers",userSessionRouter);
 
 
 
@@ -82,6 +87,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 require("./routes/users.js")(app, usersRepository);
 
 require("./routes/bd.js")(app, usersRepository);
+
+require("./routes/offers.js")(app, offersRepository);
 
 app.use('/', indexRouter);
 
