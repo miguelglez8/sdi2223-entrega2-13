@@ -43,7 +43,7 @@ app.set('crypto', crypto);
  */
 console.log(process.env)
 const { MongoClient } = require("mongodb");
-const url = "mongodb+srv://admin:admin@eii-sdi-cluster.rbxsxlu.mongodb.net/test\n";
+const url = "mongodb://localhost:27017";
 app.set('connectionStrings', url);
 
 let expressSession = require('express-session');
@@ -70,6 +70,8 @@ let userSessionRouter = require('./routes/userSessionRouter');
 app.use("/users/list", userSessionRouter);
 
 app.use("/offers/add",userSessionRouter);
+app.use("/offers/list",userSessionRouter);
+app.use("/offers/buy",userSessionRouter);
 app.use("/myoffers",userSessionRouter);
 
 
@@ -86,9 +88,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 require("./routes/users.js")(app, usersRepository);
 
-require("./routes/bd.js")(app, usersRepository);
+require("./routes/bd.js")(app, usersRepository, offersRepository);
 
-require("./routes/offers.js")(app, offersRepository);
+require("./routes/offers.js")(app, usersRepository, offersRepository);
 
 app.use('/', indexRouter);
 

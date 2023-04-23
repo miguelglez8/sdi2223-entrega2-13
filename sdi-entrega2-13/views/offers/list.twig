@@ -1,0 +1,65 @@
+{% extends "layout.twig" %}
+{% block title %} Wallapop – myWallapop {% endblock %}
+{% block main_container %}
+    <!-- Búsqueda -->
+    <div class="row">
+    <div id="custom-search-input ">
+        <form method="get" action="/offers">
+            <div class="input-group col-xs-8 col-sm-6 col-md-4 col-lg-5 pull-right">
+                <input id="search" type="text" class="search-query form-control"
+                       placeholder="Nombre de la oferta" name="search"/>
+                <span class="input-group-btn">
+                <button class="btn" type="submit">
+                <span class="glyphicon glyphicon-search"></span>
+                </button>
+                </span>
+            </div>
+        </form>
+    </div>
+    <h2>Todas las ofertas</h2>
+    <div class="table-responsive">
+        <table class="table table-hover" id="tableOffersB">
+            <thead>
+            <tr>
+                <th>Título</th>
+                <th>Detalle</th>
+                <th>Fecha</th>
+                <th>Precio</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for offer in offers %}
+                <tr>
+                    <td>{{ offer.title }}</td>
+                    <td>{{ offer.detail }}</td>
+                    <td>{{ offer.date }}</td>
+                    <td>{{ offer.price }}</td>
+                    <td>
+                        {% if offer.isBought==false %}
+                            <a class="btn btn-primary pull-right"
+                               href="/offers/buy/{{ offer.title }}">Comprar</a>
+                        {% else %}
+                            <p>Vendido</p>
+                        {% endif %}
+                    </td>
+
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- Paginación mostrar la actual y 2 anteriores y dos siguientes -->
+    <div class="row text-center">
+        <ul class="pagination">
+            {% for page in pages %}
+                <li class="page-item" id="pi-{{ page }}">
+                    <a class="page-link" href="/offers/?page={{ page }}">{{ page }}</a>
+                </li>
+            {% endfor %}
+            <script>
+                $("#pi-" + "{{ currentPage }}").addClass("active");
+            </script>
+        </ul>
+    </div>
+{% endblock %}
