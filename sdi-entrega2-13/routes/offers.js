@@ -33,13 +33,14 @@ module.exports = function (app, usersRepository, offersRepository) {
             seller: req.session.user,
             isBuy: false
         }
-        offersRepository.insertOffer(offer, function (offerId) {
+        offersRepository.insertOffer(offer).then((offerId) => {
             if (offerId == null) {
                 res.send("Error al insertar la oferta");
             } else {
                 res.send("Agregada la oferta ID: " + offerId)
             }
         });
+
     });
 
     app.get('/offers/buy', function (req, res) {
