@@ -34,20 +34,17 @@ module.exports = {
             throw (error);
         }
     },
-    insertOffer: function (offer, callbackFunction) {
-        this.mongoClient.connect(this.app.get('connectionStrings'), function (err, dbClient) {
-            if (err) {
-                callbackFunction(null)
-            } else {
-                const database = dbClient.db("entrega2");
-                const collectionName = 'offers';
-                const offersCollection = database.collection(collectionName);
-                offersCollection.insertOne(offer)
-                    .then(result => callbackFunction(result.insertedId))
-                    .then(() => dbClient.close())
-                    .catch(err => callbackFunction({error: err.message}));
-            }
-        });
+    insertOffer: async function (offer) {
+        try {
+            const client = await getConnection(this.mongoClient, this.app.get('connectionStrings'))
+            const database = client.db("entrega2");
+            const collectionName = 'offers';
+            const usersCollection = database.collection(collectionName);
+            const result = await usersCollection.insertOne(offer);
+            return result.insertedId;
+        } catch (error) {
+            throw (error);
+        }
     },
     resetOffers: async function (offers) {
         try {
