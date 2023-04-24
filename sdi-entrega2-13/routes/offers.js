@@ -49,8 +49,6 @@ module.exports = function (app, usersRepository, offersRepository) {
             page = 1;
         }
         offersRepository.getBuys(filter, options).then(buys => {
-            res.render("offers/buy.twig", {buys: buys});
-
             let lastPage = buys.total / 5;
             if (buys.total % 5 > 0) { // Sobran decimales
                 lastPage = lastPage + 1;
@@ -66,7 +64,7 @@ module.exports = function (app, usersRepository, offersRepository) {
                 pages: pages,
                 currentPage: page
             }
-            res.render("shop.twig", response);
+            res.render("offers/buy.twig", response);
         }).catch(error => {
             res.send("Se ha producido un error al listar las compras del usuario:" + error)
         });
