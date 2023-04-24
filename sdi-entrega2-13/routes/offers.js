@@ -30,7 +30,8 @@ module.exports = function (app, usersRepository, offersRepository) {
             detail: req.body.detail,
             date: new Date().getDate().toLocaleString(),
             price: req.body.price,
-            seller: req.session.user
+            seller: req.session.user,
+            isBuy: false
         }
         offersRepository.insertOffer(offer, function (offerId) {
             if (offerId == null) {
@@ -48,7 +49,7 @@ module.exports = function (app, usersRepository, offersRepository) {
         if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") { // Puede no venir el param
             page = 1;
         }
-        offersRepository.getBuysPg(filter, options).then(buys => {
+        offersRepository.getBuysPg(filter, options, page).then(buys => {
             let lastPage = buys.total / 5;
             if (buys.total % 5 > 0) { // Sobran decimales
                 lastPage = lastPage + 1;
@@ -106,13 +107,13 @@ module.exports = function (app, usersRepository, offersRepository) {
                         pages.push(i);
                     }
                 }
-
                 let response = {
-                    offers: result,
+                    offers: result.offers,
                     pages: pages,
                     currentPage: page,
                     session: req.session,
-                    money: user.money
+                    money: user.money,
+                    search: req.query.search
                 }
                 res.render("offers/list.twig", response);
             })
@@ -129,14 +130,25 @@ module.exports = function (app, usersRepository, offersRepository) {
         }
         let options = {};
         offersRepository.findOffer(filter, options).then(offer => {
-            compruebaBuy(offer, req.session.user, function (result, errors) {
+            compruebaBuy(offer, req.session.user, function (result, errors, money) {
                 if (result == false) {
                     offersRepository.buyOffer(shop, function (offerId) {
-                        if (offerId == null) {
-                            res.send("Error al realizar la compra");
-                        } else {
-                            res.redirect("/offers/list", errors);
-                        }
+                        const rest = money - offer.price;
+                        offersRepository.updateOffer({seller: offer.seller}, { $set: { isBuy: true}}).then(offer => {
+                            usersRepository.updateUser({email: req.session.user}, { $set: { money: rest}}).then(user => {
+                                if (offerId == null) {
+                                    res.send("Error al realizar la compra");
+                                } else {
+                                    let response = {
+                                        offers: result.offers,
+                                        session: req.session,
+                                        money: user.money,
+                                        errors: errors
+                                    }
+                                    res.redirect("/offers/list", response);
+                                }
+                            })
+                        })
                     })
                 }
             })
@@ -151,12 +163,14 @@ module.exports = function (app, usersRepository, offersRepository) {
         let filter = {
             user: user
         }
+        let money;
         let isBought = false;
         if (user == offer.seller) { // la oferta ha sido creada por el usuario
             isBought = true;
             errors.push("ERROR: la oferta ha sido creada por el usuario")
         }
         usersRepository.findUser(filter, options).then(user => {
+            money = user.money;
             if (user != null && user.money < offer.price) { // no tenemos suficiente saldo para comprar la oferta
                 isBought = true;
                 errors.push("ERROR: no tenemos suficiente saldo para comprar la oferta")
@@ -168,7 +182,7 @@ module.exports = function (app, usersRepository, offersRepository) {
                 isBought = true
                 errors.push("ERROR: la oferta ya ha sido comprada por un usuario")
             }
-            callback(isBought, errors);
+            callback(isBought, errors, money);
         })
     };
 }

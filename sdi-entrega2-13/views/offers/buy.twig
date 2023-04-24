@@ -1,15 +1,14 @@
 {% extends "../layout.twig" %}
 {% block title %} Wallapop – Ofertas compradas {% endblock %}
 {% block body %}
-    <h2 Todas las ofertas compradas></h2>
-
+    <h1>Ofertas compradas</h1>
     <div class="table-responsive">
         <table class="table table-hover" id="tableOffersB">
             <thead>
             <tr>
                 <th>Título</th>
                 <th>Detalle</th>
-                <th>Precio</th>
+                <th>Precio (€)</th>
                 <th>Vendedor</th>
             </tr>
             </thead>
@@ -30,7 +29,7 @@
         <ul class="pagination">
             {% for page in pages %}
                 <li class="page-item" id="pi-{{ page }}">
-                    <a class="page-link" href="/buy/?page={{ page }}">{{ page }}</a>
+                    <a class="page-link" href="/offers/buy/?page={{ page }}">{{ page }}</a>
                 </li>
             {% endfor %}
             <script>
