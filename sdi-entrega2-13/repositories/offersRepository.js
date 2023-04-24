@@ -34,18 +34,6 @@ module.exports = {
             throw (error);
         }
     },
-    findOffer: async function (filter, options) {
-        try {
-            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
-            const database = client.db("entrega2");
-            const collectionName = 'offers';
-            const offersCollection = database.collection(collectionName);
-            const offer = await offersCollection.find(filter, options);
-            return offer;
-        } catch (error) {
-            throw (error);
-        }
-    },
     insertOffer: function (offer, callbackFunction) {
         this.mongoClient.connect(this.app.get('connectionStrings'), function (err, dbClient) {
             if (err) {
@@ -66,12 +54,35 @@ module.exports = {
             const client = await getConnection(this.mongoClient,this.app.get('connectionStrings'))
             const database = client.db("entrega2");
             const collectionName = 'offers';
-            const usersCollection = database.collection(collectionName);
-            await usersCollection.deleteMany();
-            await usersCollection.insertMany(offers);
+            const offersCollection = database.collection(collectionName);
+            await offersCollection.deleteMany();
+            await offersCollection.insertMany(offers);
             return true;
         } catch(error){
             throw error;
+        }
+    },
+    resetBuyOffers: async function () {
+        try {
+            const client = await getConnection(this.mongoClient,this.app.get('connectionStrings'))
+            const database = client.db("entrega2");
+            const collectionName = 'buys';
+            const offersCollection = database.collection(collectionName);
+            await offersCollection.deleteMany();
+            return true;
+        } catch(error){
+            throw error;
+        }
+    },
+    updateOffer: async function (filter, options) {
+        try {
+            const client = await getConnection(this.mongoClient,this.app.get('connectionStrings'))
+            const database = client.db("entrega2");
+            const collectionName = 'offers';
+            const offersCollection = database.collection(collectionName);
+            return await offersCollection.updateOne(filter, options);
+        } catch (error) {
+            throw (error);
         }
     },
     buyOffer: function (shop, callbackFunction) {

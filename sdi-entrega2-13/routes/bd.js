@@ -1,3 +1,4 @@
+const {resetBuyOffers} = require("../repositories/offersRepository");
 module.exports = function (app, usersRepository, offersRepository) {
 
 
@@ -79,13 +80,15 @@ module.exports = function (app, usersRepository, offersRepository) {
                 detail: detail + i,
                 date: new Date().getDate(),
                 price: i,
-                seller: name + "@email.com"
+                seller: name + "@email.com",
+                isBuy: false
             });
         }
 
 
         await usersRepository.resetUsers(users);
         await offersRepository.resetOffers(offers);
+        await resetBuyOffers();
 
         res.render("login.twig");
     });

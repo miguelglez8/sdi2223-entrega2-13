@@ -1,13 +1,11 @@
-{% extends "layout.twig" %}
-{% block title %} Wallapop – myWallapop {% endblock %}
-{% block main_container %}
-    <!-- Búsqueda -->
-    <div class="row">
+{% extends "../layout.twig" %}
+{% block title %} Wallapop – Todas las ofertas {% endblock %}
+{% block body %}
     <div id="custom-search-input ">
-        <form method="get" action="/offers">
+        <form method="get" action="/offers/searchOffers">
             <div class="input-group col-xs-8 col-sm-6 col-md-4 col-lg-5 pull-right">
                 <input id="search" type="text" class="search-query form-control"
-                       placeholder="Nombre de la oferta" name="search"/>
+                       placeholder="Nombre de la oferta" name="search" value={{ search }}>
                 <span class="input-group-btn">
                 <button class="btn" type="submit">
                 <span class="glyphicon glyphicon-search"></span>
@@ -16,15 +14,20 @@
             </div>
         </form>
     </div>
-    <h2>Todas las ofertas</h2>
-    <div class="table-responsive">
-        <table class="table table-hover" id="tableOffersB">
+    <h1>Busca ofertas por título</h1>
+    <div id="errors">
+        {% for error in errors %}
+            <li class="text-danger" text={{ error }}></li>
+        {% endfor %}
+    </div>
+    <div class="row">
+        <table class="table table-hover" id="tableOffers">
             <thead>
             <tr>
                 <th>Título</th>
                 <th>Detalle</th>
                 <th>Fecha</th>
-                <th>Precio</th>
+                <th>Precio (€)</th>
                 <th></th>
             </tr>
             </thead>
@@ -36,9 +39,9 @@
                     <td>{{ offer.date }}</td>
                     <td>{{ offer.price }}</td>
                     <td>
-                        {% if offer.isBought==false %}
+                        {% if offer.isBuy==false %}
                             <a class="btn btn-primary pull-right"
-                               href="/offers/buy/{{ offer.title }}">Comprar</a>
+                               href="/offers/buy/{{ offer._id }}">Comprar</a>
                         {% else %}
                             <p>Vendido</p>
                         {% endif %}
@@ -54,7 +57,11 @@
         <ul class="pagination">
             {% for page in pages %}
                 <li class="page-item" id="pi-{{ page }}">
-                    <a class="page-link" href="/offers/?page={{ page }}">{{ page }}</a>
+                    {% if search %}
+                        <a class="page-link" href="/offers/searchOffers/?page={{ page }}&search={{ search }}">{{ page }}</a>
+                    {% else %}
+                        <a class="page-link" href="/offers/searchOffers/?page={{ page }}">{{ page }}</a>
+                    {% endif %}
                 </li>
             {% endfor %}
             <script>
