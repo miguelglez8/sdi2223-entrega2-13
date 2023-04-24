@@ -72,7 +72,7 @@ app.use("/users/list", userSessionRouter);
 app.use("/offers/add",userSessionRouter);
 app.use("/offers/list",userSessionRouter);
 app.use("/offers/buy",userSessionRouter);
-app.use("/myoffers",userSessionRouter);
+app.use("/offers/myoffers",userSessionRouter);
 
 
 
