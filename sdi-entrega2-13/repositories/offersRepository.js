@@ -34,18 +34,6 @@ module.exports = {
             throw (error);
         }
     },
-    findOffer: async function (filter, options) {
-        try {
-            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
-            const database = client.db("entrega2");
-            const collectionName = 'offers';
-            const offersCollection = database.collection(collectionName);
-            const offer = await offersCollection.find(filter, options);
-            return offer;
-        } catch (error) {
-            throw (error);
-        }
-    },
     insertOffer: function (offer, callbackFunction) {
         this.mongoClient.connect(this.app.get('connectionStrings'), function (err, dbClient) {
             if (err) {

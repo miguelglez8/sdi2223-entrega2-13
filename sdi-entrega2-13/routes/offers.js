@@ -122,19 +122,21 @@ module.exports = function (app, usersRepository, offersRepository) {
         });
     });
 
-    app.post('/offers/buy/:_id', function (req, res) {
-        let filter = {_id: ObjectId(req.params._id)};
+    app.get('/offers/buy/:id', function (req, res) {
+        let id = new ObjectId(req.params.id);
+        let user = req.session.user;
+        let filter = {_id: id};
         let shop = {
             user: req.session.user,
-            offerId: ObjectId(req.params._id)
+            offerId: id
         }
         let options = {};
-        offersRepository.findOffer(filter, options).then(offer => {
-            compruebaBuy(offer, req.session.user, function (result, errors, money) {
+        offersRepository.getOffers(filter, options).then(offer => {
+            compruebaBuy(offer, user, function (result, errors, money) {
                 if (result == false) {
                     offersRepository.buyOffer(shop, function (offerId) {
                         const rest = money - offer.price;
-                        offersRepository.updateOffer({seller: offer.seller}, { $set: { isBuy: true}}).then(offer => {
+                        offersRepository.updateOffer({_id: offerId}, { $set: { isBuy: true}}).then(offer => {
                             usersRepository.updateUser({email: req.session.user}, { $set: { money: rest}}).then(user => {
                                 if (offerId == null) {
                                     res.send("Error al realizar la compra");
@@ -161,28 +163,30 @@ module.exports = function (app, usersRepository, offersRepository) {
         let errors = new Array();
         let options = {};
         let filter = {
-            user: user
+            email: user
         }
+        let oferta = offer[0]
         let money;
         let isBought = false;
-        if (user == offer.seller) { // la oferta ha sido creada por el usuario
+        if (user == oferta.seller) { // la oferta ha sido creada por el usuario
             isBought = true;
             errors.push("ERROR: la oferta ha sido creada por el usuario")
         }
         usersRepository.findUser(filter, options).then(user => {
             money = user.money;
-            if (user != null && user.money < offer.price) { // no tenemos suficiente saldo para comprar la oferta
+            if (user != null && user.money < oferta.price) { // no tenemos suficiente saldo para comprar la oferta
                 isBought = true;
                 errors.push("ERROR: no tenemos suficiente saldo para comprar la oferta")
             }
+            offersRepository.getBuys({ $and: [ { seller: user}, { offerId: oferta._id} ]}, options).then(users => {
+                if (users.length > 0) { // la oferta ya ha sido comprada por un usuario
+                    isBought = true
+                    errors.push("ERROR: la oferta ya ha sido comprada por un usuario")
+                }
+                callback(isBought, errors, money);
+            })
         })
 
-        offersRepository.getBuys({ $and: [ { seller: user}, { offerId: offer._id} ]}, options).then(users => {
-            if (users.length > 0) { // la oferta ya ha sido comprada por un usuario
-                isBought = true
-                errors.push("ERROR: la oferta ya ha sido comprada por un usuario")
-            }
-            callback(isBought, errors, money);
-        })
+
     };
 }
