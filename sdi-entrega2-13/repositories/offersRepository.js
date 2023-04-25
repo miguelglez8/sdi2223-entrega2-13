@@ -6,6 +6,9 @@ module.exports = {
         this.mongoClient = mongoClient;
         this.app = app;
     },
+    /**
+     * Obtiene las ofertas
+     */
     getOffers: async function (filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -18,6 +21,9 @@ module.exports = {
             throw (error);
         }
     },
+    /**
+     * Obtiene las ofertas con paginación
+     */
     getOffersPg: async function (filter, options, page) {
         try {
             const limit = 5;
@@ -39,8 +45,8 @@ module.exports = {
             const client = await getConnection(this.mongoClient, this.app.get('connectionStrings'))
             const database = client.db("entrega2");
             const collectionName = 'offers';
-            const usersCollection = database.collection(collectionName);
-            const result = await usersCollection.insertOne(offer);
+            const offers = database.collection(collectionName);
+            const result = await offers.insertOne(offer);
             return result.insertedId;
         } catch (error) {
             throw (error);
@@ -59,6 +65,9 @@ module.exports = {
             throw error;
         }
     },
+    /**
+     * Borra los datos que había en buyOffers (colección)
+     */
     resetBuyOffers: async function () {
         try {
             const client = await getConnection(this.mongoClient,this.app.get('connectionStrings'))
@@ -71,6 +80,9 @@ module.exports = {
             throw error;
         }
     },
+    /**
+     * Actualiza la oferta
+     */
     updateOffer: async function (filter, options) {
         try {
             const client = await getConnection(this.mongoClient,this.app.get('connectionStrings'))
@@ -82,21 +94,24 @@ module.exports = {
             throw (error);
         }
     },
-    buyOffer: function (shop, callbackFunction) {
-        this.mongoClient.connect(this.app.get('connectionStrings'), function (err, dbClient) {
-            if (err) {
-                callbackFunction(null)
-            } else {
-                const database = dbClient.db("entrega2");
-                const collectionName = 'buys';
-                const buysCollection = database.collection(collectionName);
-                buysCollection.insertOne(shop)
-                    .then(result => callbackFunction(result.insertedId))
-                    .then(() => dbClient.close())
-                    .catch(err => callbackFunction({error: err.message}));
-            }
-        });
+    /**
+     * Compra la oferta (la añade a otra colección "buy")
+     */
+    buyOffer: async function (buy) {
+        try {
+            const client = await getConnection(this.mongoClient, this.app.get('connectionStrings'))
+            const database = client.db("entrega2");
+            const collectionName = 'buys';
+            const buysCollection = database.collection(collectionName);
+            const result = await buysCollection.insertOne(buy);
+            return result.insertedId;
+        } catch (error) {
+            throw (error);
+        }
     },
+    /**
+     * Obtiene las ofertas que han sido compradas
+     */
     getBuys: async function (filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -109,6 +124,9 @@ module.exports = {
             throw (error);
         }
     },
+    /**
+     * Obtiene las ofertas que han sido compradas con paginación
+     */
     getBuysPg: async function (filter, options, page) {
         try {
             const limit = 5;
