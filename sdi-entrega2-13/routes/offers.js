@@ -148,9 +148,10 @@ module.exports = function (app, usersRepository, offersRepository) {
     /**
      * Compra la oferta a través de la id
      */
-    app.get('/offers/buy/:id', function (req, res) {
+    app.get('/offers/buy/:id', async function (req, res) {
         let id = new ObjectId(req.params.id);
         let user = req.session.user;
+        let sesion = req.session
         let filter = {_id: id};
         let shop = {
             user: req.session.user,
@@ -158,89 +159,73 @@ module.exports = function (app, usersRepository, offersRepository) {
         }
         let options = {};
         // filtramos oferta por título
-        offersRepository.getOffers(filter, options).then(offer => {
-            if (offer==null) {
+        offersRepository.getOffers(filter, options).then(async offer => {
+            if (offer == null) {
                 res.send("No hay ninguna oferta");
             } else {
-                // comprobamos si es válida para comprar
-                compruebaBuy(offer, user, function (result, errors, money, offer) {
+                let canBuyResult = await compruebaBuy(offer, user);
+                if (canBuyResult.errors.length != 0) {
                     let response = {
-                        session: req.session,
-                        money: money,
-                        errors: errors
+                        session: sesion,
+                        money: 30,
+                        errors: canBuyResult.errors
                     }
-                    if (result == false) {
-                        // compramos la oferta
-                        offersRepository.buyOffer(shop).then(offerId => {
-                            const rest = money - offer.price;
-                            // actualizamos la oferta (el campo isBuy a true)
-                            offersRepository.updateOffer({_id: new ObjectId(req.params.id)}, { $set: { isBuy: true}}).then(offer => {
-                                if (offer == null) {
-                                    res.send("Error al actualizar la oferta");
-                                } else {
-                                    // actualizamos el saldo del usuario
-                                    usersRepository.updateUser({email: req.session.user}, { $set: { money: rest}}).then(user => {
-                                        if (user == null) {
-                                            res.send("Error al actualizar el usuario");
-                                        } else {
-                                            // volvemos a la vista de listar todas las ofertas
-                                            res.render("/offers/list", response);
-                                        }
-                                    }).catch(error => {
-                                        res.send("Se ha producido un error al actualizar el usuario en sesión: " + error)
-                                    });
-                                }
-                            }).catch(error => {
-                                res.send("Se ha producido un error al actualizar la oferta: " + error)
-                            });
+                    res.redirect("/offers/searchOffers?errors="+canBuyResult.errors,)
+                } else {
+                    offersRepository.buyOffer(shop).then(offerId => {
+                        const rest = user.money - offer.price;
+                        // actualizamos la oferta (el campo isBuy a true)
+                        offersRepository.updateOffer({_id: new ObjectId(req.params.id)}, {$set: {isBuy: true}}).then(offer => {
+                            if (offer == null) {
+                                res.send("Error al actualizar la oferta");
+                            } else {
+                                // actualizamos el saldo del usuario
+                                usersRepository.updateUser({email: req.session.user}, {$set: {money: rest}}).then(user => {
+                                    if (user == null) {
+                                        res.send("Error al actualizar el usuario");
+                                    } else {
+                                        // volvemos a la vista de listar todas las ofertas
+                                        res.redirect("/offers/searchOffers");
+                                    }
+                                }).catch(error => {
+                                    console.log("e ha producido un error al actualizar el usuario en ")
+                                    res.send("Se ha producido un error al actualizar el usuario en sesión: " + error)
+                                });
+                            }
                         }).catch(error => {
-                            res.send("Se ha producido un error al comprar: " + error)
+                            console.log("Se ha producido un error al actualizar la oferta:")
+                            res.send("Se ha producido un error al actualizar la oferta: " + error)
                         });
-                    }
-                }).catch(error => {
-                    res.send("Se ha producido un error al buscar si es válida la compra: " + error)
-                });
+                    }).catch(error => {
+                        res.send("Se ha producido un error al comprar: " + error)
+                    });
+                }
             }
-        }).catch(error => {
-            res.send("Se ha producido un error al buscar la oferta " + error)
+        }).catch(err => {
+            console.log(err)
+            res.send("Error al obtener la lista de ofertas " + err)
         });
     });
 
     /**
      * Devuelve false si no está comprada (válida) y true en otro caso
      */
-    function compruebaBuy(offer, user, callback) {
+    async function compruebaBuy(offer, user)
+    {
         let errors = new Array();
-        let options = {};
+        let oferta = offer[0];
+        if(user == oferta.seller)
+            errors.push("ERROR: la oferta ha sido creada por el usuario")
         let filter = {
             email: user
         }
-        let oferta = offer[0]
-        let money;
-        let isBought = false;
-        if (user == oferta.seller) { // la oferta ha sido creada por el usuario
-            isBought = true;
-            errors.push("ERROR: la oferta ha sido creada por el usuario")
-        }
-        usersRepository.findUser(filter, options).then(user => {
-            money = user.money;
-            if (user != null && user.money < oferta.price) { // no tenemos suficiente saldo para comprar la oferta
-                isBought = true;
-                errors.push("ERROR: no tenemos suficiente saldo para comprar la oferta")
-            }
-            offersRepository.getBuys({ $and: [ { seller: user}, { offerId: oferta._id} ]}, options).then(users => {
-                if (users.length > 0) { // la oferta ya ha sido comprada por un usuario
-                    isBought = true
-                    errors.push("ERROR: la oferta ya ha sido comprada por un usuario")
-                }
-                callback(isBought, errors, money, oferta);
-            }).catch(error => {
-                res.send("Se ha producido un error al obtener las compras: " + error)
-            });
-        }).catch(error => {
-            res.send("Se ha producido un buscar el usuario en sesión: " + error)
-        });
-
-
-    };
+        let userResponse = await usersRepository.findUser(filter, {})
+        if(userResponse == null){ return {errors: ["Ha ocurrido un error al obtener el usuario"]}}
+        if(userResponse.money < oferta.price)
+            errors.push("ERROR: no tenemos suficiente saldo para comprar la oferta")
+        let offersResponse = await offersRepository.getBuys({ $and: [ { seller: user}, { offerId: oferta._id} ]}, {});
+        if(offersResponse == null) {return {errors: ["Ha ocurrido un error al obtener las ofertas"]}}
+        if(offersResponse.length > 0) errors.push("ERROR: la oferta ya ha sido comprada por un usuario")
+        return {errors}
+    }
 }

@@ -16,9 +16,6 @@
     </div>
     <h1>Busca ofertas por título</h1>
     <div id="errors">
-        {% for error in errors %}
-            <li class="text-danger" text={{ error }}></li>
-        {% endfor %}
     </div>
     <div class="row">
         <table class="table table-hover" id="tableOffers">
@@ -69,4 +66,13 @@
             </script>
         </ul>
     </div>
+
+    <script>
+        let urlParams = new URLSearchParams(window.location.search)
+        let errors = urlParams.get("errors")
+        if(errors != null)
+            $("#errors").append(`<li>${errors}</li>`);
+    </script>
+
+
 {% endblock %}
