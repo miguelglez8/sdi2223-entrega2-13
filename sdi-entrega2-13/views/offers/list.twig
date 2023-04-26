@@ -38,9 +38,9 @@
                     <td>
                         {% if offer.isBuy==false %}
                             <a class="btn btn-primary pull-right"
-                               href="/offers/buy/{{ offer._id }}">Comprar</a>
+                               href="/offers/buy/{{ offer._id }}/{{ currentPage }}">Comprar</a>
                         {% else %}
-                            <p class="pull-right">Vendido</p>
+                            <a aria-colcount="red" class="pull-right">Vendido</a>
                         {% endif %}
                     </td>
 
@@ -70,8 +70,16 @@
     <script>
         let urlParams = new URLSearchParams(window.location.search)
         let errors = urlParams.get("errors")
+        let money = urlParams.get("money")
+        let page = urlParams.get("page")
         if(errors != null)
-            $("#errors").append(`<li>${errors}</li>`);
+            $("#errors").append(`<li class="text-danger">${errors}</li>`);
+        if(money != null) {
+            $("#money").clear();
+            $("#money").append(`<a>Money: ${money} €</a>`);
+        }
+        if(page != null)
+            $("#pi-" + "{{ page }}").addClass("active");
     </script>
 
 
