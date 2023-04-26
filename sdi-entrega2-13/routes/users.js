@@ -173,7 +173,8 @@ module.exports = function (app, usersRepository) {
             password: securePassword,
             name: req.body.email,
             surname: req.body.surname,
-            rol: "STANDARD"
+            rol: "STANDARD",
+            money: 100
         }
 
 
