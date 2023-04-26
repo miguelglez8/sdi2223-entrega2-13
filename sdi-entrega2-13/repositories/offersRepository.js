@@ -74,7 +74,7 @@ module.exports = {
             const database = client.db("entrega2");
             const collectionName = 'buys';
             const offersCollection = database.collection(collectionName);
-            await offersCollection.deleteMany();
+            await offersCollection.drop();
             return true;
         } catch(error){
             throw error;

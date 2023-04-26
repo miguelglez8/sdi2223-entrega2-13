@@ -88,7 +88,7 @@ module.exports = function (app, usersRepository, offersRepository) {
 
         await usersRepository.resetUsers(users);
         await offersRepository.resetOffers(offers);
-        await resetBuyOffers();
+        await offersRepository.resetBuyOffers();
 
         res.render("login.twig");
     });

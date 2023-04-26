@@ -72,9 +72,8 @@ module.exports = function (app, usersRepository, offersRepository) {
                     offers.push(buys.buys[i].offerId)
                 }
                 let filter = {"_id": {$in: offers}};
-                let options = {sort: {title: 1}};
                 // obtenemos las ofertas
-                offersRepository.getOffers(filter, options).then(offers => {
+                offersRepository.getOffers(filter, {}).then(offers => {
                     // buscamos el usuario en sesión
                     usersRepository.findUser({email: req.session.user}, options).then(user => {
                         let response = {
@@ -103,7 +102,6 @@ module.exports = function (app, usersRepository, offersRepository) {
      */
     app.get('/offers/searchOffers', function (req, res) {
         let filter = {};
-        let options = {sort: { title: 1}}
         // establecemos el filtro
         if(req.query.search != null && typeof(req.query.search) != "undefined" && req.query.search != ""){
             filter = {"title": {$regex: ".*" + req.query.search + ".*"}};
@@ -114,9 +112,9 @@ module.exports = function (app, usersRepository, offersRepository) {
             page = 1;
         }
         // buscamos las oferta con paginación
-        offersRepository.getOffersPg(filter, options, page).then(result => {
+        offersRepository.getOffersPg(filter, {}, page).then(result => {
             // buscamos el usuario
-            usersRepository.findUser({email: req.session.user}, options).then(user => {
+            usersRepository.findUser({email: req.session.user}, {}).then(user => {
                 let lastPage = result.total / 5;
                 if (result.total % 5 > 0) { // Sobran decimales
                     lastPage = lastPage + 1;
@@ -148,11 +146,12 @@ module.exports = function (app, usersRepository, offersRepository) {
     /**
      * Compra la oferta a través de la id
      */
-    app.get('/offers/buy/:id', async function (req, res) {
+    app.get('/offers/buy/:id/:page', async function (req, res) {
         let id = new ObjectId(req.params.id);
         let user = req.session.user;
         let sesion = req.session
         let filter = {_id: id};
+        let page = parseInt(req.params.page)
         let shop = {
             user: req.session.user,
             offerId: id
@@ -163,17 +162,13 @@ module.exports = function (app, usersRepository, offersRepository) {
             if (offer == null) {
                 res.send("No hay ninguna oferta");
             } else {
+                // comprueba si podemos comprar la oferta
                 let canBuyResult = await compruebaBuy(offer, user);
                 if (canBuyResult.errors.length != 0) {
-                    let response = {
-                        session: sesion,
-                        money: 30,
-                        errors: canBuyResult.errors
-                    }
-                    res.redirect("/offers/searchOffers?errors="+canBuyResult.errors,)
+                    res.redirect("/offers/searchOffers?errors="+canBuyResult.errors+"&page="+page)
                 } else {
                     offersRepository.buyOffer(shop).then(offerId => {
-                        const rest = user.money - offer.price;
+                        const rest = canBuyResult.price;
                         // actualizamos la oferta (el campo isBuy a true)
                         offersRepository.updateOffer({_id: new ObjectId(req.params.id)}, {$set: {isBuy: true}}).then(offer => {
                             if (offer == null) {
@@ -185,15 +180,13 @@ module.exports = function (app, usersRepository, offersRepository) {
                                         res.send("Error al actualizar el usuario");
                                     } else {
                                         // volvemos a la vista de listar todas las ofertas
-                                        res.redirect("/offers/searchOffers");
+                                        res.redirect("/offers/searchOffers?money="+canBuyResult.price+"&page="+page)
                                     }
                                 }).catch(error => {
-                                    console.log("e ha producido un error al actualizar el usuario en ")
                                     res.send("Se ha producido un error al actualizar el usuario en sesión: " + error)
                                 });
                             }
                         }).catch(error => {
-                            console.log("Se ha producido un error al actualizar la oferta:")
                             res.send("Se ha producido un error al actualizar la oferta: " + error)
                         });
                     }).catch(error => {
@@ -202,7 +195,6 @@ module.exports = function (app, usersRepository, offersRepository) {
                 }
             }
         }).catch(err => {
-            console.log(err)
             res.send("Error al obtener la lista de ofertas " + err)
         });
     });
@@ -215,17 +207,22 @@ module.exports = function (app, usersRepository, offersRepository) {
         let errors = new Array();
         let oferta = offer[0];
         if(user == oferta.seller)
-            errors.push("ERROR: la oferta ha sido creada por el usuario")
+            // error: no puedes comprar tu oferta
+            errors.push("[Titulo="+oferta.title+"]" + " ERROR: la oferta ha sido creada por el usuario")
         let filter = {
             email: user
         }
         let userResponse = await usersRepository.findUser(filter, {})
         if(userResponse == null){ return {errors: ["Ha ocurrido un error al obtener el usuario"]}}
         if(userResponse.money < oferta.price)
-            errors.push("ERROR: no tenemos suficiente saldo para comprar la oferta")
-        let offersResponse = await offersRepository.getBuys({ $and: [ { seller: user}, { offerId: oferta._id} ]}, {});
+            // error: no tienes suficiente dinero
+            errors.push("[Titulo="+oferta.title+"]" + " ERROR: no tienes suficiente saldo para comprar la oferta")
+        let offersResponse = await offersRepository.getBuys({ $and: [ { user: user}, { offerId: oferta._id} ]}, {});
         if(offersResponse == null) {return {errors: ["Ha ocurrido un error al obtener las ofertas"]}}
-        if(offersResponse.length > 0) errors.push("ERROR: la oferta ya ha sido comprada por un usuario")
-        return {errors}
+        // error: la oferta ya está comprada
+        if(offersResponse.length > 0) errors.push("[Titulo="+oferta.title+"]" + " ERROR: la oferta ya ha sido comprada por un usuario")
+        let price = userResponse.money - oferta.price;
+        // devolvemos los errores que haya y el precio que le queda al usuario
+        return {errors, price}
     }
 }
