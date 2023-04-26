@@ -5,10 +5,10 @@ module.exports = function (app, usersRepository, offersRepository) {
      *
      */
     app.get('/offers/myoffers', function (req, res) {
-        let filter = {author : req.session.user};
+        let filter = {seller : req.session.user};
         let options = {};
-        offersRepository.getOffers(filter, options).then(offers => {
-            res.render("offers/myoffers.twig", {offers: offers});
+        offersRepository.getOffersPg(filter, options).then(offers => {
+            res.render("offers/myoffers.twig", {offers: offers.offers});
         }).catch(error => {
             res.send("Se ha producido un error al listar las publicaciones del usuario:" + error)
         });
