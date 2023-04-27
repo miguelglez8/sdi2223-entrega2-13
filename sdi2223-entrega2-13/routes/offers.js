@@ -53,48 +53,47 @@ module.exports = function (app, usersRepository, offersRepository) {
         let page = parseInt(req.query.page); // Es String !!!
         if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") { // Puede no venir el param
             page = 1;
-
-            // buscamos las ofertas por paginación
-            offersRepository.getBuysPg(filter, options, page).then(buys => {
-                let lastPage = buys.total / 5;
-                if (buys.total % 5 > 0) { // Sobran decimales
-                    lastPage = lastPage + 1;
+        }
+        // buscamos las ofertas por paginación
+        offersRepository.getBuysPg(filter, options, page).then(buys => {
+            let lastPage = buys.total / 5;
+            if (buys.total % 5 > 0) { // Sobran decimales
+                lastPage = lastPage + 1;
+            }
+            let pages = []; // paginas mostrar
+            for (let i = page - 2; i <= page + 2; i++) {
+                if (i > 0 && i <= lastPage) {
+                    pages.push(i);
                 }
-                let pages = []; // paginas mostrar
-                for (let i = page - 2; i <= page + 2; i++) {
-                    if (i > 0 && i <= lastPage) {
-                        pages.push(i);
+            }
+            // sacamos las ids de las ofertas
+            let offers = [];
+            for (let i = 0; i < buys.buys.length; i++) {
+                offers.push(buys.buys[i].offerId)
+            }
+            let filter = {"_id": {$in: offers}};
+            // obtenemos las ofertas
+            offersRepository.getOffers(filter, {}).then(offers => {
+                // buscamos el usuario en sesión
+                usersRepository.findUser({email: req.session.user}, options).then(user => {
+                    let response = {
+                        offers: offers,
+                        pages: pages,
+                        currentPage: page,
+                        session: req.session,
+                        money: user.money
                     }
-                }
-                // sacamos las ids de las ofertas
-                let offers = [];
-                for (let i = 0; i < buys.buys.length; i++) {
-                    offers.push(buys.buys[i].offerId)
-                }
-                let filter = {"_id": {$in: offers}};
-                // obtenemos las ofertas
-                offersRepository.getOffers(filter, {}).then(offers => {
-                    // buscamos el usuario en sesión
-                    usersRepository.findUser({email: req.session.user}, options).then(user => {
-                        let response = {
-                            offers: offers,
-                            pages: pages,
-                            currentPage: page,
-                            session: req.session,
-                            money: user.money
-                        }
-                        // volvemos a la vista de ofertas compradas
-                        res.render("offers/buy.twig", response);
-                    }).catch(error => {
-                        res.send("Se ha producido un error al encontrar el usuario en sesión: " + error)
-                    });
+                    // volvemos a la vista de ofertas compradas
+                    res.render("offers/buy.twig", response);
                 }).catch(error => {
-                    res.send("Se ha producido un error al listar las ofertas del usuario: " + error)
+                    res.send("Se ha producido un error al encontrar el usuario en sesión: " + error)
                 });
             }).catch(error => {
-                res.send("Se ha producido un error al listar las compras del usuario:" + error)
+                res.send("Se ha producido un error al listar las ofertas del usuario: " + error)
             });
-        }
+        }).catch(error => {
+            res.send("Se ha producido un error al listar las compras del usuario:" + error)
+        });
     })
 
     /**
@@ -115,16 +114,35 @@ module.exports = function (app, usersRepository, offersRepository) {
         offersRepository.getOffersPg(filter, {}, page).then(result => {
             // buscamos el usuario
             usersRepository.findUser({email: req.session.user}, {}).then(user => {
-                let lastPage = result.total / 5;
-                if (result.total % 5 > 0) { // Sobran decimales
-                    lastPage = lastPage + 1;
-                }
                 let pages = []; // paginas mostrar
-                for (let i = page - 2; i <= page + 2; i++) {
-                    if (i > 0 && i <= lastPage) {
-                        pages.push(i);
+
+                let lastPage
+                if (!req.query.search) {
+                    lastPage = result.total / 5;
+                    if (result.total % 5 > 0) { // Sobran decimales
+                        lastPage = lastPage + 1;
+                    }
+                } else {
+                    lastPage = result.offers.length/ 5;
+                    if (result.offers.length % 5 > 0) { // Sobran decimales
+                        lastPage = lastPage + 1;
                     }
                 }
+
+                if (lastPage < 2) {
+                    for (let i = page - 1; i <= page + 1; i++) {
+                        if (i > 0 && i <= lastPage) {
+                            pages.push(i);
+                        }
+                    }
+                } else {
+                    for (let i = page - 2; i <= page + 2; i++) {
+                        if (i > 0 && i <= lastPage) {
+                            pages.push(i);
+                        }
+                    }
+                }
+
                 let response = {
                     offers: result.offers,
                     pages: pages,

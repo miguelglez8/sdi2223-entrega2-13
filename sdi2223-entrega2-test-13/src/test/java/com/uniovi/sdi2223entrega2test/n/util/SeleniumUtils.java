@@ -1,5 +1,6 @@
 package com.uniovi.sdi2223entrega2test.n.util;
 
+import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.openqa.selenium.By;
@@ -10,7 +11,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class SeleniumUtils {
 
-	
+
 	/**
 	 * Aborta si el "texto" no está presente en la página actual
 	 * @param driver: apuntando al navegador abierto actualmente.
@@ -41,8 +42,8 @@ public class SeleniumUtils {
 	 */
 	static public void waitTextIsNotPresentOnPage(WebDriver driver, String text, int timeout)
 	{
-		Boolean resultado = 
-				(new WebDriverWait(driver, timeout)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(text(),'" + text + "')]")));
+		Boolean resultado =
+				(new WebDriverWait(driver, Duration.ofMinutes(timeout))).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(text(),'" + text + "')]")));
 
 		Assertions.assertTrue(resultado);
 	}
@@ -58,17 +59,17 @@ public class SeleniumUtils {
 	static public List<WebElement> waitLoadElementsByXpath(WebDriver driver, String xpath, int timeout)
 	{
 		WebElement result =
-				(new WebDriverWait(driver, timeout)).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
+				(new WebDriverWait(driver, Duration.ofMinutes(timeout))).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
 		Assertions.assertNotNull(result);
 		return driver.findElements(By.xpath(xpath));
 	}
 
 	/**
-	 * Espera por la visibilidad de un elemento/s en la vista actualmente cargandose en driver. Para ello se empleará una consulta xpath 
+	 * Espera por la visibilidad de un elemento/s en la vista actualmente cargandose en driver. Para ello se empleará una consulta xpath
 	 * según varios criterios..
-	 * 
+	 *
 	 * @param driver: apuntando al navegador abierto actualmente.
-	 * @param criterio: "id" or "class" or "text" or "@attribute" or "free". Si el valor de criterio es free es una expresion xpath completa. 
+	 * @param criterio: "id" or "class" or "text" or "@attribute" or "free". Si el valor de criterio es free es una expresion xpath completa.
 	 * @param text: texto correspondiente al criterio.
 	 * @param timeout: el tiempo máximo que se esperará por la apareción del elemento a buscar con criterio/text.
 	 * @return Se retornará la lista de elementos resultantes de la búsqueda.
@@ -76,22 +77,16 @@ public class SeleniumUtils {
 	static public List<WebElement> waitLoadElementsBy(WebDriver driver, String criterio, String text, int timeout)
 	{
 		String searchCriterio;
-		switch (criterio) {
-			case "id":
-				searchCriterio = "//*[contains(@id,'" + text + "')]";
-				break;
-			case "class":
-				searchCriterio = "//*[contains(@class,'" + text + "')]";
-				break;
-			case "text":
-				searchCriterio = "//*[contains(text(),'" + text + "')]";
-				break;
-			case "free":
-				searchCriterio = text;
-				break;
-			default:
-				searchCriterio = "//*[contains(" + criterio + ",'" + text + "')]";
-				break;
+		if (criterio.equals("id")) {
+			searchCriterio = "//*[contains(@id,'" + text + "')]";
+		} else if (criterio.equals("class")) {
+			searchCriterio = "//*[contains(@class,'" + text + "')]";
+		} else if (criterio.equals("text")) {
+			searchCriterio = "//*[contains(text(),'" + text + "')]";
+		} else if (criterio.equals("free")) {
+			searchCriterio = text;
+		} else {
+			searchCriterio = "//*[contains(" + criterio + ",'" + text + "')]";
 		}
 
 		return waitLoadElementsByXpath(driver, searchCriterio, timeout);
@@ -100,7 +95,7 @@ public class SeleniumUtils {
 
 	/**
 	 * PROHIBIDO USARLO PARA VERSIÓN FINAL.
-	 * Esperar "segundos" durante la ejecucion del navegador 
+	 * Esperar "segundos" durante la ejecucion del navegador
 	 * @param driver: apuntando al navegador abierto actualmente.
 	 * @param seconds: Segundos de bloqueo de la ejecución en el navegador.
 	 */

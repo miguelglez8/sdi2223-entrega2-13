@@ -78,13 +78,12 @@ module.exports = function (app, usersRepository, offersRepository) {
             offers.push({
                 title: title + i,
                 detail: detail + i,
-                date: new Date().getDate().toLocaleString(),
+                date: new Date().toDateString(),
                 price: i,
                 seller: name + "@email.com",
                 isBuy: false
             });
         }
-
 
         await usersRepository.resetUsers(users);
         await offersRepository.resetOffers(offers);
