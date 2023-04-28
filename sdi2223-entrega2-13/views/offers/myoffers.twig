@@ -23,6 +23,8 @@
                     <td>{{ offer.detail }}</td>
                     <td>{{ offer.date }}</td>
                     <td>{{ offer.price }}</td>
+                    <td><a href="/offers/delete/{{ offer._id }}">Eliminar</a> <br>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -30,5 +32,21 @@
     </div>
     <div class="row text-right">
         <a href="/offers/add" class="btn btn-info" role="button">Agregar oferta</a>
+    </div>
+    <div class="row text-center">
+        <ul class="pagination">
+            {% for page in pages %}
+                <li class="page-item" id="pi-{{ page }}">
+                    {% if search %}
+                        <a class="page-link" href="/offers/myoffers?page={{ page }}&search={{ search }}">{{ page }}</a>
+                    {% else %}
+                        <a class="page-link" href="/offers/myoffers?page={{ page }}">{{ page }}</a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+            <script>
+                $("#pi-" + "{{ currentPage }}").addClass("active");
+            </script>
+        </ul>
     </div>
 {% endblock %}

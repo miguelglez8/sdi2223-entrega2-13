@@ -142,5 +142,20 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
+    },
+    /**
+     *
+     */
+    deleteOffer: async function (filter, options) {
+        try {
+            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+            const database = client.db("entrega2");
+            const collectionName = 'offers';
+            const songsCollection = database.collection(collectionName);
+            const result = await songsCollection.deleteOne(filter, options);
+            return result;
+        } catch (error) {
+            throw (error);
+        }
     }
 };
