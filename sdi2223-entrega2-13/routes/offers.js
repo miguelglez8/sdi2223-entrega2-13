@@ -5,12 +5,40 @@ module.exports = function (app, usersRepository, offersRepository) {
      *
      */
     app.get('/offers/myoffers', function (req, res) {
-        let filter = {seller : req.session.user};
+        let filter = {seller : req.session.user}
         let options = {};
-        offersRepository.getOffersPg(filter, options).then(offers => {
-            res.render("offers/myoffers.twig", {offers: offers.offers});
+        let page = parseInt(req.query.page);
+        if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") { // Puede no venir el param
+            page = 1;
+        }
+        // buscamos las ofertas por paginación
+        offersRepository.getOffersPg(filter, options, page).then(offers => {
+            let lastPage = offers.total / 5;
+            if (offers.total % 5 > 0) {
+                lastPage = lastPage + 1;
+            }
+            let pages = [];
+            for (let i = page - 2; i <= page + 2; i++) {
+                if (i > 0 && i <= lastPage) {
+                    pages.push(i);
+                }
+            }
+            // sacamos las ids de las ofertas
+            let result = [];
+            for (let i = 0; i < offers.offers.length; i++) {
+                result.push(offers.offers[i].offerId)
+            }
+            let response = {
+                offers: offers.offers,
+                pages: pages,
+                currentPage: page,
+                session: req.session,
+                money: req.session.user.money
+            }
+            // volvemos a la vista de ofertas compradas
+            res.render("offers/myoffers.twig", response);
         }).catch(error => {
-            res.send("Se ha producido un error al listar las publicaciones del usuario:" + error)
+            res.send("Se ha producido un error al listar las compras del usuario:" + error)
         });
     })
 
@@ -18,7 +46,11 @@ module.exports = function (app, usersRepository, offersRepository) {
      *
      */
     app.get('/offers/add', function (req, res) {
-        res.render("offers/add.twig");
+        let response = {
+            session: req.session,
+            money: req.session.user.money
+        }
+        res.render("offers/add.twig", response);
     });
 
     /**
@@ -37,11 +69,28 @@ module.exports = function (app, usersRepository, offersRepository) {
             if (offerId == null) {
                 res.send("Error al insertar la oferta");
             } else {
-                res.send("Agregada la oferta ID: " + offerId)
+                // res.send("Agregada la oferta ID: " + offerId)
+                res.redirect("/offers/myoffers")
             }
         });
 
     });
+
+    /**
+     *
+     */
+    app.get('/offers/delete/:id', function (req, res) {
+        let filter = {_id: new ObjectId(req.params.id)};
+        offersRepository.deleteOffer(filter, {}).then(result => {
+            if (result === null || result.deletedCount === 0) {
+                res.send("No se ha podido eliminar el registro");
+            } else {
+                res.redirect("/offers/myoffers");
+            }
+        }).catch(error => {
+            res.send("Se ha producido un error al intentar eliminar la canción: " + error)
+        });
+    })
 
     /**
      * Obtiene las ofertas que han sido compradas
