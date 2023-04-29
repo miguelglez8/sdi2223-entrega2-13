@@ -29,12 +29,15 @@
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-api</artifactId>
+            <artifactId>selenium-java</artifactId>
+            <scope>system</scope>
             <version>3.141.59</version>
+            <systemPath>${basedir}/sdi2223-entrega2-test-13/src/lib/selenium-server-standalone-3.141.59.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
+            <version>5.8.1</version>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>

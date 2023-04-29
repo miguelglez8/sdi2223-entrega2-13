@@ -19,7 +19,9 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
+            <scope>system</scope>
             <version>3.141.59</version>
+            <systemPath>${basedir}/src/lib/selenium-server-standalone-3.141.59.jar</systemPath>
         </dependency>
 
         <dependency>
