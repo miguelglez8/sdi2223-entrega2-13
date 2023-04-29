@@ -60,6 +60,8 @@ let usersRepository = require("./repositories/usersRepository.js");
 usersRepository.init(app, MongoClient);
 let offersRepository = require("./repositories/offersRepository.js");
 offersRepository.init(app, MongoClient);
+let messagesRepository = require("./repositories/messagesRepository.js");
+messagesRepository.init(app, MongoClient);
 
 /**
  * INDEX
@@ -76,6 +78,7 @@ app.use("/offers/myoffers",userSessionRouter);
 
 const userTokenRouter = require('./routes/userTokenRouter');
 app.use("/api/v1.0/offers/", userTokenRouter);
+app.use("/api/v1.0/offers/messages", userTokenRouter);
 
 
 /**
@@ -101,6 +104,7 @@ app.use('/', indexRouter);
  */
 require("./routes/api/offersAPIv1.0.js")(app, offersRepository);
 require("./routes/api/usersAPIv1.0.js")(app, offersRepository, usersRepository);
+require("./routes/api/conversationsAPIv1.0")(app, offersRepository, messagesRepository);
 
 
 /**

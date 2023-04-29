@@ -1,7 +1,9 @@
 const {ObjectId} = require("mongodb");
 module.exports = function (app, offersRepository) {
     app.get("/api/v1.0/offers", function (req, res) {
-        let filter = {};
+        let filter = {
+            seller: { $ne: res.user}
+        };
         let options = {};
         offersRepository.getOffers(filter, options).then(songs => {
             res.status(200);
@@ -34,5 +36,6 @@ module.exports = function (app, offersRepository) {
             res.json({error: "Se ha producido un error :" + e})
         }
     });
+
 }
 
