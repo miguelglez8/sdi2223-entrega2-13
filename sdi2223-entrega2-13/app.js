@@ -74,6 +74,8 @@ app.use("/offers/list",userSessionRouter);
 app.use("/offers/buy",userSessionRouter);
 app.use("/offers/myoffers",userSessionRouter);
 
+const userTokenRouter = require('./routes/userTokenRouter');
+app.use("/api/v1.0/offers/", userTokenRouter);
 
 
 /**
@@ -94,6 +96,11 @@ require("./routes/offers.js")(app, usersRepository, offersRepository);
 
 app.use('/', indexRouter);
 
+/*
+ * API Rest
+ */
+require("./routes/api/offersAPIv1.0.js")(app, offersRepository);
+require("./routes/api/usersAPIv1.0.js")(app, offersRepository, usersRepository);
 
 
 /**
