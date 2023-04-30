@@ -36,21 +36,6 @@ module.exports = {
             throw (error);
         }
     },
-    //insertMessage: function (message, callbackFunction) {
-    //    this.mongoClient.connect(this.app.get('connectionStrings'), function (err, dbClient) {
-    //        if (err) {
-    //            callbackFunction(null)
-    //        } else {
-    //            const database = dbClient.db("entrega2");
-    //            const collectionName = 'messages';
-    //            const messagesCollection = database.collection(collectionName);
-    //            messagesCollection.insertOne(message)
-    //                .then(result => callbackFunction(result.insertedId))
-    //                .then(() => dbClient.close())
-    //                .catch(err => callbackFunction({error: err.message}));
-    //        }
-    //    });
-    //}
     insertMessage: async function (message) {
         try {
             const client = await getConnection(this.mongoClient, this.app.get('connectionStrings'))

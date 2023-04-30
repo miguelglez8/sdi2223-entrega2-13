@@ -38,22 +38,18 @@ module.exports = function (app, offersRepository, messagesRepository) {
         }
     })
 
-    app.get("/api/v1.0/offers/messages", function (req, res) {
+    app.get("/api/v1.0/offers/messages/:id", function (req, res) {
         let filter = {
             $or: [ {seller: res.user}, {buyer: res.user} ],
-            offer: req.body.offer
+            offer: req.params.id
         };
         let options = {};
-        messagesRepository.getMessages(filter, options).then(songs => {
+        messagesRepository.getMessages(filter, options).then(messages => {
             res.status(200);
-            res.send({songs: songs})
+            res.send({messages: messages})
         }).catch(error => {
             res.status(500);
-            res.json({ error: "Se ha producido un error al recuperar las ofertas." })
+            res.json({ error: "Se ha producido un error al recuperar los mensajes." })
         });
     });
-
-    function validatorInsertMessage(message, callbackFunction) {
-        callbackFunction(null); // TODO
-    }
 }

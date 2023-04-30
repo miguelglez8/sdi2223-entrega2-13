@@ -104,7 +104,7 @@ app.use('/', indexRouter);
  */
 require("./routes/api/offersAPIv1.0.js")(app, offersRepository);
 require("./routes/api/usersAPIv1.0.js")(app, offersRepository, usersRepository);
-require("./routes/api/conversationsAPIv1.0")(app, offersRepository, messagesRepository);
+require("./routes/api/messagesAPIv1.0")(app, offersRepository, messagesRepository);
 
 
 /**
