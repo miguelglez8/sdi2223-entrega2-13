@@ -22,6 +22,21 @@ module.exports = {
         }
     },
     /**
+     * Obtiene una oferta dada una id
+     */
+    findOffer: async function (filter, options) {
+        try {
+            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+            const database = client.db("entrega2");
+            const collectionName = 'offers';
+            const songsCollection = database.collection(collectionName);
+            const offer = await songsCollection.findOne(filter, options);
+            return offer;
+        } catch (error) {
+            throw (error);
+        }
+    },
+    /**
      * Obtiene las ofertas con paginación
      */
     getOffersPg: async function (filter, options, page) {
