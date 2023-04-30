@@ -42,9 +42,22 @@
                         </div>
 
                     </li>
-                    <li id="myoffers"><a href="/offers/myoffers">Mis Ofertas</a></li>
-                    <li id="list"><a href="/offers/searchOffers">Busca ofertas</a></li>
-                    <li id="buy"><a href="/offers/buy">Ofertas compradas</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="usersDropdown"
+                            role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Offers</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" id="myoffers" href="/offers/myoffers">Mis Ofertas</a>
+                            <br>
+                            <a class="dropdown-item" id="addoffers" href="/offers/add">Añadir ofertas</a>
+                            <br>
+                            <a class="dropdown-item" id="list" href="/offers/searchOffers">Busca ofertas</a>
+                            <br>
+                            <a class="dropdown-item" id="buy" href="/offers/buy">Ofertas compradas</a>
+                        </div>
+                    </li>
+{#                    <li id="myoffers"><a href="/offers/myoffers">Mis Ofertas</a></li>#}
+{#                    <li id="list"><a href="/offers/searchOffers">Busca ofertas</a></li>#}
+{#                    <li id="buy"><a href="/offers/buy">Ofertas compradas</a></li>#}
                 </ul>
             {% endif %}
 
