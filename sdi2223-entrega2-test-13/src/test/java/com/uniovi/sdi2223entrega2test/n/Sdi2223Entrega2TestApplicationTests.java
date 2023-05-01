@@ -283,6 +283,28 @@ class Sdi2223Entrega2TestApplicationTests {
 
     // PARTE DE AJAX
 
+    /**
+     * PR51. Mostrar el listado de ofertas disponibles y comprobar que se muestran todas las que existen,
+     * menos las del usuario identificado
+     */
+    @Test
+    @Order(51)
+    public void PR51() {
+        final String RestAssuredURL = "http://localhost:8081/api/v1.0/users/login";
+        //2. Preparamos el parámetro en formato JSON
+        RequestSpecification request = RestAssured.given();
+        JSONObject requestParams = new JSONObject();
+        requestParams.put("email", "prueba1@prueba1.com");
+        requestParams.put("password", "prueba1");
+        request.header("Content-Type", "application/json");
+        request.body(requestParams.toJSONString());
+        //3. Hacemos la petición
+        Response response = request.post(RestAssuredURL);
+        //4. Comprobamos que el servicio ha tenido exito
+        Assertions.assertEquals(200, response.getStatusCode());
+        // comprobar las ofertas ...
+    }
+
     @Test
     @Order(50)
     public void PR50() {
