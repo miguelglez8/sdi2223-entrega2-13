@@ -32,4 +32,14 @@ public class PO_ListOfferView {
         return driver.findElement(By.name("title")).getText();
     }
 
+    public static void goToPage(WebDriver driver) {
+        //Vamos a offers.
+        WebElement link = driver.findElement(By.linkText("Offers"));
+        // Hacer clic en el enlace
+        link.click();
+        // vamos a list offers.
+        WebElement link2 = driver.findElement(By.linkText("Busca ofertas"));
+        // Hacer clic en el enlace
+        link2.click();
+    }
 }

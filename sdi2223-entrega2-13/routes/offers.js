@@ -96,7 +96,7 @@ module.exports = function (app, usersRepository, offersRepository) {
      * Obtiene las ofertas que han sido compradas
      */
     app.get('/offers/buy', function (req, res) {
-        let filter = {};
+        let filter = {user: req.session.user};
         let options = {};
         // establecemos la página
         let page = parseInt(req.query.page); // Es String !!!
