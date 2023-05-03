@@ -79,6 +79,7 @@ app.use("/offers/myoffers",userSessionRouter);
 const userTokenRouter = require('./routes/userTokenRouter');
 app.use("/api/v1.0/offers/", userTokenRouter);
 app.use("/api/v1.0/offers/messages", userTokenRouter);
+app.use("/api/v1.0/conversations", userTokenRouter);
 
 
 /**

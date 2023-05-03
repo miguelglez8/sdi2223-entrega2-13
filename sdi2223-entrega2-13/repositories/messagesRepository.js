@@ -47,5 +47,27 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
+    },
+    /**
+     * Obtiene los conversaciones
+     */
+    getConversations: async function (filter, options) {
+        try {
+            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+            const database = client.db("entrega2");
+            const collectionName = 'messages';
+            const messagesCollection = database.collection(collectionName).aggregate([
+                { $group: {
+                    _id: {
+                        buyer: "$buyer",
+                        seller: "$seller"
+                    }, messages: { $push: "$$ROOT" }
+                }}
+            ]);
+            const messages = messagesCollection.toArray()
+            return messages;
+        } catch (error) {
+            throw (error);
+        }
     }
 }
