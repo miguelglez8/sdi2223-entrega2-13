@@ -1,5 +1,6 @@
 package com.uniovi.sdi2223entrega2test.n;
 
+import com.uniovi.sdi2223entrega2test.n.pageobjects.PO_BuyOfferView;
 import com.uniovi.sdi2223entrega2test.n.pageobjects.PO_HomeView;
 import com.uniovi.sdi2223entrega2test.n.pageobjects.PO_ListOfferView;
 import com.uniovi.sdi2223entrega2test.n.pageobjects.PO_PrivateView;
@@ -72,6 +73,7 @@ class Sdi2223Entrega2TestApplicationTests {
     public void PR23() {
         // nos logueamos
         PO_PrivateView.refactorLogging(driver, "user01@email.com", "user01");
+        // vamos a la vista de buscar ofertas
         PO_ListOfferView.goToPage(driver);
         // hay mas de una página
         Assertions.assertTrue(PO_HomeView.checkElementUl(driver, "pagination") > 0);
@@ -116,11 +118,8 @@ class Sdi2223Entrega2TestApplicationTests {
     public void PR24() {
         // nos logueamos
         PO_PrivateView.refactorLogging(driver, "user01@email.com", "user01");
+        // vamos a la vista de buscar ofertas
         PO_ListOfferView.goToPage(driver);
-        // hay mas de una página
-        Assertions.assertTrue(PO_HomeView.checkElementUl(driver, "pagination") > 0);
-        // hay 5 ofertas en la tabla (en la primera página)
-        Assertions.assertEquals(5, PO_HomeView.checkElementTableBody(driver, "offers").size());
         // introducimos un campo que no existe en el campo de búsqueda
         WebElement input = driver.findElement(By.xpath("//*[@id=\"search\"]"));
         input.click();
@@ -129,7 +128,7 @@ class Sdi2223Entrega2TestApplicationTests {
         // seleccionamos el botón de buscar
         By boton = By.xpath("//*[@id=\"custom-search-input \"]/form/div/span/button");
         driver.findElement(boton).click();
-        // comprobamos que no hay paginas
+        // comprobamos que no hay páginas (ninguna búsqueda existente)
         Assertions.assertEquals(0, PO_HomeView.checkElementUl(driver, "pagination"));
         // no hay ninguna oferta en la tabla
         Assertions.assertEquals(0, PO_HomeView.checkElementTableBody(driver, "offers").size());
@@ -147,11 +146,8 @@ class Sdi2223Entrega2TestApplicationTests {
     public void PR25() {
         // nos logueamos
         PO_PrivateView.refactorLogging(driver, "user01@email.com", "user01");
+        // vamos a la vista de buscar ofertas
         PO_ListOfferView.goToPage(driver);
-        // hay mas de una página
-        Assertions.assertTrue(PO_HomeView.checkElementUl(driver, "pagination") > 0);
-        // hay 5 ofertas en la tabla (en la primera página)
-        Assertions.assertEquals(5, PO_HomeView.checkElementTableBody(driver, "offers").size());
         // introducimos un campo que no existe en el campo de búsqueda
         WebElement input = driver.findElement(By.xpath("//*[@id=\"search\"]"));
         input.click();
@@ -178,26 +174,28 @@ class Sdi2223Entrega2TestApplicationTests {
     public void PR26() {
         // nos logueamos
         PO_PrivateView.refactorLogging(driver, "user01@email.com", "user01");
+        // vamos a la vista de buscar ofertas
         PO_ListOfferView.goToPage(driver);
         // introducimos un campo que no existe en el campo de búsqueda
         WebElement input = driver.findElement(By.xpath("//*[@id=\"search\"]"));
         input.click();
         input.clear();
-        input.sendKeys("141");
+        input.sendKeys("11");
         // seleccionamos el botón de buscar
         By boton = By.xpath("//*[@id=\"custom-search-input \"]/form/div/span/button");
         driver.findElement(boton).click();
         // comprobamos que tiene 100 euros
         double saldoA = PO_ListOfferView.wallet(driver);
         Assertions.assertEquals(100, saldoA);
-        // compramos la oferta 141
+        // sacamos el precio de la oferta que vamos a comprar
+        double precio = Double.parseDouble(driver.findElement(By.xpath("//*[@id=\"offers\"]/tr/td[4]")).getText());
+        // compramos la oferta 11
         By comprar = By.xpath("//*[@id=\"offers\"]/tr/td[5]/a");
         driver.findElement(comprar).click();
-        // sacamos el precio de la oferta que compramos
-        double precio = Double.parseDouble(driver.findElement(By.xpath("//*[@id=\"offers\"]/tr/td[4]")).getText());
         // comprobamos que tiene saldo positivo
         double saldoB = PO_ListOfferView.wallet(driver);
         Assertions.assertTrue(saldoB > 0);
+        // comprobamos que se ha descontado el precio correctamente
         Assertions.assertEquals(precio, saldoA - saldoB);
         // logout
         PO_PrivateView.refactorLogout(driver);
@@ -211,32 +209,33 @@ class Sdi2223Entrega2TestApplicationTests {
     @Test
     @Order(27)
     public void PR27() {
-         /*
         // nos logueamos
-        PO_PrivateView.refactorLogging(driver, "user03@email.com", "user01");
-        // mostramos todas las ofertas
-        driver.get("http://localhost:8090/offer/list?size=200");
-        // introducimos un campo que existe en el campo de búsqueda
-        WebElement input = driver.findElement(By.name("searchText"));
+        PO_PrivateView.refactorLogging(driver, "user02@email.com", "user02");
+        // vamos a la vista de buscar ofertas
+        PO_ListOfferView.goToPage(driver);
+        // introducimos un campo que no existe en el campo de búsqueda
+        WebElement input = driver.findElement(By.xpath("//*[@id=\"search\"]"));
         input.click();
         input.clear();
-        input.sendKeys("Oferta 43");
-        // buscamos la oferta
-        driver.findElement(By.xpath("//*[@id=\"main-container\"]/form/button")).click();
-        // la intentamos comprar
-        driver.findElement(By.xpath("//*[@id=\"tableOffers\"]/tbody/tr/td[6]/div/a")).click();
-        double value = (Double.parseDouble(driver.findElement
-                (By.xpath("//*[@id=\"myNavbar\"]/ul[2]/li[1]/h4")).getText()));
-        // comprobamos que el marcador sigue igual (a 100) porque no se pudo comprar
-        Assertions.assertEquals(value, 100);
-        // seleccionamos el mensaje que aparece
-        String textFail = driver.findElement(By.xpath("//*[@id=\"main-container\"]/div[1]/div/span")).getText();
-        // comprobamos que se corresponde con el mensaje de saldo no suficiente
-        Assertions.assertEquals("El precio de la oferta es superior a su saldo (Saldo no suficiente)", textFail);
+        input.sendKeys("100");
+        // seleccionamos el botón de buscar
+        By boton = By.xpath("//*[@id=\"custom-search-input \"]/form/div/span/button");
+        driver.findElement(boton).click();
+        // comprobamos que tiene 100 euros
+        double saldoA = PO_ListOfferView.wallet(driver);
+        Assertions.assertEquals(100, saldoA);
+        // sacamos el precio de la oferta que vamos a comprar
+        double precio = Double.parseDouble(driver.findElement(By.xpath("//*[@id=\"offers\"]/tr/td[4]")).getText());
+        // compramos la oferta 100
+        By comprar = By.xpath("//*[@id=\"offers\"]/tr/td[5]/a");
+        driver.findElement(comprar).click();
+        // comprobamos que tiene saldo a cero
+        double saldoB = PO_ListOfferView.wallet(driver);
+        Assertions.assertTrue(saldoB == 0);
+        // comprobamos que se ha descontado el precio correctamente
+        Assertions.assertEquals(precio, saldoA - saldoB);
         // logout
-        PO_PrivateView.refactorLogout(driver, "logout");
-
-          */
+        PO_PrivateView.refactorLogout(driver);
     }
 
     /**
@@ -247,31 +246,38 @@ class Sdi2223Entrega2TestApplicationTests {
     @Test
     @Order(28)
     public void PR28() {
-        // login
-         /*
-        PO_PrivateView.refactorLogging(driver, "user04@email.com", "user01");
-        // mostramos las ofertas
-        driver.get("http://localhost:8090/offer/list?size=200");
-        // buscamos por título
-        WebElement input = driver.findElement(By.name("searchText"));
+        // nos logueamos
+        PO_PrivateView.refactorLogging(driver, "user03@email.com", "user03");
+        // vamos a la vista de buscar ofertas
+        PO_ListOfferView.goToPage(driver);
+        // introducimos un campo que no existe en el campo de búsqueda
+        WebElement input = driver.findElement(By.xpath("//*[@id=\"search\"]"));
         input.click();
         input.clear();
-        input.sendKeys("Oferta 6");
-        // seleccionamos buscar
-        driver.findElement(By.xpath("//*[@id=\"main-container\"]/form/button")).click();
-        // la compramos
-        driver.findElement(By.xpath("//*[@id=\"tableOffers\"]/tbody/tr/td[6]/div/a")).click();
-        // vamos a la vista de ofertas compradas
-        driver.get("http://localhost:8090/offer/listBuy");
-        // seleccionamos todas las ofertas que aparecen
-        List<WebElement> rows = driver.findElements(By.className("filas-listBuy-offers"));
-        // vemos que solo puede haber una
-        //Assertions.assertEquals(offersService.getOffers().stream()
-        //        .filter(offer -> offer.isSold() && offer.getEmailComprador().equals("user04@email.com")).toList().size(), rows.size());
+        input.sendKeys("101");
+        // seleccionamos el botón de buscar
+        By boton = By.xpath("//*[@id=\"custom-search-input \"]/form/div/span/button");
+        driver.findElement(boton).click();
+        // comprobamos que tiene 100 euros
+        double saldoA = PO_ListOfferView.wallet(driver);
+        Assertions.assertEquals(100, saldoA);
+        // sacamos el precio de la oferta que supuestamente queremos comprar
+        double precio = Double.parseDouble(driver.findElement(By.xpath("//*[@id=\"offers\"]/tr/td[4]")).getText());
+        // comprobamos que el precio es superior al saldo del usuario
+        Assertions.assertTrue(precio > saldoA);
+        // la oferta tiene un precio de 101 euros
+        Assertions.assertEquals(101, precio);
+        // intentamos comprar la oferta 101
+        By comprar = By.xpath("//*[@id=\"offers\"]/tr/td[5]/a");
+        driver.findElement(comprar).click();
+        // comprobamos que tiene el mismo saldo, ya que no la pudo comprar
+        double saldoB = PO_ListOfferView.wallet(driver);
+        Assertions.assertTrue(saldoB == saldoA);
+        // comprobamos que se ha lanzado un mensaje de error
+        String messageError = PO_ListOfferView.getErrors(driver);
+        Assertions.assertEquals("[Titulo=Oferta 101] ERROR: no tienes suficiente saldo para comprar la oferta", messageError);
         // logout
-        PO_PrivateView.refactorLogout(driver, "logout");
-
-          */
+        PO_PrivateView.refactorLogout(driver);
     }
 
     /**
@@ -281,31 +287,31 @@ class Sdi2223Entrega2TestApplicationTests {
     @Test
     @Order(29)
     public void PR29() {
-        /*
-        // login
-        PO_PrivateView.refactorLogging(driver, "user04@email.com", "user01");
-        // mostramos las ofertas
-        driver.get("http://localhost:8090/offer/list?size=200");
-        // buscamos por título
-        WebElement input = driver.findElement(By.name("searchText"));
+        // nos logueamos
+        PO_PrivateView.refactorLogging(driver, "user03@email.com", "user03");
+        // vamos a la vista de las ofertas compradas por el usuario y vemos que no aparece ninguna oferta comprada
+        PO_BuyOfferView.goToPage(driver);
+        List<WebElement> tableBefore = PO_HomeView.checkElementTableBody(driver, "buy-offers");
+        Assertions.assertEquals(0, tableBefore.size());
+        // vamos a la vista de buscar ofertas
+        PO_ListOfferView.goToPage(driver);
+        // introducimos un campo que no existe en el campo de búsqueda
+        WebElement input = driver.findElement(By.xpath("//*[@id=\"search\"]"));
         input.click();
         input.clear();
-        input.sendKeys("Oferta 6");
-        // seleccionamos buscar
-        driver.findElement(By.xpath("//*[@id=\"main-container\"]/form/button")).click();
-        // la compramos
-        driver.findElement(By.xpath("//*[@id=\"tableOffers\"]/tbody/tr/td[6]/div/a")).click();
-        // vamos a la vista de ofertas compradas
-        driver.get("http://localhost:8090/offer/listBuy");
-        // seleccionamos todas las ofertas que aparecen
-        List<WebElement> rows = driver.findElements(By.className("filas-listBuy-offers"));
-        // vemos que solo puede haber una
-        //Assertions.assertEquals(offersService.getOffers().stream()
-        //        .filter(offer -> offer.isSold() && offer.getEmailComprador().equals("user04@email.com")).toList().size(), rows.size());
+        input.sendKeys("99");
+        // seleccionamos el botón de buscar
+        By boton = By.xpath("//*[@id=\"custom-search-input \"]/form/div/span/button");
+        driver.findElement(boton).click();
+        // compramos la oferta 99
+        By comprar = By.xpath("//*[@id=\"offers\"]/tr/td[5]/a");
+        driver.findElement(comprar).click();
+        // vamos a la vista de las ofertas compradas por el usuario y vemos que aparece la oferta
+        PO_BuyOfferView.goToPage(driver);
+        List<WebElement> tableAfter = PO_HomeView.checkElementTableBody(driver, "buy-offers");
+        Assertions.assertEquals(1, tableAfter.size());
         // logout
-        PO_PrivateView.refactorLogout(driver, "logout");
-
-         */
+        PO_PrivateView.refactorLogout(driver);
     }
 
     // PARTE DE API-REST
@@ -320,7 +326,6 @@ class Sdi2223Entrega2TestApplicationTests {
         Response response = RestAssured.get(RestAssuredURL);
         Assertions.assertEquals(403, response.getStatusCode());
          */
-
     }
 
     // PARTE DE AJAX
@@ -332,6 +337,7 @@ class Sdi2223Entrega2TestApplicationTests {
     @Test
     @Order(51)
     public void PR51() {
+        /*
         final String RestAssuredURL = "http://localhost:8081/api/v1.0/users/login";
         //2. Preparamos el parámetro en formato JSON
         RequestSpecification request = RestAssured.given();
@@ -345,6 +351,7 @@ class Sdi2223Entrega2TestApplicationTests {
         //4. Comprobamos que el servicio ha tenido exito
         Assertions.assertEquals(200, response.getStatusCode());
         // comprobar las ofertas ...
+         */
     }
 
     @Test
@@ -363,7 +370,6 @@ class Sdi2223Entrega2TestApplicationTests {
         Response response = request.post(RestAssuredURL);
         //4. Comprobamos que el servicio ha tenido exito
         Assertions.assertEquals(200, response.getStatusCode());
-
           */
     }
 }

@@ -4,19 +4,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class PO_ListOfferView {
+import java.util.List;
 
-    public static void searchText(WebDriver driver, String text) {
-        // hacer
-        // PO_NavView.selectDropdownById(driver,"gestionOfertasMenu","gestionOfertasDropdow","listAllOfferMenu");
-        // Introducimos texto
-        WebElement element = driver.findElement(By.name("search"));
-        element.click();
-        element.clear();
-        element.sendKeys(text);
-        // Seleccionamos el botón buscar
-        driver.findElement(By.name("search")).click();
-    }
+public class PO_ListOfferView {
 
     public static void goToPage(WebDriver driver) {
         //Vamos a offers.
@@ -35,5 +25,13 @@ public class PO_ListOfferView {
         // cogemos el segundo campo del string que es el saldo del usuario
         double precio = Double.parseDouble(text.split(" ")[1]);
         return precio; // devolvemos el saldo
+    }
+
+    public static String getErrors(WebDriver driver) {
+        List<WebElement> liElements = driver.findElements(By.className("text-danger"));
+        for (WebElement liElement : liElements) {
+            return liElement.getText();
+        }
+        return "";
     }
 }
