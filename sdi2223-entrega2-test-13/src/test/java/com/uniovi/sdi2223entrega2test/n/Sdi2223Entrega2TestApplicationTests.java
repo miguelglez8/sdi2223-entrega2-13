@@ -176,29 +176,31 @@ class Sdi2223Entrega2TestApplicationTests {
     @Test
     @Order(26)
     public void PR26() {
-         /*
         // nos logueamos
-        PO_PrivateView.refactorLogging(driver, "user08@email.com", "user01");
-        // mostramos todas las ofertas
-        driver.get("http://localhost:8090/offer/list?size=200");
-        // introducimos un campo que existe en el campo de búsqueda
-        WebElement input = driver.findElement(By.name("searchText"));
+        PO_PrivateView.refactorLogging(driver, "user01@email.com", "user01");
+        PO_ListOfferView.goToPage(driver);
+        // introducimos un campo que no existe en el campo de búsqueda
+        WebElement input = driver.findElement(By.xpath("//*[@id=\"search\"]"));
         input.click();
         input.clear();
-        input.sendKeys("Oferta 2");
-        // buscamos la oferta
-        driver.findElement(By.xpath("//*[@id=\"main-container\"]/form/button")).click();
-        // la compramos
-        driver.findElement(By.xpath("//*[@id=\"tableOffers\"]/tbody/tr[2]/td[6]/div/a")).click();
-        double value = (Double.parseDouble(driver.findElement
-                (By.xpath("//*[@id=\"myNavbar\"]/ul[2]/li[1]/h4")).getText()));
-        // comprobamos que se descuenta correctamente el marcador (está a cero)
-        //Assertions.assertEquals(100 - offersService.getOffers().stream()
-        //        .filter(offer -> offer.isSold()).toList().get(0).getPrice(), value);
+        input.sendKeys("141");
+        // seleccionamos el botón de buscar
+        By boton = By.xpath("//*[@id=\"custom-search-input \"]/form/div/span/button");
+        driver.findElement(boton).click();
+        // comprobamos que tiene 100 euros
+        double saldoA = PO_ListOfferView.wallet(driver);
+        Assertions.assertEquals(100, saldoA);
+        // compramos la oferta 141
+        By comprar = By.xpath("//*[@id=\"offers\"]/tr/td[5]/a");
+        driver.findElement(comprar).click();
+        // sacamos el precio de la oferta que compramos
+        double precio = Double.parseDouble(driver.findElement(By.xpath("//*[@id=\"offers\"]/tr/td[4]")).getText());
+        // comprobamos que tiene saldo positivo
+        double saldoB = PO_ListOfferView.wallet(driver);
+        Assertions.assertTrue(saldoB > 0);
+        Assertions.assertEquals(precio, saldoA - saldoB);
         // logout
-        PO_PrivateView.refactorLogout(driver, "logout");
-
-          */
+        PO_PrivateView.refactorLogout(driver);
     }
 
     /**
