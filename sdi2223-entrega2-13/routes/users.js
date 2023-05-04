@@ -68,21 +68,38 @@ module.exports = function (app, usersRepository) {
         let filter = {};
         let options = {sort: {email: 1}};
 
-        usersRepository.getUsers(filter, options)
-            .then(result => {
+        //For pagination
+        let page = parseInt(req.query.page);
+        if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") {
+            page = 1;
+        }
 
+        usersRepository.getUsersPg(filter, options, page)
+            .then(result => {
+                let lastPage = Math.ceil(result.total / 5);
+                if (result.total % 5 > 0) { // Decimales
+                    lastPage = lastPage + 1;
+                }
+                let pages = [];
+                for (let i = page - 2; i <= page + 2; i++) {
+                    if (i > 0 && i <= lastPage) {
+                        pages.push(i);
+                    }
+                }
                 let response = {
                     users: result.users,
+                    pages: pages,
+                    currentPage: page,
                     session: req.session,
                     search: req.query.search
                 }
                 res.render("users/admin/list.twig", response);
             })
-            .catch( () => {
+            .catch(() => {
                 res.redirect("/" +
                     "?message=Ha ocurrido un error al listar los usuarios." +
-                    "&messageType=alert-danger ");}
-            );
+                    "&messageType=alert-danger ");
+            });
     });
 
     /**
@@ -142,7 +159,7 @@ module.exports = function (app, usersRepository) {
                     "&messageType=alert-danger ");
             } else {
                 req.session.user = user.email;
-                res.redirect("/users/list");
+                res.redirect("/offers/myoffers");
             }
         }).catch(() => {
             req.session.user = null;
