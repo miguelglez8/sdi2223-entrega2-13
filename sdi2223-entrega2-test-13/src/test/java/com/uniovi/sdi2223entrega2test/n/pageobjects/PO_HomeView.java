@@ -34,6 +34,12 @@ public class PO_HomeView extends PO_NavView {
         PO_HomeView.checkWelcomeToPage(driver, locale1);
     }
 
+    /**
+     * Devueve las páginas de la web
+     * @param driver
+     * @param criterio
+     * @return
+     */
     public static int checkElementUl(WebDriver driver, String criterio) {
         // Encontrar el ul por su selector
         WebElement ul = driver.findElement(By.className(criterio));
@@ -45,6 +51,12 @@ public class PO_HomeView extends PO_NavView {
         return elementos.size();
     }
 
+    /**
+     * Devuelve todos los elementos de la tabla de ofertas
+     * @param driver
+     * @param criterio
+     * @return
+     */
     public static List<WebElement> checkElementTableBody(WebDriver driver, String criterio) {
         WebElement tbody = driver.findElement(By.id(criterio));
 
