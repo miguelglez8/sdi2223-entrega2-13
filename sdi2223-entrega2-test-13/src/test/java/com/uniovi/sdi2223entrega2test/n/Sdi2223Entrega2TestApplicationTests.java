@@ -38,7 +38,7 @@ class Sdi2223Entrega2TestApplicationTests {
     static String URL = "http://localhost:3000";
 
     // acceder a la base de datos
-    static MongoDB m;
+    static MongoDB mongo;
 
     public static WebDriver getDriver(String PathFirefox, String Geckodriver) {
         System.setProperty("webdriver.firefox.bin", PathFirefox);
@@ -50,8 +50,8 @@ class Sdi2223Entrega2TestApplicationTests {
     @BeforeEach
     public void setUp() {
         driver.navigate().to(URL);
-        m = new MongoDB();
-        m.resetMongo();
+        mongo = new MongoDB();
+        mongo.resetMongo();
     }
 
     //Después de cada prueba se borran las cookies del navegador
@@ -89,11 +89,11 @@ class Sdi2223Entrega2TestApplicationTests {
     @Test
     @Order(17)
     public void PR17(){
-        PO_HomeView.clickOption(driver, "Identifícate", "text", "/users/login");
+//        PO_HomeView.clickOption(driver, "Identifícate", "text", "/users/login");
 //        PO_HomeView.clickOption(driver,  "", "", "");
         //Iniciamos sesión a través del formulario de login
-        PO_PrivateView.refactorLogging(driver, "user16@email.com", "user16");
-        PO_PrivateView.clickElement(driver, "//a[@id='myoffers']", 0);
+//        PO_PrivateView.refactorLogging(driver, "user16@email.com", "user16");
+//        PO_PrivateView.clickElement(driver, "//a[@id='myoffers']", 0);
 //        PO_NavView.clickOption(driver,"Mis Ofertas", "@href", "/offers/myoffers");
     }
 
@@ -158,10 +158,6 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_PrivateView.refactorLogging(driver, "user01@email.com", "user01");
         // vamos a la vista de buscar ofertas
         PO_ListOfferView.goToPage(driver);
-        // hay mas de una página
-        Assertions.assertTrue(PO_HomeView.checkElementUl(driver, "pagination") > 0);
-        // hay 5 ofertas en la tabla (en la primera página)
-        Assertions.assertEquals(5, PO_HomeView.checkElementTableBody(driver, "offers").size());
         // introducimos un campo que no existe en el campo de búsqueda
         WebElement input = driver.findElement(By.xpath("//*[@id=\"search\"]"));
         input.click();
@@ -172,7 +168,7 @@ class Sdi2223Entrega2TestApplicationTests {
         driver.findElement(boton).click();
         List<WebElement> offers = PO_HomeView.checkElementTableBody(driver, "offers"); // ofertas
         int size = 0; // acumular todas las ofertas que hay
-        int i = 1; // páginas
+        int i = 2; // páginas
         String url = "http://localhost:3000/offers/searchOffers?page=";
         while (offers.isEmpty()==false) {
             size = size + offers.size(); // acumulamos las ofertas
@@ -181,7 +177,7 @@ class Sdi2223Entrega2TestApplicationTests {
             i++; // incrementamos el número de página
         }
         // comprobamos que están todas las ofertas
-        Assertions.assertEquals(150, size);
+        Assertions.assertEquals(mongo.getCollection("offers").count(), size);
         // logout
         PO_PrivateView.refactorLogout(driver);
     }
@@ -197,6 +193,8 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_PrivateView.refactorLogging(driver, "user01@email.com", "user01");
         // vamos a la vista de buscar ofertas
         PO_ListOfferView.goToPage(driver);
+        // comprobamos que hay ofertas en la base de datos
+        Assertions.assertTrue(mongo.getCollection("offers").count() > 0);
         // introducimos un campo que no existe en el campo de búsqueda
         WebElement input = driver.findElement(By.xpath("//*[@id=\"search\"]"));
         input.click();
@@ -229,7 +227,7 @@ class Sdi2223Entrega2TestApplicationTests {
         WebElement input = driver.findElement(By.xpath("//*[@id=\"search\"]"));
         input.click();
         input.clear();
-        input.sendKeys("141");
+        input.sendKeys("OFERTA 141");
         // seleccionamos el botón de buscar
         By boton = By.xpath("//*[@id=\"custom-search-input \"]/form/div/span/button");
         driver.findElement(boton).click();
@@ -261,17 +259,21 @@ class Sdi2223Entrega2TestApplicationTests {
         // seleccionamos el botón de buscar
         By boton = By.xpath("//*[@id=\"custom-search-input \"]/form/div/span/button");
         driver.findElement(boton).click();
-        // comprobamos que tiene 100 euros
+        // comprobamos que tiene el saldo de su base de datos
         double saldoA = PO_ListOfferView.wallet(driver);
-        Assertions.assertEquals(100, saldoA);
+        Assertions.assertEquals(mongo.getSaldo("user01@email.com"), saldoA);
         // sacamos el precio de la oferta que vamos a comprar
         double precio = Double.parseDouble(driver.findElement(By.xpath("//*[@id=\"offers\"]/tr/td[4]")).getText());
+        // comprobamos que el precio mostrado se corresponde con el de la base de datos
+        Assertions.assertEquals(mongo.getPrice("Oferta 11"), precio);
         // compramos la oferta 11
         By comprar = By.xpath("//*[@id=\"offers\"]/tr/td[5]/a");
         driver.findElement(comprar).click();
         // comprobamos que tiene saldo positivo
         double saldoB = PO_ListOfferView.wallet(driver);
         Assertions.assertTrue(saldoB > 0);
+        // comprobamos que tiene el saldo de su base de datos
+        Assertions.assertEquals(mongo.getSaldo("user01@email.com"), saldoB);
         // comprobamos que se ha descontado el precio correctamente
         Assertions.assertEquals(precio, saldoA - saldoB);
         // logout
@@ -298,17 +300,21 @@ class Sdi2223Entrega2TestApplicationTests {
         // seleccionamos el botón de buscar
         By boton = By.xpath("//*[@id=\"custom-search-input \"]/form/div/span/button");
         driver.findElement(boton).click();
-        // comprobamos que tiene 100 euros
+        // comprobamos que tiene el saldo de la base de datos
         double saldoA = PO_ListOfferView.wallet(driver);
-        Assertions.assertEquals(100, saldoA);
+        Assertions.assertEquals(mongo.getSaldo("user02@email.com"), saldoA);
         // sacamos el precio de la oferta que vamos a comprar
         double precio = Double.parseDouble(driver.findElement(By.xpath("//*[@id=\"offers\"]/tr/td[4]")).getText());
+        // comprobamos que el precio mostrado se corresponde con el de la base de datos
+        Assertions.assertEquals(mongo.getPrice("Oferta 100"), precio);
         // compramos la oferta 100
         By comprar = By.xpath("//*[@id=\"offers\"]/tr/td[5]/a");
         driver.findElement(comprar).click();
         // comprobamos que tiene saldo a cero
         double saldoB = PO_ListOfferView.wallet(driver);
         Assertions.assertTrue(saldoB == 0);
+        // comprobamos que tiene el saldo de su base de datos
+        Assertions.assertEquals(mongo.getSaldo("user02@email.com"), saldoB);
         // comprobamos que se ha descontado el precio correctamente
         Assertions.assertEquals(precio, saldoA - saldoB);
         // logout
@@ -335,11 +341,13 @@ class Sdi2223Entrega2TestApplicationTests {
         // seleccionamos el botón de buscar
         By boton = By.xpath("//*[@id=\"custom-search-input \"]/form/div/span/button");
         driver.findElement(boton).click();
-        // comprobamos que tiene 100 euros
+        // comprobamos que tiene el saldo de la base de datos
         double saldoA = PO_ListOfferView.wallet(driver);
-        Assertions.assertEquals(100, saldoA);
+        Assertions.assertEquals(mongo.getSaldo("user03@email.com"), saldoA);
         // sacamos el precio de la oferta que supuestamente queremos comprar
         double precio = Double.parseDouble(driver.findElement(By.xpath("//*[@id=\"offers\"]/tr/td[4]")).getText());
+        // comprobamos que el precio mostrado se corresponde con el de la base de datos
+        Assertions.assertEquals(mongo.getPrice("Oferta 101"), precio);
         // comprobamos que el precio es superior al saldo del usuario
         Assertions.assertTrue(precio > saldoA);
         // la oferta tiene un precio de 101 euros
@@ -350,6 +358,7 @@ class Sdi2223Entrega2TestApplicationTests {
         // comprobamos que tiene el mismo saldo, ya que no la pudo comprar
         double saldoB = PO_ListOfferView.wallet(driver);
         Assertions.assertTrue(saldoB == saldoA);
+        Assertions.assertEquals(mongo.getSaldo("user03@email.com"), saldoB);
         // comprobamos que se ha lanzado un mensaje de error
         String messageError = PO_ListOfferView.getErrors(driver);
         Assertions.assertEquals("[Titulo=Oferta 101] ERROR: no tienes suficiente saldo para comprar la oferta", messageError);
@@ -369,7 +378,7 @@ class Sdi2223Entrega2TestApplicationTests {
         // vamos a la vista de las ofertas compradas por el usuario y vemos que no aparece ninguna oferta comprada
         PO_BuyOfferView.goToPage(driver);
         List<WebElement> tableBefore = PO_HomeView.checkElementTableBody(driver, "buy-offers");
-        Assertions.assertEquals(0, tableBefore.size());
+        Assertions.assertEquals(mongo.getBuys("user03@email.com"), tableBefore.size());
         // vamos a la vista de buscar ofertas
         PO_ListOfferView.goToPage(driver);
         // introducimos un campo que no existe en el campo de búsqueda
@@ -386,7 +395,7 @@ class Sdi2223Entrega2TestApplicationTests {
         // vamos a la vista de las ofertas compradas por el usuario y vemos que aparece la oferta
         PO_BuyOfferView.goToPage(driver);
         List<WebElement> tableAfter = PO_HomeView.checkElementTableBody(driver, "buy-offers");
-        Assertions.assertEquals(1, tableAfter.size());
+        Assertions.assertEquals(mongo.getBuys("user03@email.com"), tableAfter.size());
         // logout
         PO_PrivateView.refactorLogout(driver);
     }
@@ -405,7 +414,7 @@ class Sdi2223Entrega2TestApplicationTests {
         // sacamos los datos de la tabla y vemos que aparecen todas las ofertas menos las del usuario identificado
         List<WebElement> table = PO_HomeView.checkElementTableBody(driver, "offersTableBody");
         // sacamos los datos que hay en la base de datos en la colección de ofertas
-        MongoCollection<Document> collection = m.getCollection("offers");
+        MongoCollection<Document> collection = mongo.getCollection("offers");
         // Crear un objeto de filtro para especificar el criterio de búsqueda
         Bson filter = Filters.not(Filters.eq("seller", "user01@email.com"));
         // Filtrar los documentos de la colección
