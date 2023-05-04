@@ -33,15 +33,19 @@ module.exports = function (app, usersRepository) {
                         pages.push(i);
                     }
                 }
-
-                let response = {
-                    users: result.users,
-                    pages: pages,
-                    currentPage: page,
-                    session: req.session,
-                    search: req.query.search
-                }
-                res.render("users/list.twig", response);
+                usersRepository.findUser({email: req.session.user}, options).then(user => {
+                    let response = {
+                        users: result.users,
+                        pages: pages,
+                        currentPage: page,
+                        session: req.session,
+                        search: req.query.search,
+                        money: user.money
+                    }
+                    res.render("users/list.twig", response);
+                }).catch(error => {
+                    res.send("Se ha producido un error al encontrar el usuario en sesión: " + error)
+                });
             })
             .catch( () => {
                 res.redirect("/" +

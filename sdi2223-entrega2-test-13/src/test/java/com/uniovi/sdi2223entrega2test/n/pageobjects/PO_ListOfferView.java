@@ -8,6 +8,10 @@ import java.util.List;
 
 public class PO_ListOfferView {
 
+    /**
+     * Va a la página de listas de ofertas (para buscar)
+     * @param driver
+     */
     public static void goToPage(WebDriver driver) {
         //Vamos a offers.
         WebElement link = driver.findElement(By.linkText("Offers"));
@@ -19,6 +23,11 @@ public class PO_ListOfferView {
         link2.click();
     }
 
+    /**
+     * Devuelve la cartera del usuario
+     * @param driver
+     * @return
+     */
     public static double wallet(WebDriver driver) {
         // formato: Precio: 100 €
         String text = driver.findElement(By.xpath("//*[@id=\"money\"]/a")).getText(); // texto del enlace
@@ -27,6 +36,11 @@ public class PO_ListOfferView {
         return precio; // devolvemos el saldo
     }
 
+    /**
+     * Devuelve los errores al comprar ofertas
+     * @param driver
+     * @return
+     */
     public static String getErrors(WebDriver driver) {
         List<WebElement> liElements = driver.findElements(By.className("text-danger"));
         for (WebElement liElement : liElements) {
