@@ -4,6 +4,10 @@ import com.uniovi.sdi2223entrega2test.n.pageobjects.PO_BuyOfferView;
 import com.uniovi.sdi2223entrega2test.n.pageobjects.PO_HomeView;
 import com.uniovi.sdi2223entrega2test.n.pageobjects.PO_ListOfferView;
 import com.uniovi.sdi2223entrega2test.n.pageobjects.PO_PrivateView;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+import org.json.simple.JSONObject;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -19,8 +23,9 @@ class Sdi2223Entrega2TestApplicationTests {
     static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
 
     //Ton
-    // static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-    // static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
+   // static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+   // static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
+
 
     //static String Geckodriver = "C:\\Path\\geckodriver-v0.30.0-win64.exe";
     //static String PathFirefox = "/Applications/Firefox.app/Contents/MacOS/firefox-bin";
@@ -28,8 +33,6 @@ class Sdi2223Entrega2TestApplicationTests {
     //Común a Windows y a MACOSX
     static WebDriver driver = getDriver(PathFirefox, Geckodriver);
     static String URL = "http://localhost:3000";
-
-    // creamos una instancia de conexión a mongo
     public static WebDriver getDriver(String PathFirefox, String Geckodriver) {
         System.setProperty("webdriver.firefox.bin", PathFirefox);
         System.setProperty("webdriver.gecko.driver", Geckodriver);
@@ -40,7 +43,6 @@ class Sdi2223Entrega2TestApplicationTests {
     @BeforeEach
     public void setUp() {
         // driver.navigate().to(URL + "/initbd"); // recargar base de datos
-        // creamos una instancia de conexión
         driver.navigate().to(URL);
     }
 
@@ -58,7 +60,7 @@ class Sdi2223Entrega2TestApplicationTests {
     //Al finalizar la última prueba
     @AfterAll
     static public void end() {
-        //Cerramos el navegador al finalizar las pruebas
+    //Cerramos el navegador al finalizar las pruebas
         driver.quit();
     }
 
