@@ -1,9 +1,15 @@
 package com.uniovi.sdi2223entrega2test.n;
 
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.MongoCollection;
+import com.uniovi.sdi2223entrega2test.n.mongo.MongoDB;
 import com.uniovi.sdi2223entrega2test.n.pageobjects.*;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.json.simple.JSONObject;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
@@ -15,21 +21,25 @@ import java.util.List;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class Sdi2223Entrega2TestApplicationTests {
-    // Miguel (UO282337)
-//    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-//    static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
+    // Miguel
+    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
 
     //Ton
-    static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
-
+    // static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+    // static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
 
     //static String Geckodriver = "C:\\Path\\geckodriver-v0.30.0-win64.exe";
     //static String PathFirefox = "/Applications/Firefox.app/Contents/MacOS/firefox-bin";
     //static String Geckodriver = "/Users/USUARIO/selenium/geckodriver-v0.30.0-macos";
     //Común a Windows y a MACOSX
+
     static WebDriver driver = getDriver(PathFirefox, Geckodriver);
     static String URL = "http://localhost:3000";
+
+    // acceder a la base de datos
+    static MongoDB m;
+
     public static WebDriver getDriver(String PathFirefox, String Geckodriver) {
         System.setProperty("webdriver.firefox.bin", PathFirefox);
         System.setProperty("webdriver.gecko.driver", Geckodriver);
@@ -40,6 +50,8 @@ class Sdi2223Entrega2TestApplicationTests {
     @BeforeEach
     public void setUp() {
         driver.navigate().to(URL);
+        m = new MongoDB();
+        m.resetMongo();
     }
 
     //Después de cada prueba se borran las cookies del navegador
@@ -161,16 +173,10 @@ class Sdi2223Entrega2TestApplicationTests {
         List<WebElement> offers = PO_HomeView.checkElementTableBody(driver, "offers"); // ofertas
         int size = 0; // acumular todas las ofertas que hay
         int i = 1; // páginas
+        String url = "http://localhost:3000/offers/searchOffers?page=";
         while (offers.isEmpty()==false) {
-            try {
-                // existe la página
-                WebElement enlace = driver.findElement(By.linkText(i + ""));
-                enlace.click();
-            } catch (org.openqa.selenium.NoSuchElementException e) {
-                // no existen más páginas
-                break;
-            }
             size = size + offers.size(); // acumulamos las ofertas
+            driver.navigate().to(url + i);
             offers = PO_HomeView.checkElementTableBody(driver, "offers"); // buscamos otra vez las ofertas de la siguiente página
             i++; // incrementamos el número de página
         }
@@ -385,7 +391,31 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_PrivateView.refactorLogout(driver);
     }
 
-    // PARTE DE API-REST
+    /**
+     * PR51. Mostrar el listado de ofertas disponibles y comprobar que se muestran todas las que existen,
+     * menos las del usuario identificado
+     */
+    @Test
+    @Order(51)
+    public void PR51() {
+        // navegamos a la URL
+        driver.get("http://localhost:3000/apiclient/client.html?w=login");
+        // introducimos los datos en el login
+        PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user01");
+        // sacamos los datos de la tabla y vemos que aparecen todas las ofertas menos las del usuario identificado
+        List<WebElement> table = PO_HomeView.checkElementTableBody(driver, "offersTableBody");
+        // sacamos los datos que hay en la base de datos en la colección de ofertas
+        MongoCollection<Document> collection = m.getCollection("offers");
+        // Crear un objeto de filtro para especificar el criterio de búsqueda
+        Bson filter = Filters.not(Filters.eq("seller", "user01@email.com"));
+        // Filtrar los documentos de la colección
+        FindIterable<Document> cursor = collection.find(filter);
+        int size = 0;
+        for (Document document : cursor) { // vamos sumando el número de elementos que hay en la colección
+            size++;
+        }
+        Assertions.assertEquals(size, table.size()); // comprobamos que sea el mismo número
+    }
 
     /* Ejemplos de pruebas de llamada a una API-REST */
     /* ---- Probamos a obtener lista de canciones sin token ---- */
@@ -396,32 +426,6 @@ class Sdi2223Entrega2TestApplicationTests {
         final String RestAssuredURL = "http://localhost:8081/api/v1.0/songs";
         Response response = RestAssured.get(RestAssuredURL);
         Assertions.assertEquals(403, response.getStatusCode());
-         */
-    }
-
-    // PARTE DE AJAX
-
-    /**
-     * PR51. Mostrar el listado de ofertas disponibles y comprobar que se muestran todas las que existen,
-     * menos las del usuario identificado
-     */
-    @Test
-    @Order(51)
-    public void PR51() {
-        /*
-        final String RestAssuredURL = "http://localhost:8081/api/v1.0/users/login";
-        //2. Preparamos el parámetro en formato JSON
-        RequestSpecification request = RestAssured.given();
-        JSONObject requestParams = new JSONObject();
-        requestParams.put("email", "prueba1@prueba1.com");
-        requestParams.put("password", "prueba1");
-        request.header("Content-Type", "application/json");
-        request.body(requestParams.toJSONString());
-        //3. Hacemos la petición
-        Response response = request.post(RestAssuredURL);
-        //4. Comprobamos que el servicio ha tenido exito
-        Assertions.assertEquals(200, response.getStatusCode());
-        // comprobar las ofertas ...
          */
     }
 
