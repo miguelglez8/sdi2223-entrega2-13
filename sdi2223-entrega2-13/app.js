@@ -105,7 +105,18 @@ for(let i = 1; i <= 16; i++){
         password: app.get("crypto").createHmac('sha256', app.get('clave'))
             .update(name).digest('hex')
     });
+
 }
+
+users.push({
+    email: "admin" + "@email.com",
+    rol: "ADMIN",
+    name: "admin",
+    surname: "admin",
+    money: 100,
+    password: app.get("crypto").createHmac('sha256', app.get('clave'))
+        .update("admin").digest('hex')
+});
 
 fs.writeFileSync('../data/users.json', JSON.stringify(users));
 console.log('JSON users generado correctamente');
