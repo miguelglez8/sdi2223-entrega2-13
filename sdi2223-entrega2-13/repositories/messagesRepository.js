@@ -57,13 +57,15 @@ module.exports = {
             const database = client.db("entrega2");
             const collectionName = 'messages';
             const messagesCollection = database.collection(collectionName).aggregate([
+                { $match: filter},
                 { $group: {
                     _id: {
                         buyer: "$buyer",
-                        seller: "$seller"
+                        seller: "$seller",
+                        offer: "$offer"
                     }, messages: { $push: "$$ROOT" }
                 }}
-            ]);
+            ], options);
             const messages = messagesCollection.toArray()
             return messages;
         } catch (error) {
