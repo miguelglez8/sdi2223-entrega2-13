@@ -39,7 +39,6 @@ class Sdi2223Entrega2TestApplicationTests {
 
     @BeforeEach
     public void setUp() {
-        // driver.navigate().to(URL + "/initbd"); // recargar base de datos
         driver.navigate().to(URL);
     }
 

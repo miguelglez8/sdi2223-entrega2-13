@@ -67,34 +67,6 @@ module.exports = {
             throw (error);
         }
     },
-    resetOffers: async function (offers) {
-        try {
-            const client = await getConnection(this.mongoClient,this.app.get('connectionStrings'))
-            const database = client.db("entrega2");
-            const collectionName = 'offers';
-            const offersCollection = database.collection(collectionName);
-            await offersCollection.deleteMany();
-            await offersCollection.insertMany(offers);
-            return true;
-        } catch(error){
-            throw error;
-        }
-    },
-    /**
-     * Borra los datos que había en buyOffers (colección)
-     */
-    resetBuyOffers: async function () {
-        try {
-            const client = await getConnection(this.mongoClient,this.app.get('connectionStrings'))
-            const database = client.db("entrega2");
-            const collectionName = 'buys';
-            const offersCollection = database.collection(collectionName);
-            await offersCollection.drop();
-            return true;
-        } catch(error){
-            throw error;
-        }
-    },
     /**
      * Actualiza la oferta
      */
