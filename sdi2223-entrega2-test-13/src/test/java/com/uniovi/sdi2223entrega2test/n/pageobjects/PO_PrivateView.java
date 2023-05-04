@@ -28,14 +28,16 @@ public class PO_PrivateView extends PO_NavView {
 
     static public void refactorLogging(WebDriver driver, String email, String password) {
         //Vamos al formulario de logueo.
-        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        WebElement link = driver.findElement(By.linkText("Identifícate"));
+        // Hacer clic en el enlace
+        link.click();
         //Rellenamos el formulario
         PO_LoginView.fillLoginForm(driver, email, password);
     }
 
-    static public void refactorLogout(WebDriver driver, String text) {
-        String loginText = PO_HomeView.getP().getString("signup.message", PO_Properties.getSPANISH());
-        PO_PrivateView.clickOption(driver, text, "text", loginText);
+    static public void refactorLogout(WebDriver driver) {
+        WebElement link = driver.findElement(By.linkText("Cerrar sesión"));
+        link.click();
     }
 
     public static void clickElement(WebDriver driver, String s, int i) {
