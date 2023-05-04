@@ -84,10 +84,10 @@ app.use("/api/v1.0/conversations", userTokenRouter);
 async function loadUsersData() {
     try {
         const client = await MongoClient.connect(url);
-        const db = client.db("mydb");
+        const db = client.db("entrega2");
         const usersCollection = db.collection("users");
 
-        const rawData = fs.readFileSync('./data/users.json');
+        const rawData = fs.readFileSync("../data/users.json");
         const users = JSON.parse(rawData);
 
         await usersCollection.deleteMany({});
