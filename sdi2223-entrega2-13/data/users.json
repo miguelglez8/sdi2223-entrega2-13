@@ -1,0 +1,42 @@
+[
+  {
+    "email": "user01@mail.com",
+    "rol": "STANDARD",
+    "name": "user01",
+    "surname": "user01",
+    "money": 100,
+    "password": "19bca1bdebb41b43c8cf005d18eeae47ec522c7db06a8d9750b7dd06aa2f34c1"
+  },
+  {
+    "email": "user02@mail.com",
+    "rol": "STANDARD",
+    "name": "user02",
+    "surname": "user02",
+    "money": 100,
+    "password": "f01d6b3da6e5c7f5e9d4a4b4d2ef2cbb1d95b586d040fb08171a6ef929f43b5e"
+  },
+  {
+    "email": "user03@mail.com",
+    "rol": "STANDARD",
+    "name": "user03",
+    "surname": "user03",
+    "money": 100,
+    "password": "e1e3d3ce1535468207a178ac9dd9a3f3a62fcbdedf84eb8dcb8b7cf0bfde052e"
+  },
+  {
+    "email": "user04@mail.com",
+    "rol": "STANDARD",
+    "name": "user04",
+    "surname": "user04",
+    "money": 100,
+    "password": "2ed7dcaf8bde1b7f70ef585047a2e1b6fb92e40cbb3ce7d0dd05fbb6f1220a0b"
+  },
+  {
+    "email": "user05@mail.com",
+    "rol": "STANDARD",
+    "name": "user05",
+    "surname": "user05",
+    "money": 100,
+    "password": "c9dc2a8d853132da4653e3e296a358031f8bca37380b9e9d9d1c2a78a7dfe3af"
+  }
+]

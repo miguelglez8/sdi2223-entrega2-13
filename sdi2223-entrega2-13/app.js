@@ -1,7 +1,7 @@
 let createError = require('http-errors');
 let express = require('express');
 let path = require('path');
-
+const fs = require('fs');
 
 let app = express();
 
@@ -81,6 +81,24 @@ app.use("/api/v1.0/offers/", userTokenRouter);
 app.use("/api/v1.0/offers/messages", userTokenRouter);
 app.use("/api/v1.0/conversations", userTokenRouter);
 
+async function loadUsersData() {
+    try {
+        const client = await MongoClient.connect(url);
+        const db = client.db("mydb");
+        const usersCollection = db.collection("users");
+
+        const rawData = fs.readFileSync('./data/users.json');
+        const users = JSON.parse(rawData);
+
+        await usersCollection.deleteMany({});
+        await usersCollection.insertMany(users);
+
+        console.log(`Loaded ${users.length} users`);
+    } catch (err) {
+        console.error(`Failed to load users data: ${err}`);
+    }
+}
+
 
 /**
  * Motor de vistas twig
@@ -106,6 +124,12 @@ app.use('/', indexRouter);
 require("./routes/api/offersAPIv1.0.js")(app, offersRepository);
 require("./routes/api/usersAPIv1.0.js")(app, offersRepository, usersRepository);
 require("./routes/api/messagesAPIv1.0")(app, offersRepository, messagesRepository);
+
+/**
+ * Carga de usuarios
+ */
+loadUsersData();
+
 
 
 /**
