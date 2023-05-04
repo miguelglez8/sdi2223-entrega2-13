@@ -62,19 +62,23 @@ let offersRepository = require("./repositories/offersRepository.js");
 offersRepository.init(app, MongoClient);
 let messagesRepository = require("./repositories/messagesRepository.js");
 messagesRepository.init(app, MongoClient);
+let logRepository = require("./repositories/logRepository");
+logRepository.init(app, MongoClient);
 
 /**
  * INDEX
  */
 let indexRouter = require('./routes/index');
 let userSessionRouter = require('./routes/userSessionRouter');
+let logRouter = require("./routes/logRouter");
 
-app.use("/users/list", userSessionRouter);
+app.use("/users/list", userSessionRouter, logRouter);
 
 app.use("/offers/add",userSessionRouter);
 app.use("/offers/list",userSessionRouter);
 app.use("/offers/buy",userSessionRouter);
 app.use("/offers/myoffers",userSessionRouter);
+app.use("/offers/*", logRouter);
 
 const userTokenRouter = require('./routes/userTokenRouter');
 app.use("/api/v1.0/offers/", userTokenRouter);
