@@ -15,7 +15,7 @@ public class PO_LoginView extends PO_NavView {
 		password.click();
 		password.clear();
 		password.sendKeys(passwordp);
-		//Pulsar el boton de Alta.
+		//Pulsar el boton de login.
 		By boton = By.xpath("/html/body/div/form/div[3]/div/button");
 		driver.findElement(boton).click();	
 	}
