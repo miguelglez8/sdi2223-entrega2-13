@@ -121,7 +121,7 @@ users.push({
 fs.writeFileSync('../data/users.json', JSON.stringify(users));
 console.log('JSON users generado correctamente');
 
-for(let i=1; i<151; i++) {
+for(let i=1; i<161; i++) {
     if(i < 11)
         name = "user01"
     else if (i < 21)
@@ -152,6 +152,8 @@ for(let i=1; i<151; i++) {
         name = "user14"
     else if (i < 151)
         name = "user15"
+    else if (i < 161)
+        name = "user16"
 
     offers.push({
         title: title + i,

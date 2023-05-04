@@ -14,7 +14,7 @@ public class PO_BuyOfferView {
      */
     public static void goToPage(WebDriver driver) {
         //Vamos a offers.
-        WebElement link = driver.findElement(By.linkText("Offers"));
+        WebElement link = driver.findElement(By.linkText("Ofertas"));
         // Hacer clic en el enlace
         link.click();
         // vamos a list offers buy.
