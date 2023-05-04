@@ -16,6 +16,7 @@ module.exports = function (app, offersRepository, messagesRepository) {
                 res.json({errors: errors.array()})
             }
             else {
+                // Creamos el mensaje
                 let message = {
                     buyer: res.user,
                     seller: req.body.seller,
@@ -25,7 +26,14 @@ module.exports = function (app, offersRepository, messagesRepository) {
                     read: false
                 }
 
-                messagesRepository.insertMessage(message).then((messageId) => {
+                // Creamos la conversación
+                let conversation = {
+                    buyer: res.user,
+                    seller: req.body.seller,
+                    offer: req.body.offer
+                }
+
+                messagesRepository.insertMessage(message, conversation).then((messageId) => {
                     if (messageId === null) {
                         res.status(409);
                         res.json({error: "No se ha podido enviar el mensaje."});
@@ -79,4 +87,66 @@ module.exports = function (app, offersRepository, messagesRepository) {
         });
     });
 
+    /**
+     * S6: Dada la ID de una conversación, elimina dicha conversación junto a todos los mensajes relacionados a ella.
+     */
+    app.delete('/api/v1.0/conversations/:id', function (req, res) {
+        try {
+            let conversationId = new ObjectId(req.params.id)
+            let filter = {_id: conversationId, $or: [ {seller: res.user}, {buyer: res.user} ]}
+            messagesRepository.deleteConversation(filter, {}).then(result => {
+                if (result === null || result.deletedCount === 0) {
+                    res.status(404);
+                    res.json({error: "ID inválido o no existe. No se ha borrado el registro."});
+                } else {
+                    res.status(200);
+                    res.send(JSON.stringify(result));
+                }
+            }).catch(error => {
+                res.status(500);
+                res.json({error: "Se ha producido un error al eliminar la conversación."})
+            });
+        } catch (e) {
+            res.status(500);
+            res.json({error: "Se ha producido un error, revise que el ID sea válido."})
+        }
+    });
+
+    /**
+     * S7: Dada la ID de un mensaje, marca dicho mensaje como leído.
+     */
+    app.put('/api/v1.0/conversations/:id', function (req, res) {
+        try {
+            let messageId = new ObjectId(req.params.id);
+            let filter = {_id: messageId};
+            // Si la _id NO no existe, no crea un nuevo documento.
+            const options = {upsert: false};
+            let message = {
+                read: true
+            }
+            messagesRepository.updateMessage(message, filter, options).then(result => {
+                if (result === null) {
+                    res.status(404);
+                    res.json({error: "ID inválido o no existe, no se ha actualizado el mensaje."});
+                }
+                // La _id No existe o los datos enviados no difieren de los ya almacenados.
+                else if (result.modifiedCount == 0) {
+                    res.status(409);
+                    res.json({error: "No se ha modificado el mensaje."});
+                } else {
+                    res.status(200);
+                    res.json({
+                        message: "Mensaje actualizado a leído correctamente.",
+                        result: result
+                    })
+                }
+            }).catch(error => {
+                res.status(500);
+                res.json({error: "Se ha producido un error al modificar el mensaje."})
+            });
+        } catch (e) {
+            res.status(500);
+            res.json({error: "Se ha producido un error al intentar modificar el mensaje: " + e})
+        }
+    })
 }
