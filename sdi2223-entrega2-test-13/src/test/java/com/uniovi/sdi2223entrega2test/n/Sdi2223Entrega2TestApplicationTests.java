@@ -1,9 +1,6 @@
 package com.uniovi.sdi2223entrega2test.n;
 
-import com.uniovi.sdi2223entrega2test.n.pageobjects.PO_BuyOfferView;
-import com.uniovi.sdi2223entrega2test.n.pageobjects.PO_HomeView;
-import com.uniovi.sdi2223entrega2test.n.pageobjects.PO_ListOfferView;
-import com.uniovi.sdi2223entrega2test.n.pageobjects.PO_PrivateView;
+import com.uniovi.sdi2223entrega2test.n.pageobjects.*;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -19,12 +16,12 @@ import java.util.List;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class Sdi2223Entrega2TestApplicationTests {
     // Miguel (UO282337)
-    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
+//    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+//    static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
 
     //Ton
-   // static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-   // static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
+    static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+    static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
 
 
     //static String Geckodriver = "C:\\Path\\geckodriver-v0.30.0-win64.exe";
@@ -62,6 +59,81 @@ class Sdi2223Entrega2TestApplicationTests {
     static public void end() {
     //Cerramos el navegador al finalizar las pruebas
         driver.quit();
+    }
+
+    /**
+     * PR16. Ir al formulario de alta de oferta, rellenarla con datos válidos y pulsar el botón Submit.
+     * Comprobar que la oferta sale en el listado de ofertas de dicho usuario.
+     */
+    @Test
+    @Order(16)
+    public void PR16(){
+
+    }
+
+    /**
+     * PR17. Ir al formulario de alta de oferta, rellenarla con datos inválidos (campo título vacío y precio
+     * en negativo) y pulsar el botón Submit. Comprobar que se muestra el mensaje de campo inválido.
+     */
+    @Test
+    @Order(17)
+    public void PR17(){
+        PO_HomeView.clickOption(driver, "Identifícate", "text", "/users/login");
+//        PO_HomeView.clickOption(driver,  "", "", "");
+        //Iniciamos sesión a través del formulario de login
+        PO_PrivateView.refactorLogging(driver, "user16@email.com", "user16");
+        PO_PrivateView.clickElement(driver, "//a[@id='myoffers']", 0);
+//        PO_NavView.clickOption(driver,"Mis Ofertas", "@href", "/offers/myoffers");
+    }
+
+    /**
+     * PR18. Mostrar el listado de ofertas para dicho usuario y comprobar que se muestran todas las que
+     * existen para este usuario.
+     */
+    @Test
+    @Order(18)
+    public void PR18(){
+
+    }
+
+    /**
+     * PR19. Ir a la lista de ofertas, borrar la primera oferta de la lista, comprobar que la lista se actualiza
+     * y que la oferta desaparece.
+     */
+    @Test
+    @Order(19)
+    public void PR19(){
+
+    }
+
+    /**
+     * PR20. Ir a la lista de ofertas, borrar la última oferta de la lista, comprobar que la lista se actualiza
+     * y que la oferta desaparece.
+     */
+    @Test
+    @Order(20)
+    public void PR20(){
+
+    }
+
+    /**
+     * PR21. Ir a la lista de ofertas, borrar una oferta de otro usuario, comprobar que la oferta no se
+     * borra.
+     */
+    @Test
+    @Order(21)
+    public void PR21(){
+
+    }
+
+    /**
+     * PR22. Ir a la lista de ofertas, borrar una oferta propia que ha sido vendida, comprobar que la
+     * oferta no se borra.
+     */
+    @Test
+    @Order(22)
+    public void PR22(){
+
     }
 
     /**
