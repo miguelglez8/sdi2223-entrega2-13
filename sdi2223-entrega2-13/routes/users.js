@@ -169,6 +169,7 @@ module.exports = function (app, usersRepository) {
      * Registro de usuarios POST
      */
     app.post('/users/signup', async function (req, res) {
+        let birthdate = new Date(req.body.birthdate);
 
         let securePassword = app.get("crypto").createHmac('sha256', app.get('clave'))
             .update(req.body.password).digest('hex');
@@ -177,6 +178,7 @@ module.exports = function (app, usersRepository) {
             password: securePassword,
             name: req.body.email,
             surname: req.body.surname,
+            birthdate: birthdate,
             rol: "STANDARD",
             money: 100
         }
@@ -226,8 +228,23 @@ module.exports = function (app, usersRepository) {
         if (userFound != null) {
             errors.push("El email ya existe");
         }
+        //check that the birthdate format is correct
+        let birthdateRegex = /^(\d{2})-(\d{2})-(\d{4})$/;
+        if (!birthdateRegex.test(user.birthdate)) {
+            errors.push("La fecha de nacimiento no tiene un formato correcto. El formato debe ser DD-MM-YYYY");
+        } else {
+            //parse the birthdate string to a date object
+            let birthdate = new Date(user.birthdate.split("-").reverse().join("-"));
+            let today = new Date();
+            //compare the birthdate to today
+            if (birthdate > today) {
+                errors.push("La fecha de nacimiento no puede ser posterior a hoy");
+            }
+        }
+
         return errors;
     }
+
 
     app.get('/users/logout', function (req, res) {
         req.session.user = null;
