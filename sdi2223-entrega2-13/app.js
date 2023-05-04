@@ -1,9 +1,12 @@
 let createError = require('http-errors');
 let express = require('express');
 let path = require('path');
-
+const fs = require('fs');
 
 let app = express();
+
+
+
 
 /**
  * Control de acceso mas permisivo
@@ -81,8 +84,135 @@ app.use("/offers/myoffers",userSessionRouter);
 app.use("/offers/*", logRouter);
 
 const userTokenRouter = require('./routes/userTokenRouter');
+const {getConnection} = require("./repositories/db");
 app.use("/api/v1.0/offers/", userTokenRouter);
 app.use("/api/v1.0/offers/messages", userTokenRouter);
+app.use("/api/v1.0/conversations", userTokenRouter);
+
+/**
+ * Generacion de usuarios del 1 al 16 y ofertas de la 1 a la 150
+ * @type {*[]}
+ */
+let users = [];
+let offers = [];
+let title = "Oferta ";
+let detail = "Detalle ";
+
+for(let i = 1; i <= 16; i++){
+    let name = "user" + i.toString().padStart(2, '0');
+    users.push({
+        email: name + "@email.com",
+        rol: "STANDARD",
+        name: name,
+        surname: name,
+        money: 100,
+        password: app.get("crypto").createHmac('sha256', app.get('clave'))
+            .update(name).digest('hex')
+    });
+}
+
+fs.writeFileSync('../data/users.json', JSON.stringify(users));
+console.log('JSON users generado correctamente');
+
+for(let i=1; i<151; i++) {
+    if(i < 11)
+        name = "user01"
+    else if (i < 21)
+        name = "user02"
+    else if (i < 31)
+        name = "user03"
+    else if (i < 41)
+        name = "user04"
+    else if (i < 51)
+        name = "user05"
+    else if (i < 61)
+        name = "user06"
+    else if (i < 71)
+        name = "user07"
+    else if (i < 81)
+        name = "user08"
+    else if (i < 91)
+        name = "user09"
+    else if (i < 101)
+        name = "user10"
+    else if (i < 111)
+        name = "user11"
+    else if (i < 121)
+        name = "user12"
+    else if (i < 131)
+        name = "user13"
+    else if (i < 141)
+        name = "user14"
+    else if (i < 151)
+        name = "user15"
+
+    offers.push({
+        title: title + i,
+        detail: detail + i,
+        date: new Date().toDateString(),
+        price: i,
+        seller: name + "@email.com",
+        isBuy: false
+    });
+}
+
+fs.writeFileSync('../data/offers.json', JSON.stringify(offers));
+console.log('JSON offers generado correctamente');
+
+async function loadUsersData() {
+    try {
+        const client = await MongoClient.connect(url);
+        const db = client.db("entrega2");
+        const usersCollection = db.collection("users");
+
+        const rawData = fs.readFileSync("../data/users.json");
+        const users = JSON.parse(rawData);
+
+        await usersCollection.deleteMany({});
+        await usersCollection.insertMany(users);
+
+        console.log(`Loaded ${users.length} users`);
+    } catch (err) {
+        console.error(`Failed to load users data: ${err}`);
+    }
+}
+
+async function loadOffersData() {
+    try {
+        const client = await MongoClient.connect(url);
+        const db = client.db("entrega2");
+        const offersCollection = db.collection("offers");
+
+        const rawData = fs.readFileSync("../data/offers.json");
+        const offers = JSON.parse(rawData);
+
+        await offersCollection.deleteMany();
+        await offersCollection.insertMany(offers);
+
+        console.log(`Loaded ${offers.length} offers`);
+    } catch (err) {
+        console.error(`Failed to load offers data: ${err}`);
+    }
+}
+
+async function loadBuyData() {
+    try {
+        const client = await MongoClient.connect(url);
+        const db = client.db("entrega2");
+
+        const collections = await db.listCollections().toArray();
+        const buysExists = collections.some((collection) => collection.name === "buys");
+
+        if (buysExists) {
+            const buysCollection = db.collection("buys");
+            await buysCollection.drop();
+            console.log("Deleted 'buys' collection");
+        }
+
+    } catch (err) {
+        console.error(`Failed to delete buys: ${err}`);
+    }
+}
 
 
 /**
@@ -97,8 +227,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 require("./routes/users.js")(app, usersRepository);
 
-require("./routes/bd.js")(app, usersRepository, offersRepository);
-
 require("./routes/offers.js")(app, usersRepository, offersRepository);
 
 app.use('/', indexRouter);
@@ -110,6 +238,12 @@ require("./routes/api/offersAPIv1.0.js")(app, offersRepository);
 require("./routes/api/usersAPIv1.0.js")(app, offersRepository, usersRepository);
 require("./routes/api/messagesAPIv1.0")(app, offersRepository, messagesRepository);
 
+/**
+ * Carga de usuarios y ofertas
+ */
+loadUsersData(); // users
+loadOffersData(); // offers
+loadBuyData(); // buyOffers
 
 /**
  * Manejar errores 404

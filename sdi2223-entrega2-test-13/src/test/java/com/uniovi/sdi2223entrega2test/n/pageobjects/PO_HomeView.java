@@ -1,6 +1,7 @@
 package com.uniovi.sdi2223entrega2test.n.pageobjects;
 
 import com.uniovi.sdi2223entrega2test.n.util.SeleniumUtils;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -31,6 +32,39 @@ public class PO_HomeView extends PO_NavView {
         changeLanguage(driver, textLanguage1);
         //Esperamos a que se cargue el saludo de bienvenida en Español
         PO_HomeView.checkWelcomeToPage(driver, locale1);
+    }
+
+    /**
+     * Devueve las páginas de la web
+     * @param driver
+     * @param criterio
+     * @return
+     */
+    public static int checkElementUl(WebDriver driver, String criterio) {
+        // Encontrar el ul por su selector
+        WebElement ul = driver.findElement(By.className(criterio));
+
+        // Encontrar todos los elementos li dentro del ul
+        List<WebElement> elementos = ul.findElements(By.cssSelector("li"));
+
+        // devolver la lista de elementos
+        return elementos.size();
+    }
+
+    /**
+     * Devuelve todos los elementos de la tabla de ofertas
+     * @param driver
+     * @param criterio
+     * @return
+     */
+    public static List<WebElement> checkElementTableBody(WebDriver driver, String criterio) {
+        WebElement tbody = driver.findElement(By.id(criterio));
+
+        // Encontrar todos los elementos tr dentro del tbody
+        List<WebElement> elementos = tbody.findElements(By.tagName("tr"));
+
+        // devolver la lista de elementos
+        return elementos;
     }
 
 }

@@ -1,0 +1,52 @@
+<div id="widget-offers">
+  <button className="btn" onClick="loadOffers()">Actualizar</button>
+  <h1>Listado de ofertas</h1>
+  <table className="table table-hover">
+    <thead>
+    <tr>
+      <th>Título</th>
+      <th>Detalle</th>
+      <th>Precio</th>
+      <th>Fecha de publicación</th>
+      <th>Email del vendedor</th>
+      <th className="col-md-1"></th>
+    </tr>
+    </thead>
+    <tbody id="offersTableBody"></tbody>
+  </table>
+</div>
+<script>
+  window.history.pushState("", "", "/apiclient/client.html?w=offers");
+  function loadOffers() {
+    $.ajax({
+      url: URLbase + "/offers",
+      type: "GET",
+      data: {},
+      dataType: 'json',
+      headers: {"token": token},
+      success: function (response) {
+        offers = response.offers;
+        updateOffersTable(offers);
+      },
+      error: function (error) {
+        $("#main-container").load("widget-login.html");
+      }
+    });
+  }
+  function updateOffersTable(offers) {
+    $("#offersTableBody").empty(); // Vaciar la tabla
+    for (i = 0; i < offers.length; i++) {
+      $("#offersTableBody").append(
+              "<tr id=" + offers[i]._id + ">" +
+              "<td>" + offers[i].title + "</td>" +
+              "<td>" + offers[i].detail + "</td>" +
+              "<td>" + offers[i].price + "</td>" +
+              "<td>" + offers[i].date + "</td>" +
+              "<td>" + offers[i].seller + "</td>" +
+              "</tr>");
+      // Mucho cuidado con las comillas del eliminarCancion
+      //la id tiene que ir entre comillas ' '
+    }
+  }
+  loadOffers();
+</script>

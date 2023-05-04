@@ -4,32 +4,48 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+
 public class PO_ListOfferView {
 
-    public static void searchText(WebDriver driver, String text) {
-        // hacer
-        // PO_NavView.selectDropdownById(driver,"gestionOfertasMenu","gestionOfertasDropdow","listAllOfferMenu");
-        // Introducimos texto
-        WebElement element = driver.findElement(By.name("search"));
-        element.click();
-        element.clear();
-        element.sendKeys(text);
-        // Seleccionamos el botón buscar
-        driver.findElement(By.name("search")).click();
-    }
-    public static void buyOffer(WebDriver driver,String nameButton) {
-        // haceR
-        // PO_NavView.selectDropdownById(driver,"gestionOfertasMenu","gestionOfertasDropdow","listAllOfferMenu");
-        By boton = By.id(nameButton);
-        driver.findElement(boton).click();
+    /**
+     * Va a la página de listas de ofertas (para buscar)
+     * @param driver
+     */
+    public static void goToPage(WebDriver driver) {
+        //Vamos a offers.
+        WebElement link = driver.findElement(By.linkText("Offers"));
+        // Hacer clic en el enlace
+        link.click();
+        // vamos a list offers.
+        WebElement link2 = driver.findElement(By.linkText("Busca ofertas"));
+        // Hacer clic en el enlace
+        link2.click();
     }
 
-    public static String getMoney(WebDriver driver) {
-        return driver.findElement(By.id("wallet")).getText();
+    /**
+     * Devuelve la cartera del usuario
+     * @param driver
+     * @return
+     */
+    public static double wallet(WebDriver driver) {
+        // formato: Precio: 100 €
+        String text = driver.findElement(By.xpath("//*[@id=\"money\"]/a")).getText(); // texto del enlace
+        // cogemos el segundo campo del string que es el saldo del usuario
+        double precio = Double.parseDouble(text.split(" ")[1]);
+        return precio; // devolvemos el saldo
     }
 
-    public static String getTitleMessage(WebDriver driver) {
-        return driver.findElement(By.name("title")).getText();
+    /**
+     * Devuelve los errores al comprar ofertas
+     * @param driver
+     * @return
+     */
+    public static String getErrors(WebDriver driver) {
+        List<WebElement> liElements = driver.findElements(By.className("text-danger"));
+        for (WebElement liElement : liElements) {
+            return liElement.getText();
+        }
+        return "";
     }
-
 }
