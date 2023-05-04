@@ -36,13 +36,25 @@ module.exports = {
             throw (error);
         }
     },
-    insertMessage: async function (message) {
+    insertMessage: async function (message, conversation) {
         try {
             const client = await getConnection(this.mongoClient, this.app.get('connectionStrings'))
             const database = client.db("entrega2");
             const collectionName = 'messages';
+            const conversationsName = 'conversations';
             const messages = database.collection(collectionName);
+            const conversations = database.collection(conversationsName);
             const result = await messages.insertOne(message);
+            // Buscamos la conversación
+            const conversation = await conversations.find({
+                buyer: conversation.buyer,
+                seller: conversation.seller,
+                offer: conversation.offer
+            }, {}).toArray();
+            // Si lo retornado está vacío, significa que no existe. La insertamos.
+            if (conversation.isEmpty()) {
+                conversations.insertOne(conversation);
+            }
             return result.insertedId;
         } catch (error) {
             throw (error);
@@ -71,5 +83,17 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }
+    },
+    insertConversation: async function (conversation) {
+        try {
+            const client = await getConnection(this.mongoClient, this.app.get('connectionStrings'))
+            const database = client.db("entrega2");
+            const collectionName = 'conversations';
+            const conversations = database.collection(collectionName);
+            const result = await conversations.insertOne(conversation);
+            return result.insertedId;
+        } catch (error) {
+            throw (error);
+        }
+    },
 }
