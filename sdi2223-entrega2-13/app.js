@@ -5,6 +5,9 @@ const fs = require('fs');
 
 let app = express();
 
+
+
+
 /**
  * Control de acceso mas permisivo
  */
@@ -80,6 +83,29 @@ const userTokenRouter = require('./routes/userTokenRouter');
 app.use("/api/v1.0/offers/", userTokenRouter);
 app.use("/api/v1.0/offers/messages", userTokenRouter);
 app.use("/api/v1.0/conversations", userTokenRouter);
+
+/**
+ * Generacion de usuarios del 1 al 16
+ * @type {*[]}
+ */
+let users = [];
+
+for(let i = 1; i <= 16; i++){
+    let name = "user" + i.toString().padStart(2, '0');
+    users.push({
+        email: name + "@email.com",
+        rol: "STANDARD",
+        name: name,
+        surname: name,
+        money: 100,
+        password: app.get("crypto").createHmac('sha256', app.get('clave'))
+            .update(name).digest('hex')
+    });
+}
+
+fs.writeFileSync('../data/users.json', JSON.stringify(users));
+console.log('JSON generado correctamente');
+
 
 async function loadUsersData() {
     try {
