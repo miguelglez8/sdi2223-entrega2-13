@@ -28,15 +28,18 @@ module.exports = function (app, usersRepository, offersRepository) {
             for (let i = 0; i < offers.offers.length; i++) {
                 result.push(offers.offers[i].offerId)
             }
-            let response = {
-                offers: offers.offers,
-                pages: pages,
-                currentPage: page,
-                session: req.session,
-                money: req.session.user.money
-            }
+            usersRepository.findUser({email: req.session.user}, options).then(user => {
+                let response = {
+                    offers: offers.offers,
+                    pages: pages,
+                    currentPage: page,
+                    session: req.session,
+                    money: user.money
+                }
+                res.render("offers/myoffers.twig", response);
+            })
             // volvemos a la vista de ofertas compradas
-            res.render("offers/myoffers.twig", response);
+
         }).catch(error => {
             res.send("Se ha producido un error al listar las compras del usuario:" + error)
         });
@@ -46,11 +49,13 @@ module.exports = function (app, usersRepository, offersRepository) {
      *
      */
     app.get('/offers/add', function (req, res) {
-        let response = {
-            session: req.session,
-            money: req.session.user.money
-        }
-        res.render("offers/add.twig", response);
+        usersRepository.findUser({email: req.session.user}, {}).then(user => {
+            let response = {
+                session: req.session,
+                money: user.money
+            }
+            res.render("offers/add.twig", response);
+        })
     });
 
     /**
