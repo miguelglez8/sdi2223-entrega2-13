@@ -29,9 +29,10 @@ module.exports = function (app, offersRepository, messagesRepository) {
             else {
                 // Creamos el mensaje
                 let message = {
-                    buyer: res.user,
+                    buyer: req.body.buyer,
                     seller: req.body.seller,
                     offer: req.body.offer,
+                    author: res.user,
                     text: req.body.text,
                     date: Date.now(),
                     read: false
@@ -39,7 +40,7 @@ module.exports = function (app, offersRepository, messagesRepository) {
 
                 // Creamos la conversación
                 let conversation = {
-                    buyer: res.user,
+                    buyer: req.body.buyer,
                     seller: req.body.seller,
                     offer: req.body.offer
                 }

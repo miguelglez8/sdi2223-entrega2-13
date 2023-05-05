@@ -16,9 +16,11 @@ public class PO_RestApi extends PO_View {
         return loginResponse;
     }
 
-    public static Response sendMessage(String user, String offer, String text, RequestSpecification request, String MessagesURL) {
+    public static Response sendMessage(String buyer, String seller, String author, String offer, String text, RequestSpecification request, String MessagesURL) {
         JSONObject messageRequestParams = new JSONObject();
-        messageRequestParams.put("seller", user);
+        messageRequestParams.put("author", author);
+        messageRequestParams.put("buyer", buyer);
+        messageRequestParams.put("seller", seller);
         messageRequestParams.put("offer", offer);
         messageRequestParams.put("text", text);
         request.header("Content-Type", "application/json");

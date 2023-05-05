@@ -503,7 +503,9 @@ class Sdi2223Entrega2TestApplicationTests {
         final String MessagesURL = "http://localhost:3000/api/v1.0/offers/messages";
         // 5. Enviamos el siguiente mensaje:
         Response messagesResponse = PO_RestApi.sendMessage(
+                "user02@email.com",
                 "user03@email.com",
+                "user02@email.com",
                 "64552593aee4ec22206d2544",
                 "Esto es un mensaje de la prueba 42",
                 request, MessagesURL);
@@ -535,6 +537,8 @@ class Sdi2223Entrega2TestApplicationTests {
         // 5. Enviamos el siguiente mensaje:
         Response messagesResponse = PO_RestApi.sendMessage(
                 "user01@email.com",
+                "user01@email.com",
+                "user01@email.com",
                 "64555204ec3502ce2152468a",
                 "Esto es un mensaje de la prueba 43",
                 request, MessagesURL);
@@ -563,7 +567,9 @@ class Sdi2223Entrega2TestApplicationTests {
         // 4. Enviamos el siguiente mensaje:
         final String MessagesURL = "http://localhost:3000/api/v1.0/offers/messages";
         PO_RestApi.sendMessage(
+                "user02@email.com",
                 "user03@email.com",
+                "user02@email.com",
                 "64552593aee4ec22206d2544",
                 "Esto es un mensaje de la prueba 44",
                 request, MessagesURL);
@@ -592,7 +598,9 @@ class Sdi2223Entrega2TestApplicationTests {
         // 4. Enviamos el siguiente mensaje:
         final String MessagesURL = "http://localhost:3000/api/v1.0/offers/messages";
         PO_RestApi.sendMessage(
+                "user02@email.com",
                 "user04@email.com",
+                "user02@email.com",
                 "64555b1c70d8bf83b644cff9",
                 "Esto es un mensaje de la prueba 45",
                 request, MessagesURL);
@@ -649,9 +657,11 @@ class Sdi2223Entrega2TestApplicationTests {
         // 4. Añadimos un nuevo mensaje
         final String MessagesURL = "http://localhost:3000/api/v1.0/offers/messages";
         Response messagesResponse = PO_RestApi.sendMessage(
-                "user04@email.com",
-                "64555b1c70d8bf83b644cff9",
-                "Esto es un mensaje de la prueba 45",
+                "user02@email.com", // buyer
+                "user04@email.com", // seller
+                "user02@email.com", // author
+                "64555b1c70d8bf83b644cff9", // offer
+                "Esto es un mensaje de la prueba 45", // text
                 request, MessagesURL);
         String messageId = (String) messagesResponse.jsonPath().get("_id");
         // 5. Marcamos el mensaje como leido
