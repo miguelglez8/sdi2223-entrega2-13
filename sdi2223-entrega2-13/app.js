@@ -223,6 +223,34 @@ async function loadBuyData() {
     }
 }
 
+async function loadConversationData() {
+    try {
+        const client = await MongoClient.connect(url);
+        const db = client.db("entrega2");
+
+        const collections = await db.listCollections().toArray();
+        const conversationsExists = collections.some((collection) => collection.name === "conversations");
+
+        if (conversationsExists) {
+            const conversationCollection = db.collection("conversations");
+            await conversationCollection.drop();
+            console.log("Deleted 'conversations' collection");
+        }
+
+        const messagesExists = collections.some((collection) => collection.name === "messages");
+
+        if (messagesExists) {
+            const messagesCollection = db.collection("messages");
+            await messagesCollection.drop();
+            console.log("Deleted 'messages' collection");
+        }
+
+
+    } catch (err) {
+        console.error(`Failed to delete conversations or messages: ${err}`);
+    }
+}
+
 
 /**
  * Motor de vistas twig
@@ -253,6 +281,7 @@ require("./routes/api/messagesAPIv1.0")(app, offersRepository, messagesRepositor
 loadUsersData(); // users
 loadOffersData(); // offers
 loadBuyData(); // buyOffers
+loadConversationData();
 
 /**
  * Manejar errores 404

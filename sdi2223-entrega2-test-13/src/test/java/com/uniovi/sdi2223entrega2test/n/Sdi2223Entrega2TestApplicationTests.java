@@ -22,12 +22,16 @@ import java.util.List;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class Sdi2223Entrega2TestApplicationTests {
     // Miguel
-    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
+    // static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    // static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
 
-    //Ton
+    // Ton
     // static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
     // static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
+
+    // Alves
+    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     //static String Geckodriver = "C:\\Path\\geckodriver-v0.30.0-win64.exe";
     //static String PathFirefox = "/Applications/Firefox.app/Contents/MacOS/firefox-bin";
@@ -400,6 +404,266 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_PrivateView.refactorLogout(driver);
     }
 
+    // ###############################################################################################
+    // ######################################### PARTE 2 #############################################
+    // ###############################################################################################
+
+    /**
+     * PR38. Inicio de sesión con datos válidos
+     */
+    @Test
+    @Order(38)
+    public void PR38() {
+        // 1. Accedemos a la URL de login
+        final String RestAssuredURL = "http://localhost:3000/api/v1.0/users/login";
+        // 2. Preparamos el parámetro en formato JSON
+        RequestSpecification request = RestAssured.given();
+        Response loginResponse = PO_RestApi.login("user01@email.com", "user01", RestAssuredURL, request);
+        // 3. Hacemos la petición
+        Response response = request.post(RestAssuredURL);
+        // 4. Comprobamos que el servicio ha tenido exito
+        Assertions.assertEquals(200, response.getStatusCode());
+        Assertions.assertTrue(response.getBody().asString().contains("usuario autorizado"));
+    }
+
+    /**
+     * PR39. Inicio de sesión con datos inválidos (email existente, pero contraseña incorrecta).
+     */
+    @Test
+    @Order(39)
+    public void PR39() {
+        // 1. Accedemos a la URL de login
+        final String RestAssuredURL = "http://localhost:3000/api/v1.0/users/login";
+        // 2. Preparamos el parámetro en formato JSON
+        RequestSpecification request = RestAssured.given();
+        Response loginResponse = PO_RestApi.login("user01@email.com", "incorrecta", RestAssuredURL, request);
+        // 3. Hacemos la petición
+        Response response = request.post(RestAssuredURL);
+        // 4. Comprobamos que el servicio ha tenido un error por credenciales
+        Assertions.assertEquals(401, response.getStatusCode());
+        Assertions.assertTrue(response.getBody().asString().contains("usuario no autorizado"));
+    }
+
+    /**
+     * PR40. Inicio de sesión con datos inválidos (campo email o contraseña vacíos).
+     */
+    @Test
+    @Order(40)
+    public void PR40() {
+        // 1. Accedemos a la URL de login
+        final String RestAssuredURL = "http://localhost:3000/api/v1.0/users/login";
+        // 2. Preparamos el parámetro en formato JSON
+        RequestSpecification request = RestAssured.given();
+        Response loginResponse = PO_RestApi.login("", "incorrecta", RestAssuredURL, request);
+        // 3. Hacemos la petición
+        Response response = request.post(RestAssuredURL);
+        // 4. Comprobamos que el servicio ha tenido un error por credenciales
+        Assertions.assertEquals(401, response.getStatusCode());
+        Assertions.assertTrue(response.getBody().asString().contains("usuario no autorizado"));
+    }
+
+    /**
+     * PR41. Mostrar el listado de ofertas para el usuario registrado. Comprobar que se muestran toads las ofertas
+     * que existen para dicho usuario.
+     */
+    @Test
+    @Order(41)
+    public void PR41() {
+        // 1. Accedemos a la URL de login
+        final String LoginURL = "http://localhost:3000/api/v1.0/users/login";
+        // 2. Nos logueamos
+        RequestSpecification request = RestAssured.given();
+        Response loginResponse = PO_RestApi.login("user01@email.com", "user01", LoginURL, request);
+        // 3. Añadimos el token a la petición
+        request.header("token", loginResponse.jsonPath().get("token"));
+        // 4. Accedemos a la URL de listar ofertas
+        final String OffersURL = "http://localhost:3000/api/v1.0/offers";
+        // 5. Obtenemos las ofertas y verificamos el estado
+        Response offersResponse = request.get(OffersURL);
+        Assertions.assertEquals(200, offersResponse.getStatusCode());
+        // 6. Verificamos que no se muestran las ofertas del usuario
+        Assertions.assertFalse(offersResponse.getBody().asString().contains("user01@email.com"));
+    }
+
+    /**
+     * PR42. Enviar un mensaje a una oferta. Se debe comprobar que el servicio almacena correctamente el mensaje
+     * para dicha oferta.
+     */
+    @Test
+    @Order(42)
+    public void PR42() {
+        // 1. Accedemos a la URL de login
+        final String LoginURL = "http://localhost:3000/api/v1.0/users/login";
+        // 2. Nos logueamos como user02
+        RequestSpecification request = RestAssured.given();
+        Response loginResponse = PO_RestApi.login("user02@email.com", "user02", LoginURL, request);
+        // 3. Añadimos el token a la petición
+        request.header("token", loginResponse.jsonPath().get("token"));
+        // 4. Accedemos a la URL de enviar mensajes
+        final String MessagesURL = "http://localhost:3000/api/v1.0/offers/messages";
+        // 5. Enviamos el siguiente mensaje:
+        Response messagesResponse = PO_RestApi.sendMessage(
+                "user03@email.com",
+                "64552593aee4ec22206d2544",
+                "Esto es un mensaje de la prueba 42",
+                request, MessagesURL);
+        // 6. Verificamos el estado
+        Assertions.assertEquals(201, messagesResponse.getStatusCode());
+        Assertions.assertTrue(messagesResponse.getBody().asString().contains("Mensaje enviado correctamente"));
+        // 7. Comprobamos que el mensaje queda bien registrado
+        Response messageListResponse = request.get(MessagesURL + "/" + "64552593aee4ec22206d2544");
+        Assertions.assertEquals(200, messageListResponse.getStatusCode());
+        // 8. Verificamos que se obtiene el texto del mensaje añadido
+        Assertions.assertTrue(messageListResponse.getBody().asString().contains("Esto es un mensaje de la prueba 42"));
+    }
+
+    /**
+     * PR43. Enviar un mensaje a una oferta propia. Comprobar que el mensaje no se almacena.
+     */
+    @Test
+    @Order(43)
+    public void PR43() {
+        // 1. Accedemos a la URL de login
+        final String LoginURL = "http://localhost:3000/api/v1.0/users/login";
+        // 2. Nos logueamos como user01
+        RequestSpecification request = RestAssured.given();
+        Response loginResponse = PO_RestApi.login("user01@email.com", "user01", LoginURL, request);
+        // 3. Añadimos el token a la petición
+        request.header("token", loginResponse.jsonPath().get("token"));
+        // 4. Accedemos a la URL de enviar mensajes
+        final String MessagesURL = "http://localhost:3000/api/v1.0/offers/messages";
+        // 5. Enviamos el siguiente mensaje:
+        Response messagesResponse = PO_RestApi.sendMessage(
+                "user01@email.com",
+                "64555204ec3502ce2152468a",
+                "Esto es un mensaje de la prueba 43",
+                request, MessagesURL);
+        // 6. Verificamos el estado
+        Assertions.assertEquals(422, messagesResponse.getStatusCode());
+        Assertions.assertTrue(messagesResponse.getBody().asString().contains("El vendedor debe ser distinto del comprador"));
+        // 7. Comprobamos que el mensaje no queda registrado
+        Response messageListResponse = request.get(MessagesURL + "/" + "64555204ec3502ce2152468a");
+        Assertions.assertTrue(!messageListResponse.getBody().asString().contains("Esto es un mensaje de la prueba 43"));
+    }
+
+    /**
+     * PR44. Obtener los mensajes de una conversación. Se debe comprobar que el servicio retorna el número correcto de
+     * mensajes para una conversación de id conocido.
+     */
+    @Test
+    @Order(44)
+    public void PR44() {
+        // 1. Accedemos a la URL de login
+        final String LoginURL = "http://localhost:3000/api/v1.0/users/login";
+        // 2. Nos logueamos como user02
+        RequestSpecification request = RestAssured.given();
+        Response loginResponse = PO_RestApi.login("user02@email.com", "user02", LoginURL, request);
+        // 3. Añadimos el token a la petición
+        request.header("token", loginResponse.jsonPath().get("token"));
+        // 4. Enviamos el siguiente mensaje:
+        final String MessagesURL = "http://localhost:3000/api/v1.0/offers/messages";
+        PO_RestApi.sendMessage(
+                "user03@email.com",
+                "64552593aee4ec22206d2544",
+                "Esto es un mensaje de la prueba 44",
+                request, MessagesURL);
+        // 5. Accedemos a la URL de obtener mensajes y obtenemos el listado correspondiente a la oferta
+        final String ConversationsURL = "http://localhost:3000/api/v1.0/offers/messages/64552593aee4ec22206d2544";
+        Response messageListResponse = request.get(ConversationsURL);
+        // 6. Verificamos el estado
+        Assertions.assertEquals(200, messageListResponse.getStatusCode());
+        Assertions.assertTrue((int) messageListResponse.body().path("messages.size()") == 2);
+    }
+
+    /**
+     * PR45. Obtener la lista de conversaciones de un usuario. Comprobar que se devuelve el número correcto de
+     * conversaciones
+     */
+    @Test
+    @Order(45)
+    public void PR45() {
+        // 1. Accedemos a la URL de login
+        final String LoginURL = "http://localhost:3000/api/v1.0/users/login";
+        // 2. Nos logueamos como user02
+        RequestSpecification request = RestAssured.given();
+        Response loginResponse = PO_RestApi.login("user02@email.com", "user02", LoginURL, request);
+        // 3. Añadimos el token a la petición
+        request.header("token", loginResponse.jsonPath().get("token"));
+        // 4. Enviamos el siguiente mensaje:
+        final String MessagesURL = "http://localhost:3000/api/v1.0/offers/messages";
+        PO_RestApi.sendMessage(
+                "user04@email.com",
+                "64555b1c70d8bf83b644cff9",
+                "Esto es un mensaje de la prueba 45",
+                request, MessagesURL);
+        // 5. Accedemos a la URL de obtener conversaciones
+        final String ConversationsURL = "http://localhost:3000/api/v1.0/conversations";
+        Response conversationListResponse = request.get(ConversationsURL);
+        // 6. Verificamos el estado
+        Assertions.assertEquals(200, conversationListResponse.getStatusCode());
+        Assertions.assertTrue((int) conversationListResponse.body().path("conversations.size()") == 2);
+    }
+
+    /**
+     * PR46. Eliminar una conversación dado un ID conocido. Se debe comprobar que se elimina correctamente una
+     * conversación concreta.
+     */
+    @Test
+    @Order(46)
+    public void PR46() {
+        // 1. Accedemos a la URL de login
+        final String LoginURL = "http://localhost:3000/api/v1.0/users/login";
+        // 2. Nos logueamos como user02
+        RequestSpecification request = RestAssured.given();
+        Response loginResponse = PO_RestApi.login("user02@email.com", "user02", LoginURL, request);
+        // 3. Añadimos el token a la petición
+        request.header("token", loginResponse.jsonPath().get("token"));
+        // 4. Obtenemos el listado de conversaciones. En este punto deberían ser dos.
+        final String ConversationsURL = "http://localhost:3000/api/v1.0/conversations";
+        Response conversationListResponse = request.get(ConversationsURL);
+        final String conversationId = conversationListResponse.jsonPath().get("conversations[1]._id");
+        // 5. Accedemos a la URL de obtener conversaciones con la conversación a eliminar como parámetro
+        final String DeleteConversationURL = "http://localhost:3000/api/v1.0/conversations/" + conversationId;
+        // 6. Eliminamos una conversación
+        Response deleteConversationResponse = request.delete(DeleteConversationURL);
+        // 7. Verificamos el estado. Ahora sólo debería haber una conversación.
+        Assertions.assertEquals(200, deleteConversationResponse.getStatusCode());
+        conversationListResponse = request.get(ConversationsURL);
+        Assertions.assertEquals(1, (int) conversationListResponse.body().path("conversations.size()"));
+    }
+
+    /**
+     * PR47. Marcar mensaje con ID conocida como leído. Se debe comprobar que el mensaje queda marcado correctamente
+     * a true.
+     */
+    @Test
+    @Order(47)
+    public void PR47() {
+        // 1. Accedemos a la URL de login
+        final String LoginURL = "http://localhost:3000/api/v1.0/users/login";
+        // 2. Nos logueamos como user02
+        RequestSpecification request = RestAssured.given();
+        Response loginResponse = PO_RestApi.login("user02@email.com", "user02", LoginURL, request);
+        // 3. Añadimos el token a la petición
+        request.header("token", loginResponse.jsonPath().get("token"));
+        // 4. Añadimos un nuevo mensaje
+        final String MessagesURL = "http://localhost:3000/api/v1.0/offers/messages";
+        Response messagesResponse = PO_RestApi.sendMessage(
+                "user04@email.com",
+                "64555b1c70d8bf83b644cff9",
+                "Esto es un mensaje de la prueba 45",
+                request, MessagesURL);
+        String messageId = (String) messagesResponse.jsonPath().get("_id");
+        // 5. Marcamos el mensaje como leido
+        final String UpdateMessageURL = "http://localhost:3000/api/v1.0/conversations/" + messageId;
+        Response updateMessageResponse = request.put(UpdateMessageURL);
+        Assertions.assertEquals(200, updateMessageResponse.getStatusCode());
+        // 6. Comprobamos que el mensaje se ha actualizado correctamente
+        Response messageListResponse = request.get(MessagesURL + "/" + "64555b1c70d8bf83b644cff9");
+        Assertions.assertEquals(200, messageListResponse.getStatusCode());
+        Assertions.assertTrue(messageListResponse.getBody().asString().contains("true"));
+    }
+
     /**
      * PR51. Mostrar el listado de ofertas disponibles y comprobar que se muestran todas las que existen,
      * menos las del usuario identificado
@@ -436,24 +700,5 @@ class Sdi2223Entrega2TestApplicationTests {
         Response response = RestAssured.get(RestAssuredURL);
         Assertions.assertEquals(403, response.getStatusCode());
          */
-    }
-
-    @Test
-    @Order(50)
-    public void PR50() {
-         /*
-        final String RestAssuredURL = "http://localhost:8081/api/v1.0/users/login";
-        //2. Preparamos el parámetro en formato JSON
-        RequestSpecification request = RestAssured.given();
-        JSONObject requestParams = new JSONObject();
-        requestParams.put("email", "prueba1@prueba1.com");
-        requestParams.put("password", "prueba1");
-        request.header("Content-Type", "application/json");
-        request.body(requestParams.toJSONString());
-        //3. Hacemos la petición
-        Response response = request.post(RestAssuredURL);
-        //4. Comprobamos que el servicio ha tenido exito
-        Assertions.assertEquals(200, response.getStatusCode());
-          */
     }
 }

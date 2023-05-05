@@ -15,6 +15,17 @@ module.exports = function (app, offersRepository, messagesRepository) {
                 res.status(422);
                 res.json({errors: errors.array()})
             }
+            // Comprueba si el comprador es igual al vendedor
+            else if (checkBuyer(req, res)) {
+                res.status(422);
+                res.json({
+                    "type": "field",
+                    "value": res.user,
+                    "msg": "El vendedor debe ser distinto del comprador",
+                    "path": "seller",
+                    "location": "body"
+                })
+            }
             else {
                 // Creamos el mensaje
                 let message = {
@@ -149,4 +160,11 @@ module.exports = function (app, offersRepository, messagesRepository) {
             res.json({error: "Se ha producido un error al intentar modificar el mensaje: " + e})
         }
     })
+
+    function checkBuyer(req, res) {
+        if (res.user === req.body.seller) {
+            return true;
+        }
+    }
 }
+
