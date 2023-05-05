@@ -29,7 +29,7 @@ module.exports = {
      * @param filter
      * @param options
      * @param page
-     * @returns {Promise<{total: *, users: *}>}
+     * @returns {Promise<{total: *, logss: *}>}
      */
     getLogsPg: async function (filter, options, page){
         try {
@@ -94,13 +94,13 @@ module.exports = {
     },
 
 
-    deleteUser: async function (filter, options) {
+    deleteLogs: async function (filter, options) {
         try {
             const client = await getConnection(this.mongoClient,this.app.get('connectionStrings'))
             const database = client.db("entrega2");
             const collectionName = 'logs';
             const logsCollection = database.collection(collectionName);
-            const result = await logsCollection.deleteOne(filter, options);
+            const result = await logsCollection.deleteMany({}, options);
             return result;
         } catch (error) {
             throw (error);

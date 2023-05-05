@@ -1,4 +1,5 @@
 const {ObjectId} = require("mongodb");
+const logsRepository = require("../repositories/logRepository");
 module.exports = function (app, usersRepository, logsRepository) {
 
     /**
@@ -70,7 +71,6 @@ module.exports = function (app, usersRepository, logsRepository) {
 
         usersRepository.getUsers(filter, options)
             .then(result => {
-
                 let response = {
                     users: result.users,
                     session: req.session,
@@ -93,31 +93,14 @@ module.exports = function (app, usersRepository, logsRepository) {
         let filter = {};
         let options = {sort: {date: -1}};
 
-        //For pagination
-        let page = parseInt(req.query.page); // Es String !!!
-        if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") { //
-            page = 1;
-        }
-
-        logsRepository.getLogsPg(filter, options, page)
+        logsRepository.getLogs(filter, options)
             .then(result => {
-                let lastPage = result.total / 10;
-                if (result.total % 10 > 0) { // Decimales
-                    lastPage = lastPage + 1;
-                }
-                let pages = [];
-                for (let i = page - 2; i <= page + 2; i++) {
-                    if (i > 0 && i <= lastPage) {
-                        pages.push(i);
-                    }
-                }
                 usersRepository.findUser({email: req.session.user}, options).then(user => {
                     let response = {
                         logs: result.logs,
                         session: req.session,
                         search: req.query.search,
                         money: user.money,
-                        pages: pages
                     }
                     res.render("users/admin/log.twig", response);
                 });
@@ -152,6 +135,48 @@ module.exports = function (app, usersRepository, logsRepository) {
     });
 
     /**
+     * Funcionalidad borrado de todos los logs
+     */
+    app.get('/users/logAction', function (req, res) {
+        let filter = {};
+        let options = {};
+
+        if (req.query.deleteLogs) {
+            logsRepository.deleteLogs(filter, options);
+            res.redirect("/users/admin/log");
+        } else {
+            filter = {type: req.query.action};
+            options = {sort: {date: -1}};
+
+            //For pagination
+            let page = parseInt(req.query.page); // Es String !!!
+            if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") { //
+                page = 1;
+            }
+
+            logsRepository.getLogs(filter, options)
+                .then(result => {
+
+                    usersRepository.findUser({email: req.session.user}, options).then(user => {
+                        let response = {
+                            logs: result.logs,
+                            session: req.session,
+                            search: req.query.search,
+                            money: user.money,
+                        }
+                        res.render("users/admin/log.twig", response);
+                    });
+                })
+                .catch(() => {
+                        res.redirect("/" +
+                            "?message=Ha ocurrido un error al listar los logs." +
+                            "&messageType=alert-danger ");
+                    }
+                );
+        }
+    });
+
+    /**
      * Funcion que borra un usuario
      */
     function deleteUser(userId, res) {
@@ -182,15 +207,36 @@ module.exports = function (app, usersRepository, logsRepository) {
         let options = {}
         usersRepository.findUser(filter, options).then(user => {
             if (user == null) {
+                let now = new Date();
+                log = {
+                    type: "LOGIN-ERR",
+                    date: now.toISOString().replace(/T/, ' ').replace(/\..+/, ''),
+                    description: req.body.email
+                };
+                logsRepository.insertLog(log);
                 req.session.user = null;
                 res.redirect("/users/login" +
                     "?message=Email o password incorrecto" +
                     "&messageType=alert-danger ");
             } else {
                 req.session.user = user.email;
+                let now = new Date();
+                log = {
+                    type: "LOGIN-EX",
+                    date: now.toISOString().replace(/T/, ' ').replace(/\..+/, ''),
+                    description: req.session.user
+                };
+                logsRepository.insertLog(log);
                 res.redirect("/users/list");
             }
         }).catch(() => {
+            let now = new Date();
+            log = {
+                type: "LOGIN-ERR",
+                date: now.toISOString().replace(/T/, ' ').replace(/\..+/, ''),
+                description: req.session.user
+            };
+            logsRepository.insertLog(log);
             req.session.user = null;
             res.redirect("/users/login" +
                 "?message=Se ha producido un error al buscar el usuario" +
@@ -233,6 +279,13 @@ module.exports = function (app, usersRepository, logsRepository) {
                 return
             }
             usersRepository.insertUser(user).then(() => {
+                let now = new Date();
+                log = {
+                    type: "ALTA",
+                    date: now.toISOString().replace(/T/, ' ').replace(/\..+/, ''),
+                    description: user.email
+                };
+                logsRepository.insertLog(log);
                 res.redirect("/users/login?message=Nuevo usuario registrado&messageType=alert-info");
             }).catch(() => {
                 res.redirect("/users/signup?message=Se ha producido un error al registrar usuario&messageType=alert-danger");
@@ -271,6 +324,13 @@ module.exports = function (app, usersRepository, logsRepository) {
     }
 
     app.get('/users/logout', function (req, res) {
+        let now = new Date();
+        log = {
+            type: "LOGOUT",
+            date: now.toISOString().replace(/T/, ' ').replace(/\..+/, ''),
+            description: req.session.user
+        };
+        logsRepository.insertLog(log);
         req.session.user = null;
         res.redirect("/users/login?message=Usuario desconectado correctamente&messageType=alert-info");
     });
