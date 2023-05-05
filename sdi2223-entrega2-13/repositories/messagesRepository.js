@@ -63,19 +63,31 @@ module.exports = {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("entrega2");
-            const collectionName = 'messages';
-            const messagesCollection = database.collection(collectionName).aggregate([
-                { $match: filter},
-                { $group: {
-                    _id: {
-                        buyer: "$buyer",
-                        seller: "$seller",
-                        offer: "$offer"
-                    }, messages: { $push: "$$ROOT" }
-                }}
-            ], options);
-            const messages = messagesCollection.toArray()
-            return messages;
+            const collectionName = 'conversations';
+            const conversationsWithMessages = await database.collection(collectionName).aggregate([
+                // Join the conversations and messages collections
+                {
+                    $lookup: {
+                        from: 'messages',
+                        let: { buyer: "$buyer", seller: "$seller", offer: "$offer" },
+                        pipeline: [
+                            { $match:
+                                    { $expr:
+                                            { $and:
+                                                    [
+                                                        { $eq: [ "$buyer",  "$$buyer" ] },
+                                                        { $eq: [ "$seller",  "$$seller" ] },
+                                                        { $eq: [ "$offer",  "$$offer" ] },
+                                                    ]
+                                            }
+                                    }
+                            },
+                        ],
+                        as: 'messages'
+                    }
+                },
+            ]).toArray();
+            return conversationsWithMessages;
         } catch (error) {
             throw (error);
         }
