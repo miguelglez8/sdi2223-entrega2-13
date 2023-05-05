@@ -15,12 +15,24 @@ module.exports = function (app, offersRepository, messagesRepository) {
                 res.status(422);
                 res.json({errors: errors.array()})
             }
+            // Comprueba si el comprador es igual al vendedor
+            else if (checkBuyer(req, res)) {
+                res.status(422);
+                res.json({
+                    "type": "field",
+                    "value": res.user,
+                    "msg": "El vendedor debe ser distinto del comprador",
+                    "path": "seller",
+                    "location": "body"
+                })
+            }
             else {
                 // Creamos el mensaje
                 let message = {
-                    buyer: res.user,
+                    buyer: req.body.buyer,
                     seller: req.body.seller,
                     offer: req.body.offer,
+                    author: res.user,
                     text: req.body.text,
                     date: Date.now(),
                     read: false
@@ -28,7 +40,7 @@ module.exports = function (app, offersRepository, messagesRepository) {
 
                 // Creamos la conversación
                 let conversation = {
-                    buyer: res.user,
+                    buyer: req.body.buyer,
                     seller: req.body.seller,
                     offer: req.body.offer
                 }
@@ -149,4 +161,11 @@ module.exports = function (app, offersRepository, messagesRepository) {
             res.json({error: "Se ha producido un error al intentar modificar el mensaje: " + e})
         }
     })
+
+    function checkBuyer(req, res) {
+        if (res.user === req.body.seller) {
+            return true;
+        }
+    }
 }
+
