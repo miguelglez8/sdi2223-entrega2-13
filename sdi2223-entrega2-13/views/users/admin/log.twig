@@ -1,0 +1,47 @@
+{% extends "layout.twig" %}
+
+{% block title %} Wallapop{% endblock %}
+{% block body %}
+
+    <h2>Listado de logs</h2>
+
+    <div class="table-responsive">
+        <table class="table table-hover" id="tableUsers">
+            <thead>
+            <tr>
+                <th scope="col">Tipo</th>
+                <th scope="col">Fecha</th>
+                <th scope="col">Descripción</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for log in logs %}
+                <tr>
+                    <td scope="row">{{ log.type }}</td>
+                    <td scope="row">{{ log.date }}</td>
+                    <td scope="row">{{ log.description }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginación mostrar la actual y 2 anteriores y dos siguientes -->
+    <div class="row text-center">
+        <ul class="pagination">
+            {% for page in pages %}
+                <li class="page-item" id="pi-{{ page }}">
+                    <a class="page-link" href="/users/admin/log?page={{ page }}"> {{ page }}</a>
+                </li>
+            {% endfor %}
+            <script>
+                $("#pi-" + "{{ currentPage }}").addClass("active");
+            </script>
+        </ul>
+    </div>
+
+{% endblock %}

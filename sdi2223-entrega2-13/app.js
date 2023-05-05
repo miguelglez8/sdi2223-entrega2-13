@@ -81,7 +81,10 @@ app.use("/offers/add",userSessionRouter);
 app.use("/offers/list",userSessionRouter);
 app.use("/offers/buy",userSessionRouter);
 app.use("/offers/myoffers",userSessionRouter);
-app.use("/offers/*", logRouter);
+app.use("/offers/*", userSessionRouter, logRouter);
+app.use("/users/admin/list", userSessionRouter, logRouter);
+app.use("/users/admin/log", userSessionRouter, logRouter);
+app.use("/users/delete", userSessionRouter, logRouter);
 
 const userTokenRouter = require('./routes/userTokenRouter');
 const {getConnection} = require("./repositories/db");
@@ -225,7 +228,7 @@ app.set('view engine', 'twig');
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
-require("./routes/users.js")(app, usersRepository);
+require("./routes/users.js")(app, usersRepository, logRepository);
 
 require("./routes/offers.js")(app, usersRepository, offersRepository);
 

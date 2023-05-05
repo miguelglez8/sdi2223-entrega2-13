@@ -1,5 +1,5 @@
 const {ObjectId} = require("mongodb");
-module.exports = function (app, usersRepository) {
+module.exports = function (app, usersRepository, logsRepository) {
 
     /**
      * Funcionalidad listado de usuarios con busqueda y paginacion
@@ -47,7 +47,7 @@ module.exports = function (app, usersRepository) {
                     res.send("Se ha producido un error al encontrar el usuario en sesión: " + error)
                 });
             })
-            .catch( () => {
+            .catch(() => {
                 res.redirect("/" +
                     "?message=Ha ocurrido un error al listar los usuarios." +
                     "&messageType=alert-danger ");
@@ -78,12 +78,58 @@ module.exports = function (app, usersRepository) {
                 }
                 res.render("users/admin/list.twig", response);
             })
-            .catch( () => {
-                res.redirect("/" +
-                    "?message=Ha ocurrido un error al listar los usuarios." +
-                    "&messageType=alert-danger ");}
+            .catch(() => {
+                    res.redirect("/" +
+                        "?message=Ha ocurrido un error al listar los usuarios." +
+                        "&messageType=alert-danger ");
+                }
             );
     });
+
+    /**
+     * Listado de logs
+     */
+    app.get("/users/admin/log", function (req, res) {
+        let filter = {};
+        let options = {sort: {date: -1}};
+
+        //For pagination
+        let page = parseInt(req.query.page); // Es String !!!
+        if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") { //
+            page = 1;
+        }
+
+        logsRepository.getLogsPg(filter, options, page)
+            .then(result => {
+                let lastPage = result.total / 10;
+                if (result.total % 10 > 0) { // Decimales
+                    lastPage = lastPage + 1;
+                }
+                let pages = [];
+                for (let i = page - 2; i <= page + 2; i++) {
+                    if (i > 0 && i <= lastPage) {
+                        pages.push(i);
+                    }
+                }
+                usersRepository.findUser({email: req.session.user}, options).then(user => {
+                    let response = {
+                        logs: result.logs,
+                        session: req.session,
+                        search: req.query.search,
+                        money: user.money,
+                        pages: pages
+                    }
+                    res.render("users/admin/log.twig", response);
+                });
+            })
+            .catch(() => {
+                    res.redirect("/" +
+                        "?message=Ha ocurrido un error al listar los logs." +
+                        "&messageType=alert-danger ");
+                }
+            );
+    });
+
 
     /**
      * Funcionalidad borrado de usuarios
@@ -114,7 +160,7 @@ module.exports = function (app, usersRepository) {
                 res.write("No se ha podido eliminar el registro");
             }
             res.end();
-        }).catch( () => {
+        }).catch(() => {
             res.redirect("/" +
                 "?message=Ha ocurrido un error al eliminar usuarios." +
                 "&messageType=alert-danger ")
@@ -151,11 +197,6 @@ module.exports = function (app, usersRepository) {
                 "&messageType=alert-danger ");
         })
     });
-
-
-
-
-
 
 
     /**

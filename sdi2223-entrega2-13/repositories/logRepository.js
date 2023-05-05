@@ -33,15 +33,15 @@ module.exports = {
      */
     getLogsPg: async function (filter, options, page){
         try {
-            const limit = 5;
+            const limit = 10;
             const client = await getConnection(this.mongoClient,this.app.get('connectionStrings'))
             const database = client.db("entrega2");
             const collectionName = 'logs';
             const logsCollection = database.collection(collectionName);
-            const logssCollectionCount = await usersCollection.find(filter, options).count();
+            const logsCollectionCount = await logsCollection.find(filter, options).count();
             const cursor = logsCollection.find(filter, options).skip((page - 1) * limit).limit(limit)
             const logs = await cursor.toArray();
-            return {logs: logs, total: logssCollectionCount };
+            return {logs: logs, total: logsCollectionCount };
         } catch (error) {
             throw (error);
         }
