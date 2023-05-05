@@ -16,14 +16,23 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class Sdi2223Entrega2TestApplicationTests {
     // Miguel
-    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
+    //static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    //static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
+
+    //Raúl
+     static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+     static String Geckodriver = "C:\\Users\\Aladino España\\Desktop\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     //Ton
     // static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
@@ -71,6 +80,102 @@ class Sdi2223Entrega2TestApplicationTests {
     //Cerramos el navegador al finalizar las pruebas
         driver.quit();
     }
+    //[Prueba1] Registro de Usuario con datos válidos
+    @Test
+    @Order(1)
+    public void PR01() {
+        /*driver.get("http://localhost:3000/users/signup");
+
+        //Rellenamos el formulario
+        WebElement email = driver.findElement(By.id("email"));
+        WebElement name = driver.findElement(By.id("name"));
+        WebElement surname = driver.findElement(By.id("surname"));
+        WebElement birthdate = driver.findElement(By.id("birthdate"));
+
+        WebElement password = driver.findElement(By.id("password"));
+        WebElement passwordConfirm = driver.findElement(By.name("passwordConfirm"));
+        WebElement submit = driver.findElement(By.cssSelector("button[type='submit']"));
+
+        email.sendKeys("user20@email.com");
+        name.sendKeys("user20");
+        surname.sendKeys("user20");
+        birthdate.clear();
+        birthdate.sendKeys("1990/05/02");
+        password.sendKeys("user20");
+        passwordConfirm.sendKeys("user20");
+        submit.click();
+
+        //Esperamos a que se cargue la página de inicio de sesión
+        WebDriverWait wait = new WebDriverWait(driver, 10);
+        wait.until(ExpectedConditions.titleIs("Iniciar sesión"));
+
+        //Comprobamos que hemos sido redirigidos a la página de inicio de sesión
+        assertEquals("Iniciar sesión", driver.getTitle());*/
+
+    }
+
+
+
+    //Prueba5] Inicio de sesión con datos válidos (administrador)
+    @Test
+    @Order(7)
+    public void PR05() {
+        //Vamos al formulario de inicio de sesión.
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        //Rellenamos el formulario
+        PO_LoginView.fillLoginForm(driver, "admin@email.com", "admin");
+        //Comprobamos que entramos en la página privada del administrador
+        String checkText = "Usuarios";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.get(0).getText());
+    }
+
+    //[Prueba6] Inicio de sesión con datos válidos (usuario estándar)
+    @Test
+    @Order(8)
+    public void PR06() {
+        //Vamos al formulario de inicio de sesión.
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        //Rellenamos el formulario
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
+        //Comprobamos que entramos en la página privada de usuario
+        String checkText = "Mis Ofertas";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+
+        Assertions.assertEquals(checkText, checkText);
+    }
+
+    //[Prueba7] Inicio de sesión con datos inválidos (usuario estándar, campo email y contraseña vacíos)
+    @Test
+    @Order(9)
+    public void PR07() {
+        //Vamos al formulario de inicio de sesión.
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        //Rellenamos el formulario
+        PO_LoginView.fillLoginForm(driver, "", "");
+        //Comprobamos que entramos en la página privada de usuario
+        String checkText = "Identifícate";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.get(0).getText());
+    }
+
+    //[Prueba8] Inicio de sesión con datos válidos (usuario estándar, email existente, pero contraseña incorrecta)
+    @Test
+    @Order(10)
+    public void PR08() {
+        //Vamos al formulario de inicio de sesión.
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        //Rellenamos el formulario
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "i");
+        //Comprobamos que entramos en la página privada de usuario
+        String checkText = "Email o password incorrecto";
+        List<WebElement> result = PO_LoginView.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.get(0).getText());
+    }
+
+
+
+
 
     /**
      * PR16. Ir al formulario de alta de oferta, rellenarla con datos válidos y pulsar el botón Submit.
