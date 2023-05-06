@@ -39,9 +39,9 @@ module.exports = {
     /**
      * Obtiene las ofertas con paginación
      */
-    getOffersPg: async function (filter, options, page) {
+    getOffersPg: async function (filter, options, page, pageSize=5) {
         try {
-            const limit = 5;
+            const limit = pageSize;
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("entrega2");
             const collectionName = 'offers';

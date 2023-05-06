@@ -1,4 +1,5 @@
 const {ObjectId} = require("mongodb");
+const {response} = require("express");
 module.exports = function (app, usersRepository, offersRepository) {
 
     /**
@@ -65,7 +66,7 @@ module.exports = function (app, usersRepository, offersRepository) {
         let offer = {
             title: req.body.title,
             detail: req.body.detail,
-            date: new Date().getDate().toLocaleString(),
+            date: new Date().toDateString(),
             price: req.body.price,
             seller: req.session.user,
             isBuy: false
@@ -178,35 +179,19 @@ module.exports = function (app, usersRepository, offersRepository) {
             page = 1;
         }
         // buscamos las oferta con paginación
-        offersRepository.getOffersPg(filter, {}, page).then(result => {
+        let pageSize = req.query.pageSize ? req.query.pageSize : 5;
+        let max = parseInt(pageSize)
+        offersRepository.getOffersPg(filter, {}, page, max).then(result => {
             // buscamos el usuario
             usersRepository.findUser({email: req.session.user}, {}).then(user => {
-                let pages = []; // paginas mostrar
-
-                let lastPage
-                if (!req.query.search) {
-                    lastPage = result.total / 5;
-                    if (result.total % 5 > 0) { // Sobran decimales
-                        lastPage = lastPage + 1;
-                    }
-                } else {
-                    lastPage = result.offers.length/ 5;
-                    if (result.offers.length % 5 > 0) { // Sobran decimales
-                        lastPage = lastPage + 1;
-                    }
+                let lastPage = result.total / max;
+                if (result.total % max > 0) { // Sobran decimales
+                    lastPage = lastPage + 1;
                 }
-
-                if (lastPage < 2) {
-                    for (let i = page - 1; i <= page + 1; i++) {
-                        if (i > 0 && i <= lastPage) {
-                            pages.push(i);
-                        }
-                    }
-                } else {
-                    for (let i = page - 2; i <= page + 2; i++) {
-                        if (i > 0 && i <= lastPage) {
-                            pages.push(i);
-                        }
+                let pages = []; // paginas mostrar
+                for (let i = page - 2; i <= page + 2; i++) {
+                    if (i > 0 && i <= lastPage) {
+                        pages.push(i);
                     }
                 }
 
@@ -216,7 +201,8 @@ module.exports = function (app, usersRepository, offersRepository) {
                     currentPage: page,
                     session: req.session,
                     money: user.money,
-                    search: req.query.search
+                    search: req.query.search,
+                    pageSize: max
                 }
                 // volvemos a la vista de listar las ofertas
                 res.render("offers/list.twig", response);
@@ -231,7 +217,7 @@ module.exports = function (app, usersRepository, offersRepository) {
     /**
      * Compra la oferta a través de la id
      */
-    app.get('/offers/buy/:id/:page', async function (req, res) {
+    app.get('/offers/buy/:id/:page/:search?', async function (req, res) {
         let id = new ObjectId(req.params.id);
         let user = req.session.user;
         let sesion = req.session
@@ -241,6 +227,8 @@ module.exports = function (app, usersRepository, offersRepository) {
             user: req.session.user,
             offerId: id
         }
+        // si no hay búsqueda, se compra directamente
+        let search = req.params.search ? req.params.search : "";
         let options = {};
         // filtramos oferta por título
         offersRepository.getOffers(filter, options).then(async offer => {
@@ -265,7 +253,7 @@ module.exports = function (app, usersRepository, offersRepository) {
                                         res.send("Error al actualizar el usuario");
                                     } else {
                                         // volvemos a la vista de listar todas las ofertas
-                                        res.redirect("/offers/searchOffers?money="+canBuyResult.price+"&page="+page)
+                                        res.redirect("/offers/searchOffers?money="+canBuyResult.price+"&page="+page+"&search="+search)
                                     }
                                 }).catch(error => {
                                     res.send("Se ha producido un error al actualizar el usuario en sesión: " + error)
