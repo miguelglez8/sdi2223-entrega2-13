@@ -25,9 +25,13 @@
         </div>
 
         <div class="collapse navbar-collapse" id="myNavbar">
+
             {% if session.user != undefined %}
 
                 <ul class="nav navbar-nav">
+                    <li>
+                        <img src="/images/logo.png" alt="logo"/>
+                    </li>
                     <li class="nav-item dropdown active">
                         <a class="nav-link dropdown-toggle" href="#" id="usersDropdown"
                            role="button" data-toggle="dropdown" aria-haspopup="true"
