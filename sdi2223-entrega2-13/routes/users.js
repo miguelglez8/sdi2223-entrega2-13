@@ -1,5 +1,4 @@
 const {ObjectId} = require("mongodb");
-const logsRepository = require("../repositories/logRepository");
 module.exports = function (app, usersRepository, logsRepository) {
 
     /**
@@ -48,7 +47,7 @@ module.exports = function (app, usersRepository, logsRepository) {
                     res.send("Se ha producido un error al encontrar el usuario en sesión: " + error)
                 });
             })
-            .catch(() => {
+            .catch( () => {
                 res.redirect("/" +
                     "?message=Ha ocurrido un error al listar los usuarios." +
                     "&messageType=alert-danger ");
@@ -69,21 +68,38 @@ module.exports = function (app, usersRepository, logsRepository) {
         let filter = {};
         let options = {sort: {email: 1}};
 
-        usersRepository.getUsers(filter, options)
+        //For pagination
+        let page = parseInt(req.query.page);
+        if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") {
+            page = 1;
+        }
+
+        usersRepository.getUsersPg(filter, options, page)
             .then(result => {
+                let lastPage = Math.ceil(result.total / 5);
+                if (result.total % 5 > 0) { // Decimales
+                    lastPage = lastPage + 1;
+                }
+                let pages = [];
+                for (let i = page - 2; i <= page + 2; i++) {
+                    if (i > 0 && i <= lastPage) {
+                        pages.push(i);
+                    }
+                }
                 let response = {
                     users: result.users,
+                    pages: pages,
+                    currentPage: page,
                     session: req.session,
                     search: req.query.search
                 }
                 res.render("users/admin/list.twig", response);
             })
             .catch(() => {
-                    res.redirect("/" +
-                        "?message=Ha ocurrido un error al listar los usuarios." +
-                        "&messageType=alert-danger ");
-                }
-            );
+                res.redirect("/" +
+                    "?message=Ha ocurrido un error al listar los usuarios." +
+                    "&messageType=alert-danger ");
+            });
     });
 
     /**
@@ -187,7 +203,7 @@ module.exports = function (app, usersRepository, logsRepository) {
                 res.write("No se ha podido eliminar el registro");
             }
             res.end();
-        }).catch(() => {
+        }).catch( () => {
             res.redirect("/" +
                 "?message=Ha ocurrido un error al eliminar usuarios." +
                 "&messageType=alert-danger ")
@@ -247,6 +263,11 @@ module.exports = function (app, usersRepository, logsRepository) {
     });
 
 
+
+
+
+
+
     /**
      * Registro de usuarios GET
      */
@@ -258,6 +279,7 @@ module.exports = function (app, usersRepository, logsRepository) {
      * Registro de usuarios POST
      */
     app.post('/users/signup', async function (req, res) {
+        let birthdate = new Date(req.body.birthdate);
 
         let securePassword = app.get("crypto").createHmac('sha256', app.get('clave'))
             .update(req.body.password).digest('hex');
@@ -266,6 +288,7 @@ module.exports = function (app, usersRepository, logsRepository) {
             password: securePassword,
             name: req.body.email,
             surname: req.body.surname,
+            birthdate: birthdate,
             rol: "STANDARD",
             money: 100
         }
@@ -322,6 +345,20 @@ module.exports = function (app, usersRepository, logsRepository) {
         if (userFound != null) {
             errors.push("El email ya existe");
         }
+        //check that the birthdate format is correct
+        let birthdateRegex = /^(\d{2})-(\d{2})-(\d{4})$/;
+        if (!birthdateRegex.test(user.birthdate)) {
+            errors.push("La fecha de nacimiento no tiene un formato correcto. El formato debe ser DD-MM-YYYY");
+        } else {
+            //parse the birthdate string to a date object
+            let birthdate = new Date(user.birthdate.split("-").reverse().join("-"));
+            let today = new Date();
+            //compare the birthdate to today
+            if (birthdate > today) {
+                errors.push("La fecha de nacimiento no puede ser posterior a hoy");
+            }
+        }
+
         return errors;
     }
 

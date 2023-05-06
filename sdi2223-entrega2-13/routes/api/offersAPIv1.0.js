@@ -5,9 +5,9 @@ module.exports = function (app, offersRepository) {
             seller: { $ne: res.user}
         };
         let options = {};
-        offersRepository.getOffers(filter, options).then(songs => {
+        offersRepository.getOffers(filter, options).then(offers => {
             res.status(200);
-            res.send({songs: songs})
+            res.send({offers: offers})
         }).catch(error => {
             res.status(500);
             res.json({ error: "Se ha producido un error al recuperar las ofertas." })

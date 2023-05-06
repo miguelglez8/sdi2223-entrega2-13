@@ -9,7 +9,7 @@ userSessionRouter.use(function(req, res, next) {
         {
             if(result.rol == "ADMIN") {
                 res.redirect("/users/admin/list");
-            } else {
+            }else {
                 next();
             }
         }).catch(error => res.redirect("/users/login"));

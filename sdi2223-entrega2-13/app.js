@@ -100,8 +100,8 @@ app.use("/api/v1.0/conversations", userTokenRouter);
  */
 let users = [];
 let offers = [];
-let title = "Oferta ";
-let detail = "Detalle ";
+let title = "Oferta";
+let detail = "Detalle";
 
 for(let i = 1; i <= 16; i++){
     let name = "user" + i.toString().padStart(2, '0');
@@ -114,12 +114,23 @@ for(let i = 1; i <= 16; i++){
         password: app.get("crypto").createHmac('sha256', app.get('clave'))
             .update(name).digest('hex')
     });
+
 }
+
+users.push({
+    email: "admin" + "@email.com",
+    rol: "ADMIN",
+    name: "admin",
+    surname: "admin",
+    money: 100,
+    password: app.get("crypto").createHmac('sha256', app.get('clave'))
+        .update("admin").digest('hex')
+});
 
 fs.writeFileSync('../data/users.json', JSON.stringify(users));
 console.log('JSON users generado correctamente');
 
-for(let i=1; i<151; i++) {
+for(let i=1; i<161; i++) {
     if(i < 11)
         name = "user01"
     else if (i < 21)
@@ -150,6 +161,8 @@ for(let i=1; i<151; i++) {
         name = "user14"
     else if (i < 151)
         name = "user15"
+    else if (i < 161)
+        name = "user16"
 
     offers.push({
         title: title + i,
@@ -219,6 +232,34 @@ async function loadBuyData() {
     }
 }
 
+async function loadConversationData() {
+    try {
+        const client = await MongoClient.connect(url);
+        const db = client.db("entrega2");
+
+        const collections = await db.listCollections().toArray();
+        const conversationsExists = collections.some((collection) => collection.name === "conversations");
+
+        if (conversationsExists) {
+            const conversationCollection = db.collection("conversations");
+            await conversationCollection.drop();
+            console.log("Deleted 'conversations' collection");
+        }
+
+        const messagesExists = collections.some((collection) => collection.name === "messages");
+
+        if (messagesExists) {
+            const messagesCollection = db.collection("messages");
+            await messagesCollection.drop();
+            console.log("Deleted 'messages' collection");
+        }
+
+
+    } catch (err) {
+        console.error(`Failed to delete conversations or messages: ${err}`);
+    }
+}
+
 
 /**
  * Motor de vistas twig
@@ -249,6 +290,7 @@ require("./routes/api/messagesAPIv1.0")(app, offersRepository, messagesRepositor
 loadUsersData(); // users
 loadOffersData(); // offers
 loadBuyData(); // buyOffers
+loadConversationData();
 
 /**
  * Manejar errores 404
