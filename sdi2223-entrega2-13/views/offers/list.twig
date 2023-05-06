@@ -38,7 +38,7 @@
                     <td>
                         {% if offer.isBuy==false %}
                             <a class="btn btn-primary pull-right"
-                               href="/offers/buy/{{ offer._id }}/{{ currentPage }}">Comprar</a>
+                               href="/offers/buy/{{ offer._id }}/{{ currentPage }}/{{ search }}">Comprar</a>
                         {% else %}
                             <a aria-colcount="red" class="pull-right">Vendido</a>
                         {% endif %}
@@ -54,8 +54,12 @@
         <ul class="pagination">
             {% for page in pages %}
                 <li class="page-item" id="pi-{{ page }}">
-                    {% if search %}
+                    {% if search and pageSize %}
+                        <a class="page-link" href="/offers/searchOffers?page={{ page }}&search={{ search }}&pageSize={{ pageSize }}">{{ page }}</a>
+                    {% elseif search %}
                         <a class="page-link" href="/offers/searchOffers?page={{ page }}&search={{ search }}">{{ page }}</a>
+                    {% elseif pageSize %}
+                        <a class="page-link" href="/offers/searchOffers?page={{ page }}&pageSize={{ pageSize }}">{{ page }}</a>
                     {% else %}
                         <a class="page-link" href="/offers/searchOffers?page={{ page }}">{{ page }}</a>
                     {% endif %}
