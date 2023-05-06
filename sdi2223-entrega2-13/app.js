@@ -85,7 +85,7 @@ app.use("/offers/*", userSessionRouter, logRouter);
 app.use("/users/admin/list", userSessionRouter, logRouter);
 app.use("/users/admin/log", userSessionRouter, logRouter);
 app.use("/users/delete", userSessionRouter, logRouter);
-app.use("/users/deleteLogs", userSessionRouter, logRouter);
+app.use("/users/logAction", userSessionRouter, logRouter);
 
 
 const userTokenRouter = require('./routes/userTokenRouter');

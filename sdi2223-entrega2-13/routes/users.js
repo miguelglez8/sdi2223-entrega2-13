@@ -141,11 +141,13 @@ module.exports = function (app, usersRepository, logsRepository) {
         let filter = {};
         let options = {};
 
-        if (req.query.deleteLogs) {
+        if (req.query.action === "deleteLogs") {
             logsRepository.deleteLogs(filter, options);
             res.redirect("/users/admin/log");
         } else {
-            filter = {type: req.query.action};
+            if(req.query.action !== "Todos"){
+                filter = {type: req.query.action};
+            }
             options = {sort: {date: -1}};
 
             //For pagination
