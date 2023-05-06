@@ -157,7 +157,7 @@ module.exports = function (app, usersRepository, offersRepository) {
         let filter = {};
         // establecemos el filtro
         if(req.query.search != null && typeof(req.query.search) != "undefined" && req.query.search != ""){
-            filter = {"title": {$regex: ".*" + req.query.search + ".*"}};
+            filter = {"title": {$regex: new RegExp(".*" + req.query.search + ".*", "i")}}
         }
         // establecemos la página
         let page = parseInt(req.query.page); // Es String !!!
