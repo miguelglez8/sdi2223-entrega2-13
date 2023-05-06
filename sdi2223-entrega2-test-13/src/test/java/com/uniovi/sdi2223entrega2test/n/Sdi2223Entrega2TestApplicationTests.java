@@ -36,8 +36,8 @@ class Sdi2223Entrega2TestApplicationTests {
     // static String Geckodriver = "C:\\Users\\Aladino España\\Desktop\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Ton
-     static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-     static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
+     //static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+     //static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
 
     // Alves
 //    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
@@ -82,9 +82,16 @@ class Sdi2223Entrega2TestApplicationTests {
     //Al finalizar la última prueba
     @AfterAll
     static public void end() {
-    //Cerramos el navegador al finalizar las pruebas
+        //Cerramos el navegador al finalizar las pruebas
         driver.quit();
+        // cerramos mongo
+        mongo.close();
     }
+
+    // ###############################################################################################
+    // ######################################### PARTE 1 #############################################
+    // ###############################################################################################
+
     //[Prueba1] Registro de Usuario con datos válidos
     @Test
     @Order(1)
@@ -396,18 +403,12 @@ class Sdi2223Entrega2TestApplicationTests {
         // seleccionamos el botón de buscar
         By boton = By.xpath("//*[@id=\"custom-search-input \"]/form/div/span/button");
         driver.findElement(boton).click();
+        // ponemos una paginación alta para que aparezcan todas las ofertas
+        String url = "http://localhost:3000/offers/searchOffers?pageSize=500";
+        driver.navigate().to(url);
         List<WebElement> offers = PO_HomeView.checkElementTableBody(driver, "offers"); // ofertas
-        int size = 0; // acumular todas las ofertas que hay
-        int i = 2; // páginas
-        String url = "http://localhost:3000/offers/searchOffers?page=";
-        while (offers.isEmpty()==false) {
-            size = size + offers.size(); // acumulamos las ofertas
-            driver.navigate().to(url + i);
-            offers = PO_HomeView.checkElementTableBody(driver, "offers"); // buscamos otra vez las ofertas de la siguiente página
-            i++; // incrementamos el número de página
-        }
         // comprobamos que están todas las ofertas
-        Assertions.assertEquals(mongo.getCollection("offers").count(), size);
+        Assertions.assertEquals(mongo.getCollection("offers").count(), offers.size());
         // logout
         PO_PrivateView.refactorLogout(driver);
     }
@@ -902,6 +903,10 @@ class Sdi2223Entrega2TestApplicationTests {
         Assertions.assertTrue(messageListResponse.getBody().asString().contains("true"));
     }
 
+    // ###############################################################################################
+    // ######################################### PARTE 3 #############################################
+    // ###############################################################################################
+
     /**
      * PR51. Mostrar el listado de ofertas disponibles y comprobar que se muestran todas las que existen,
      * menos las del usuario identificado
@@ -928,15 +933,4 @@ class Sdi2223Entrega2TestApplicationTests {
         Assertions.assertEquals(size, table.size()); // comprobamos que sea el mismo número
     }
 
-    /* Ejemplos de pruebas de llamada a una API-REST */
-    /* ---- Probamos a obtener lista de canciones sin token ---- */
-    @Test
-    @Order(49)
-    public void PR49() {
-         /*
-        final String RestAssuredURL = "http://localhost:8081/api/v1.0/songs";
-        Response response = RestAssured.get(RestAssuredURL);
-        Assertions.assertEquals(403, response.getStatusCode());
-         */
-    }
 }
