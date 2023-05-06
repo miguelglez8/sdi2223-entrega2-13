@@ -1,0 +1,88 @@
+<div id="widget-chat">
+  <h1>Conversación</h1>
+  <table className="table table-hover">
+    <thead>
+    <tr>
+      <th>Autor</th>
+      <th>Fecha y hora del envío</th>
+      <th>Mensaje</th>
+      <th>Leído</th>
+    </tr>
+    </thead>
+    <tbody id="messagesTableBody"></tbody>
+  </table>
+  <div class="form-group">
+    <label class="control-label col-sm-2" for="msg-add">Mensaje:</label>
+    <input type="text" class="form-control" name="msg-add"
+           placeholder="Mensaje" id="msg-add" />
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="button" class="btn btn-primary" id="msg-send"
+              onclick="widgetSendMsg()">Enviar</button>
+    </div>
+  </div>
+</div>
+<script>
+  window.history.pushState("", "", "/apiclient/client.html?w=chat");
+  function loadMessagess() {
+    $.ajax({
+      url: URLbase + "/offers/messages/" + selectedOfferId,
+      type: "GET",
+      data: {},
+      dataType: 'json',
+      headers: {"token": token},
+      success: function (response) {
+        messages = response.messages;
+        updateMessagesTable(messages);
+      },
+      error: function (error) {
+        $("#main-container").load("widget-login.html");
+      }
+    });
+  }
+  function updateMessagesTable(messages) {
+    $("#messagesTableBody").empty(); // Vaciar la tabla
+    for (i = 0; i < offers.length; i++) {
+      $("#messagesTableBody").append(
+              "<tr>" +
+              "<td>" + messages[i].author + "</td>" +
+              "<td>" + messages[i].date + "</td>" +
+              "<td>" + messages[i].text + "</td>" +
+              "<td>" + messages[i].read + "</td>" +
+              "</tr>");
+      // Mucho cuidado con las comillas del eliminarCancion
+      //la id tiene que ir entre comillas ' '
+    }
+  }
+  loadMessagess();
+
+  function widgetSendMsg(){
+    $.ajax({
+      url: URLbase + "/offers/messages",
+      type: "POST",
+      data: {
+        // buyer: res.user,
+        // seller: req.body.seller,
+        // offer: req.body.offer,
+        // text: req.body.text,
+        // date: Date.now(),
+        // read: false
+        buyer: 1,
+        seller: 2,
+        offer: selectedOfferId,
+        text: $("#msg-add").val(),
+        date: Date.now(),
+        price: false
+      },
+      dataType: 'json',
+      headers: {"token": token},
+      success: function (response) {
+        console.log("Canción eliminada: ");
+        // $("#" + _id).remove(); // eliminar el <tr> de la canción
+      },
+      error: function (error) {
+        $("#main-container").load("widget-login.html");
+      }
+    });
+  }
+
+</script>

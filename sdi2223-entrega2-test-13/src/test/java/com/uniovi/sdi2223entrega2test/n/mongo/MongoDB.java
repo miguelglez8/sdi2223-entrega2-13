@@ -58,6 +58,18 @@ public class MongoDB {
 		return price.doubleValue();
 	}
 
+	//Busca el número de ofertas de un usuario
+	public int getOffers(String user) {
+		MongoCollection<Document> users = getCollection("offers");
+		Bson filter = Filters.eq("seller", user);
+		FindIterable<Document> document = users.find(filter);
+		int size = 0;
+		for (Document docum : document) {
+      size++;
+		}
+		return size;
+	}
+  
 	// Busca el número de ofertas con ese titulo
 	public int getOffer(String title) {
 		MongoCollection<Document> offers = getCollection("offers");
