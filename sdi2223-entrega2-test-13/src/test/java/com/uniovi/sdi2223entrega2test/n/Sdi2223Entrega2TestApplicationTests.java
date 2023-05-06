@@ -19,6 +19,8 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -112,7 +114,9 @@ class Sdi2223Entrega2TestApplicationTests {
         name.sendKeys("user20");
         surname.sendKeys("user20");
         birthdate.clear();
-        birthdate.sendKeys("1990/05/02");
+        LocalDate dateToEnter = LocalDate.of(2023, 5, 6); // fecha a introducir
+        String dateToEnterAsString = dateToEnter.format(DateTimeFormatter.ISO_DATE); // fecha formateada en "yyyy-MM-dd"
+        birthdate.sendKeys(dateToEnterAsString);
         password.sendKeys("user20");
         passwordConfirm.sendKeys("user20");
         submit.click();
