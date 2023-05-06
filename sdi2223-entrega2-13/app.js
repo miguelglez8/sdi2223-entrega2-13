@@ -73,6 +73,7 @@ logRepository.init(app, MongoClient);
  */
 let indexRouter = require('./routes/index');
 let userSessionRouter = require('./routes/userSessionRouter');
+let userAdminRouter = require('./routes/userAdminRouter');
 let logRouter = require("./routes/logRouter");
 
 app.use("/users/list", userSessionRouter, logRouter);
@@ -82,10 +83,10 @@ app.use("/offers/list",userSessionRouter);
 app.use("/offers/buy",userSessionRouter);
 app.use("/offers/myoffers",userSessionRouter);
 app.use("/offers/*", userSessionRouter, logRouter);
-app.use("/users/admin/list", userSessionRouter, logRouter);
-app.use("/users/admin/log", userSessionRouter, logRouter);
-app.use("/users/delete", userSessionRouter, logRouter);
-app.use("/users/logAction", userSessionRouter, logRouter);
+app.use("/users/admin/list", userAdminRouter, logRouter);
+app.use("/users/admin/log", userAdminRouter, logRouter);
+app.use("/users/delete", userAdminRouter, logRouter);
+app.use("/users/logAction", userAdminRouter, logRouter);
 
 
 const userTokenRouter = require('./routes/userTokenRouter');
