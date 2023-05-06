@@ -36,12 +36,12 @@ class Sdi2223Entrega2TestApplicationTests {
     // static String Geckodriver = "C:\\Users\\Aladino España\\Desktop\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Ton
-    // static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-    // static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
+     static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+     static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
 
     // Alves
-    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+//    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+//    static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     //static String Geckodriver = "C:\\Path\\geckodriver-v0.30.0-win64.exe";
     //static String PathFirefox = "/Applications/Firefox.app/Contents/MacOS/firefox-bin";
@@ -189,6 +189,26 @@ class Sdi2223Entrega2TestApplicationTests {
     @Test
     @Order(16)
     public void PR16(){
+        //Vamos al formulario de inicio de sesión.
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        //Rellenamos el formulario
+        PO_LoginView.fillLoginForm(driver, "user16@email.com", "user16");
+        //Obtenemos el número actual de ofertas
+        int actualOffers = mongo.getOffers("user16@email.com");
+        //Accedemos a añadir oferta
+        By addBtn = By.xpath("//a[@href='/offers/add' and contains(@class, 'btn-info')]");
+        driver.findElement(addBtn).click();
+        //Rellenamos el formulario y lo enviamos
+        PO_AddOfferView.fillAddForm(driver, "Mesa", "Grande", "55");
+        //Comprobamos que el número de ofertas haya aumentado
+        Assertions.assertEquals(mongo.getOffers("user16@email.com"), actualOffers + 1);
+        //Vamos a la última página de mis ofertas
+        By pageBtn = By.xpath("//ul[@class=\"pagination\"]/li[last()]/a");
+        driver.findElement(pageBtn).click();
+        String checkText = "Mesa";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        //Comprobamos que está la oferta
+        Assertions.assertEquals(checkText, result.get(0).getText());
 
     }
 
@@ -199,12 +219,21 @@ class Sdi2223Entrega2TestApplicationTests {
     @Test
     @Order(17)
     public void PR17(){
-//        PO_HomeView.clickOption(driver, "Identifícate", "text", "/users/login");
-//        PO_HomeView.clickOption(driver,  "", "", "");
-        //Iniciamos sesión a través del formulario de login
-//        PO_PrivateView.refactorLogging(driver, "user16@email.com", "user16");
-//        PO_PrivateView.clickElement(driver, "//a[@id='myoffers']", 0);
-//        PO_NavView.clickOption(driver,"Mis Ofertas", "@href", "/offers/myoffers");
+        //Vamos al formulario de inicio de sesión.
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        //Rellenamos el formulario
+        PO_LoginView.fillLoginForm(driver, "user16@email.com", "user16");
+        //Obtenemos el número actual de ofertas
+        int actualOffers = mongo.getOffers("user16@email.com");
+        //Accedemos a añadir oferta
+        By addBtn = By.xpath("//a[@href='/offers/add' and contains(@class, 'btn-info')]");
+        driver.findElement(addBtn).click();
+        //Rellenamos el formulario y lo enviamos
+        PO_AddOfferView.fillAddForm(driver, " ", " ", "-3");
+        String checkText = "Error al añadir la oferta: Datos introducidos no válidos";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        //Comprobamos que se ve el mensaje
+        Assertions.assertEquals(checkText, result.get(0).getText());
     }
 
     /**
@@ -214,7 +243,23 @@ class Sdi2223Entrega2TestApplicationTests {
     @Test
     @Order(18)
     public void PR18(){
-
+        //Vamos al formulario de inicio de sesión.
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        //Rellenamos el formulario
+        PO_LoginView.fillLoginForm(driver, "user16@email.com", "user16");
+        //Obtenemos el número actual de ofertas
+        int dbOffers = mongo.getOffers("user16@email.com");
+        //Hacemos el cálculo de ofertas que se visualizan en la página
+        By pageBtn = By.xpath("//ul[@class=\"pagination\"]/li[last()]/a");
+        driver.findElement(pageBtn).click();
+        WebElement currentPageLink = driver.findElement(By.cssSelector(".page-item.active a.page-link"));
+        int currentPageNumber = Integer.parseInt(currentPageLink.getText());
+        WebElement tableBody = driver.findElement(By.cssSelector("table.table tbody"));
+        List<WebElement> rows = tableBody.findElements(By.tagName("tr"));
+        int rowCount = rows.size();
+        int webOffers = rowCount + (currentPageNumber-1)*5;
+        //Comprobamos que el número de ofertas en la bd y en la web sean las mismas
+        Assertions.assertEquals(webOffers, dbOffers);
     }
 
     /**
@@ -224,7 +269,25 @@ class Sdi2223Entrega2TestApplicationTests {
     @Test
     @Order(19)
     public void PR19(){
-
+        //Vamos al formulario de inicio de sesión.
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        //Rellenamos el formulario
+        PO_LoginView.fillLoginForm(driver, "user16@email.com", "user16");
+        //Obtenemos el número actual de ofertas
+        int dbOffers = mongo.getOffers("user16@email.com");
+        //Obtenemos el título de la primera oferta
+        WebElement firstRow = driver.findElement(By.xpath("//table/tbody/tr[1]/td[1]"));
+        String firstValue = firstRow.getText();
+        //Borramos la primera oferta
+        By deleteFirst = By.xpath("//a[contains(@href,'delete')][1]");
+        driver.findElement(deleteFirst).click();
+        //Obtenemos el título de la nueva primera oferta
+        WebElement newFirstRow = driver.findElement(By.xpath("//table/tbody/tr[1]/td[1]"));
+        String newFirstValue = newFirstRow.getText();
+        //Comparamos y vemos que la borrada ya no aparece la primera
+        Assertions.assertNotEquals(newFirstValue, firstValue);
+        //Comprobamos que el número de ofertas en la bd ha disminuido
+        Assertions.assertEquals(dbOffers-1, mongo.getOffers("user16@email.com"));
     }
 
     /**
@@ -234,7 +297,28 @@ class Sdi2223Entrega2TestApplicationTests {
     @Test
     @Order(20)
     public void PR20(){
-
+        //Vamos al formulario de inicio de sesión.
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        //Rellenamos el formulario
+        PO_LoginView.fillLoginForm(driver, "user16@email.com", "user16");
+        //Obtenemos el número actual de ofertas
+        int dbOffers = mongo.getOffers("user16@email.com");
+        //Vamos a la última página
+        By pageBtn = By.xpath("//ul[@class=\"pagination\"]/li[last()]/a");
+        driver.findElement(pageBtn).click();
+        //Obtenemos el título de la primera oferta
+        WebElement lastRow = driver.findElement(By.xpath("//table/tbody/tr[last()]/td[1]"));
+        String firstValue = lastRow.getText();
+        //Borramos la primera oferta
+        By deleteFirst = By.xpath("(//a[contains(@href,'delete')])[last()]");
+        driver.findElement(deleteFirst).click();
+        //Obtenemos el título de la nueva primera oferta
+        WebElement newLastRow = driver.findElement(By.xpath("//table/tbody/tr[last()]/td[1]"));
+        String newFirstValue = newLastRow.getText();
+        //Comparamos y vemos que la borrada ya no aparece la primera
+        Assertions.assertNotEquals(newFirstValue, firstValue);
+        //Comprobamos que el número de ofertas en la bd ha disminuido
+        Assertions.assertEquals(dbOffers-1, mongo.getOffers("user16@email.com"));
     }
 
     /**
@@ -244,7 +328,20 @@ class Sdi2223Entrega2TestApplicationTests {
     @Test
     @Order(21)
     public void PR21(){
-
+        //Vamos al formulario de inicio de sesión.
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        //Rellenamos el formulario
+        PO_LoginView.fillLoginForm(driver, "user16@email.com", "user16");
+        //Obtenemos el número actual de ofertas del usuario 1
+        int dbOffers = mongo.getOffers("user01@email.com");
+        //Como no se puede eliminar ofertas de otro usuario navegando por la web, tengo que ir a la url directamente
+        driver.navigate().to("http://localhost:3000/offers/delete/645658a1e88359d0a8519e61");
+        String checkText = "No se ha podido eliminar la oferta";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        //Comprobamos el mensaje de error
+        Assertions.assertEquals(checkText, result.get(0).getText());
+        //Comprobamos en la bd que el número de ofertas del usuario 1 es el mismo
+        Assertions.assertEquals(dbOffers, mongo.getOffers("user01@email.com"));
     }
 
     /**
@@ -254,7 +351,30 @@ class Sdi2223Entrega2TestApplicationTests {
     @Test
     @Order(22)
     public void PR22(){
-
+        //Vamos al formulario de inicio de sesión.
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        //Rellenamos el formulario
+        PO_LoginView.fillLoginForm(driver, "user16@email.com", "user16");
+        // vamos a la vista de buscar ofertas
+        PO_ListOfferView.goToPage(driver);
+        // compramos la oferta 1 del usuario 1
+        By comprar = By.xpath("//tbody[@id='offers']/tr[1]/td[5]/a[@class='btn btn-primary pull-right']");
+        driver.findElement(comprar).click();
+        // logout
+        PO_PrivateView.refactorLogout(driver);
+        //Rellenamos el formulario
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
+        //Obtenemos el número actual de ofertas del usuario 1
+        int dbOffers = mongo.getOffers("user01@email.com");
+        //Intentamos borrar la primera oferta
+        By deleteFirst = By.xpath("//a[contains(@href,'delete')][1]");
+        driver.findElement(deleteFirst).click();
+        String checkText = "No se ha podido eliminar la oferta";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        //Comprobamos el mensaje de error
+        Assertions.assertEquals(checkText, result.get(0).getText());
+        //Comprobamos en la bd que el número de ofertas del usuario 1 es el mismo
+        Assertions.assertEquals(dbOffers, mongo.getOffers("user01@email.com"));
     }
 
     /**

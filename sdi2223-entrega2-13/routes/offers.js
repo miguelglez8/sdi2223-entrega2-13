@@ -8,7 +8,7 @@ module.exports = function (app, usersRepository, offersRepository) {
         let filter = {seller : req.session.user}
         let options = {};
         let page = parseInt(req.query.page);
-        if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") { // Puede no venir el param
+        if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") {
             page = 1;
         }
         // buscamos las ofertas por paginación
@@ -74,8 +74,13 @@ module.exports = function (app, usersRepository, offersRepository) {
             if (offerId == null) {
                 res.send("Error al insertar la oferta");
             } else {
-                // res.send("Agregada la oferta ID: " + offerId)
-                res.redirect("/offers/myoffers")
+                checkFields(offer, function (checkFields){
+                    if(checkFields){
+                        res.redirect("/offers/myoffers");
+                    }else{
+                        res.send("Error al añadir la oferta: Datos introducidos no válidos");
+                    }
+                })
             }
         });
 
@@ -86,15 +91,23 @@ module.exports = function (app, usersRepository, offersRepository) {
      */
     app.get('/offers/delete/:id', function (req, res) {
         let filter = {_id: new ObjectId(req.params.id)};
-        offersRepository.deleteOffer(filter, {}).then(result => {
-            if (result === null || result.deletedCount === 0) {
-                res.send("No se ha podido eliminar el registro");
-            } else {
-                res.redirect("/offers/myoffers");
+        let user = req.session.user;
+        canDelete(user, filter, function (canDelete){
+            if(canDelete){
+                offersRepository.deleteOffer(filter, {}).then(result => {
+                    if (result === null || result.deletedCount === 0) {
+                        res.send("No se ha podido eliminar la oferta");
+                    } else {
+                        res.redirect("/offers/myoffers");
+                    }
+                }).catch(error => {
+                    res.send("Se ha producido un error al intentar eliminar la oferta: " + error)
+                });
+            }else{
+                res.send("No se ha podido eliminar la oferta")
             }
-        }).catch(error => {
-            res.send("Se ha producido un error al intentar eliminar la canción: " + error)
-        });
+        })
+
     })
 
     /**
@@ -296,5 +309,35 @@ module.exports = function (app, usersRepository, offersRepository) {
         let price = userResponse.money - oferta.price;
         // devolvemos los errores que haya y el precio que le queda al usuario
         return {errors, price}
+    }
+
+    /**
+     * Función que valida los campos título, detalle y precio
+     */
+    function checkFields(offer, functionCallback){
+        if(offer.title === 'undefined' || offer.title == null || offer.title.trim().length === 0){
+            functionCallback(false);
+            return;
+        }
+        if(offer.detail === 'undefined' || offer.detail == null || offer.detail.trim().length === 0){
+            functionCallback(false);
+            return;
+        }
+
+        if(offer.price === 'undefined' || offer.price == null || offer.price.trim().length === 0 || offer.price < 0){
+            functionCallback(false);
+            return;
+        }
+        functionCallback(true);
+    }
+
+    function canDelete(user, offer, functionCallback){
+        offersRepository.findOffer(offer,{}).then( offer2 => {
+            if(offer2 && (offer2.seller !== user || offer2.isBuy)){
+                functionCallback(false);
+            }else{
+                functionCallback(true);
+            }
+        })
     }
 }

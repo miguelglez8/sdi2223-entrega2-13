@@ -8,6 +8,7 @@
       <th>Precio</th>
       <th>Fecha de publicación</th>
       <th>Email del vendedor</th>
+      <th>Conversación</th>
     </tr>
     </thead>
     <tbody id="offersTableBody"></tbody>
@@ -15,6 +16,7 @@
 </div>
 <script>
   window.history.pushState("", "", "/apiclient/client.html?w=offers");
+  var selectedOfferId;
   function loadOffers() {
     $.ajax({
       url: URLbase + "/offers",
@@ -41,10 +43,16 @@
               "<td>" + offers[i].price + "</td>" +
               "<td>" + offers[i].date + "</td>" +
               "<td>" + offers[i].seller + "</td>" +
+              "<td><a onclick=widgetChat('" + offers[i]._id + "')>Conversación</a></td>" +
               "</tr>");
       // Mucho cuidado con las comillas del eliminarCancion
       //la id tiene que ir entre comillas ' '
     }
   }
   loadOffers();
+
+  function widgetChat(_id){
+    selectedOfferId = _id;
+    $("#main-container").load("widget-chat.html");
+  }
 </script>
