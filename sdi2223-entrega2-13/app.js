@@ -91,8 +91,8 @@ app.use("/api/v1.0/conversations", userTokenRouter);
  */
 let users = [];
 let offers = [];
-let title = "Oferta ";
-let detail = "Detalle ";
+let title = "Oferta";
+let detail = "Detalle";
 
 for(let i = 1; i <= 16; i++){
     let name = "user" + i.toString().padStart(2, '0');

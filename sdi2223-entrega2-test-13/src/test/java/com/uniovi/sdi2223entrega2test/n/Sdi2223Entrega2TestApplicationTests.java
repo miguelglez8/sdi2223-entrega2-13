@@ -28,8 +28,8 @@ import static org.junit.Assert.assertEquals;
 class Sdi2223Entrega2TestApplicationTests {
     // Miguel
 
-    // static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    // static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
+    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Raúl
     // static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
@@ -457,7 +457,7 @@ class Sdi2223Entrega2TestApplicationTests {
         WebElement input = driver.findElement(By.xpath("//*[@id=\"search\"]"));
         input.click();
         input.clear();
-        input.sendKeys("OFERTA 141");
+        input.sendKeys("OFERTA141");
         // seleccionamos el botón de buscar
         By boton = By.xpath("//*[@id=\"custom-search-input \"]/form/div/span/button");
         driver.findElement(boton).click();
@@ -465,6 +465,8 @@ class Sdi2223Entrega2TestApplicationTests {
         Assertions.assertEquals(1, PO_HomeView.checkElementUl(driver, "pagination"));
         // hay una oferta en la tabla (que es la 141)
         Assertions.assertEquals(1, PO_HomeView.checkElementTableBody(driver, "offers").size());
+        // comprobamos que existe la oferta en la base de datos
+        Assertions.assertTrue(mongo.getOffer("Oferta141") == 1);
         // logout
         PO_PrivateView.refactorLogout(driver);
     }
@@ -495,7 +497,7 @@ class Sdi2223Entrega2TestApplicationTests {
         // sacamos el precio de la oferta que vamos a comprar
         double precio = Double.parseDouble(driver.findElement(By.xpath("//*[@id=\"offers\"]/tr/td[4]")).getText());
         // comprobamos que el precio mostrado se corresponde con el de la base de datos
-        Assertions.assertEquals(mongo.getPrice("Oferta 11"), precio);
+        Assertions.assertEquals(mongo.getPrice("Oferta11"), precio);
         // compramos la oferta 11
         By comprar = By.xpath("//*[@id=\"offers\"]/tr/td[5]/a");
         driver.findElement(comprar).click();
@@ -536,7 +538,7 @@ class Sdi2223Entrega2TestApplicationTests {
         // sacamos el precio de la oferta que vamos a comprar
         double precio = Double.parseDouble(driver.findElement(By.xpath("//*[@id=\"offers\"]/tr/td[4]")).getText());
         // comprobamos que el precio mostrado se corresponde con el de la base de datos
-        Assertions.assertEquals(mongo.getPrice("Oferta 100"), precio);
+        Assertions.assertEquals(mongo.getPrice("Oferta100"), precio);
         // compramos la oferta 100
         By comprar = By.xpath("//*[@id=\"offers\"]/tr/td[5]/a");
         driver.findElement(comprar).click();
@@ -577,7 +579,7 @@ class Sdi2223Entrega2TestApplicationTests {
         // sacamos el precio de la oferta que supuestamente queremos comprar
         double precio = Double.parseDouble(driver.findElement(By.xpath("//*[@id=\"offers\"]/tr/td[4]")).getText());
         // comprobamos que el precio mostrado se corresponde con el de la base de datos
-        Assertions.assertEquals(mongo.getPrice("Oferta 101"), precio);
+        Assertions.assertEquals(mongo.getPrice("Oferta101"), precio);
         // comprobamos que el precio es superior al saldo del usuario
         Assertions.assertTrue(precio > saldoA);
         // la oferta tiene un precio de 101 euros
@@ -591,7 +593,7 @@ class Sdi2223Entrega2TestApplicationTests {
         Assertions.assertEquals(mongo.getSaldo("user03@email.com"), saldoB);
         // comprobamos que se ha lanzado un mensaje de error
         String messageError = PO_ListOfferView.getErrors(driver);
-        Assertions.assertEquals("[Titulo=Oferta 101] ERROR: no tienes suficiente saldo para comprar la oferta", messageError);
+        Assertions.assertEquals("[Titulo=Oferta101] ERROR: no tienes suficiente saldo para comprar la oferta", messageError);
         // logout
         PO_PrivateView.refactorLogout(driver);
     }

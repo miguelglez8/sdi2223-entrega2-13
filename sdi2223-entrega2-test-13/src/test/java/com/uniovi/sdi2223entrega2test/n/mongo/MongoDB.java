@@ -38,11 +38,11 @@ public class MongoDB {
 
 	// Busca el numero de compras de un usuario en concreto
 	public double getBuys(String user) {
-		MongoCollection<Document> users = getCollection("buys");
+		MongoCollection<Document> buys = getCollection("buys");
 		Bson filter = Filters.eq("user", user);
-		FindIterable<Document> document = users.find(filter);
+		FindIterable<Document> documents = buys.find(filter);
 		int size = 0;
-		for (Document docum : document) { // vamos sumando el número de elementos que hay en la colección
+		for (Document document : documents) { // vamos sumando el número de elementos que hay en la colección
 			size++;
 		}
 		return size;
@@ -50,9 +50,9 @@ public class MongoDB {
 
 	// Busca el precio de la oferta por su título
 	public double getPrice(String title) {
-		MongoCollection<Document> users = getCollection("offers");
+		MongoCollection<Document> offers = getCollection("offers");
 		Bson filter = Filters.eq("title", title);
-		Document document = users.find(filter).first();
+		Document document = offers.find(filter).first();
 		Number price = (Number) document.get("price");
 
 		return price.doubleValue();
@@ -65,6 +65,19 @@ public class MongoDB {
 		FindIterable<Document> document = users.find(filter);
 		int size = 0;
 		for (Document docum : document) {
+      size++;
+		}
+		return size;
+	}
+  
+	// Busca el número de ofertas con ese titulo
+	public int getOffer(String title) {
+		MongoCollection<Document> offers = getCollection("offers");
+		Bson filter = Filters.eq("title", title);
+		// Realizar la consulta
+		FindIterable<Document> ofertas = offers.find(filter);
+		int size = 0;
+		for (Document offer : ofertas) { // vamos sumando el número de elementos que hay en la colección
 			size++;
 		}
 		return size;
