@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static java.lang.Thread.sleep;
 import static org.junit.Assert.assertEquals;
 
 
@@ -30,8 +31,8 @@ import static org.junit.Assert.assertEquals;
 class Sdi2223Entrega2TestApplicationTests {
     // Miguel
 
-    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
+    // static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    // static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Raúl
     // static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
@@ -42,8 +43,8 @@ class Sdi2223Entrega2TestApplicationTests {
      //static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
 
     // Alves
-//    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-//    static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     //static String Geckodriver = "C:\\Path\\geckodriver-v0.30.0-win64.exe";
     //static String PathFirefox = "/Applications/Firefox.app/Contents/MacOS/firefox-bin";
@@ -811,7 +812,7 @@ class Sdi2223Entrega2TestApplicationTests {
         Response messageListResponse = request.get(ConversationsURL);
         // 6. Verificamos el estado
         Assertions.assertEquals(200, messageListResponse.getStatusCode());
-        Assertions.assertTrue((int) messageListResponse.body().path("messages.size()") == 2);
+        Assertions.assertEquals(1, (int) messageListResponse.body().path("messages.size()"));
     }
 
     /**
@@ -859,15 +860,39 @@ class Sdi2223Entrega2TestApplicationTests {
         Response loginResponse = PO_RestApi.login("user02@email.com", "user02", LoginURL, request);
         // 3. Añadimos el token a la petición
         request.header("token", loginResponse.jsonPath().get("token"));
-        // 4. Obtenemos el listado de conversaciones. En este punto deberían ser dos.
+        // 4. Envíamos dos nuevos mensajes
+        final String MessagesURL = "http://localhost:3000/api/v1.0/offers/messages";
+        PO_RestApi.sendMessage(
+                "user02@email.com",
+                "user04@email.com",
+                "user02@email.com",
+                "6456b470d5cf9d2932ae2b47",
+                "Esto es un mensaje de la prueba 46",
+                request, MessagesURL);
+        PO_RestApi.sendMessage(
+                "user02@email.com",
+                "user03@email.com",
+                "user02@email.com",
+                "6456b470d5cf9d2932ae2b41",
+                "Esto es otro mensaje de la prueba 46",
+                request, MessagesURL);
+        // 5. Obtenemos el listado de conversaciones. En este punto deberían ser una.
         final String ConversationsURL = "http://localhost:3000/api/v1.0/conversations";
+        // Esperamos a que cargue las conversaciones.
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Response conversationListResponse = request.get(ConversationsURL);
+        System.out.println(conversationListResponse.getBody().asString());
         final String conversationId = conversationListResponse.jsonPath().get("conversations[1]._id");
-        // 5. Accedemos a la URL de obtener conversaciones con la conversación a eliminar como parámetro
+        // 6. Accedemos a la URL de obtener conversaciones con la conversación a eliminar como parámetro
         final String DeleteConversationURL = "http://localhost:3000/api/v1.0/conversations/" + conversationId;
-        // 6. Eliminamos una conversación
+        // 7. Eliminamos una conversación
         Response deleteConversationResponse = request.delete(DeleteConversationURL);
-        // 7. Verificamos el estado. Ahora sólo debería haber una conversación.
+        // 8. Verificamos el estado. Ahora sólo debería haber una conversación.
+        System.out.println(deleteConversationResponse.getBody().asString());
         Assertions.assertEquals(200, deleteConversationResponse.getStatusCode());
         conversationListResponse = request.get(ConversationsURL);
         Assertions.assertEquals(1, (int) conversationListResponse.body().path("conversations.size()"));
