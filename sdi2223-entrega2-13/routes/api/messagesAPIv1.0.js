@@ -16,7 +16,7 @@ module.exports = function (app, offersRepository, messagesRepository) {
                 res.json({errors: errors.array()})
             }
             // Comprueba si el comprador es igual al vendedor
-            else if (checkBuyer(req, res)) {
+            else if (req.body.buyer === req.body.seller) {
                 res.status(422);
                 res.json({
                     "type": "field",
@@ -161,11 +161,5 @@ module.exports = function (app, offersRepository, messagesRepository) {
             res.json({error: "Se ha producido un error al intentar modificar el mensaje: " + e})
         }
     })
-
-    function checkBuyer(req, res) {
-        if (res.user === req.body.seller) {
-            return true;
-        }
-    }
 }
 
