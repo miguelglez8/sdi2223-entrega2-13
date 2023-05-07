@@ -24,7 +24,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static com.uniovi.sdi2223entrega2test.n.pageobjects.PO_View.checkElementBy;
 import static java.lang.Thread.sleep;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -38,21 +37,20 @@ class Sdi2223Entrega2TestApplicationTests {
     // static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Raúl
-    static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\Aladino España\\Desktop\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+    // static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+    // static String Geckodriver = "C:\\Users\\Aladino España\\Desktop\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Ton
-    static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
+    //static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+    //static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
 
     // Alves
-//    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-//    static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+    //static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    //static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Luis
-//    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-//    static String Geckodriver = "C:\\Users\\luism\\Desktop\\Clase\\SDI\\Sesión6\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
-
+    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    static String Geckodriver = "C:\\Users\\luism\\Desktop\\Clase\\SDI\\Sesión6\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     //static String Geckodriver = "C:\\Path\\geckodriver-v0.30.0-win64.exe";
     //static String PathFirefox = "/Applications/Firefox.app/Contents/MacOS/firefox-bin";
@@ -115,7 +113,7 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_PrivateView.refactorLogging(driver, "prueba3@email.com", "prueba3");
         //Compruebo que se ha logueado con exito
         String checkText = "Mis ofertas";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
 
         Assertions.assertEquals(checkText, result.get(0).getText());
 
@@ -135,7 +133,7 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_PrivateView.refactorLogging(driver, "", "");
         //Compruebo que no me permite loguearme por que dicho usuario no existe
         String checkText = "Identificación de usuario";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.get(0).getText());
 
 
@@ -154,13 +152,13 @@ class Sdi2223Entrega2TestApplicationTests {
 
         //Compruebo que NOS AVISA DE CONTRASEÑAS NO COINCIDENTES
         String checkText = "Las contraseñas no coinciden";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.get(0).getText());
         //COMPRUEBO QUE NO HA REALIZADO EL REGISTRO Y NO ME PUEDO LOGUEAR CON ESE REGISTRO INCORRECTO
         PO_PrivateView.refactorLogging(driver, "prueba4@email.com", "prueba4");
         //Compruebo que no me permite loguearme por que dicho usuario no existe
         String checkText2 = "Identificación de usuario";
-        List<WebElement> result2 = checkElementBy(driver, "text", checkText2);
+        List<WebElement> result2 = PO_View.checkElementBy(driver, "text", checkText2);
         Assertions.assertEquals(checkText2, result2.get(0).getText());
 
     }
@@ -177,14 +175,14 @@ class Sdi2223Entrega2TestApplicationTests {
 
         //Compruebo que NOS AVISA DE EMAIL EXISTENTE
         String checkText = "El email ya existe";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.get(0).getText());
         //COMPRUEBO QUE NO HA REALIZADO EL REGISTRO Y NO ME PUEDO LOGUEAR CON ESE REGISTRO INCORRECTO
         PO_PrivateView.refactorLogging(driver, "user01@email.com", "prueba4");
         //COMPRUEBO QUE PESE A AVISARME NO SE A CREADO LA CUENTA INTENTANDO LOGUEARME CON EL USUARIO QUE RELLENE
         //EN EL REGISTRO CON EMAIL YA EXISTENTE
         String checkText2 = "Identificación de usuario";
-        List<WebElement> result2 = checkElementBy(driver, "text", checkText2);
+        List<WebElement> result2 = PO_View.checkElementBy(driver, "text", checkText2);
         Assertions.assertEquals(checkText2, result2.get(0).getText());
 
     }
@@ -200,7 +198,7 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_LoginView.fillLoginForm(driver, "admin@email.com", "admin");
         //Comprobamos que entramos en la página privada del administrador
         String checkText = "Listado de usuarios";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.get(0).getText());
     }
 
@@ -215,7 +213,7 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
         //Comprobamos que entramos en la página privada de usuario
         String checkText = "Mis ofertas";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         //Compruebo que haya accedido a la vista correctamente
         Assertions.assertEquals(checkText, result.get(0).getText());
     }
@@ -231,7 +229,7 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_LoginView.fillLoginForm(driver, "user01@email.com", "user02");
         //COMPRUEBO QUE NO PUEDA LOGUEARSE Y SALTE ERROR EMAIL O PASSWORD INCORRECTO
         String checkText = "Email o password incorrecto";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.get(0).getText());
     }
 
@@ -245,7 +243,7 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_LoginView.fillLoginForm(driver, "user01@email.com", " ");
         //COMPRUEBO QUE DA ERROR Y AVISA DE QUE EMAIL O CONTRASEÑA INCORRECTOS
         String checkText = "Email o password incorrecto";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.get(0).getText());
     }
 
@@ -260,14 +258,14 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
         //Comprobamos que entramos en la página privada de usuario
         String checkText = "Mis ofertas";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         //Compruebo que haya accedido a la vista correctamente
         Assertions.assertEquals(checkText, result.get(0).getText());
         //A continuacion procedo a hacer logout
         PO_PrivateView.refactorLogout(driver);
         //Compruebo que me haya redireccionado a la vista de inicio de sesion
         String checkText2 = "Identificación de usuario";
-        List<WebElement> result2 = checkElementBy(driver, "text", checkText2);
+        List<WebElement> result2 = PO_View.checkElementBy(driver, "text", checkText2);
         Assertions.assertEquals(checkText2, result2.get(0).getText());
     }
 
@@ -295,7 +293,7 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_LoginView.fillLoginForm(driver, "admin@email.com", "admin");
         //Comprobamos que entramos en la página privada del administrador
         String checkText = "Listado de usuarios";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.get(0).getText());
         //Comprobamos el numero de usuarios es correcto
         List<WebElement> userList = SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
@@ -331,9 +329,9 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_LoginView.fillLoginForm(driver, "admin@email.com", "admin");
         //Comprobamos que entramos en la página privada del administrador
         String checkText = "Listado de usuarios";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.get(0).getText());
-        List<WebElement> list = checkElementBy(driver, "id", "cbDelete");
+        List<WebElement> list = PO_View.checkElementBy(driver, "id", "cbDelete");
         //Pulso el boton borrar sobre el primer usuario
         for (int position :  new int[]{0}) {
             list.get(position).click();
@@ -381,7 +379,7 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_LoginView.fillLoginForm(driver, "admin@email.com", "admin");
         //Comprobamos que entramos en la página privada del administrador
         String checkText = "Listado de usuarios";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.get(0).getText());
         //cambiamos a la tercera pagina
         By tercera = By.xpath("//*[@id=\"pi-3\"]/a");
@@ -389,7 +387,7 @@ class Sdi2223Entrega2TestApplicationTests {
         //Cambiamos a la ultima pagina de usuarios
         By cuartaPagina = By.xpath("//*[@id=\"pi-4\"]/a");
         driver.findElement(cuartaPagina).click();
-        List<WebElement> list = checkElementBy(driver, "id", "cbDelete");
+        List<WebElement> list = PO_View.checkElementBy(driver, "id", "cbDelete");
         //Pulso el boton borrar sobre el primer usuario
 
         list.get(1).click();
@@ -435,9 +433,9 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_LoginView.fillLoginForm(driver, "admin@email.com", "admin");
         //Comprobamos que entramos en la página privada del administrador
         String checkText = "Listado de usuarios";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.get(0).getText());
-        List<WebElement> list = checkElementBy(driver, "id", "cbDelete");
+        List<WebElement> list = PO_View.checkElementBy(driver, "id", "cbDelete");
         //Pulso el boton borrar sobre el primer usuario
         list.get(0).click();
         list.get(1).click();
@@ -481,9 +479,9 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_LoginView.fillLoginForm(driver, "admin@email.com", "admin");
         //Comprobamos que entramos en la página privada del administrador
         String checkText = "Listado de usuarios";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.get(0).getText());
-        List<WebElement> list = checkElementBy(driver, "id", "cbDelete");
+        List<WebElement> list = PO_View.checkElementBy(driver, "id", "cbDelete");
         //Pulso el boton borrar sobre el primer usuario
         list.get(0).click();
         list.get(1).click();
@@ -541,7 +539,7 @@ class Sdi2223Entrega2TestApplicationTests {
         By pageBtn = By.xpath("//ul[@class=\"pagination\"]/li[last()]/a");
         driver.findElement(pageBtn).click();
         String checkText = "Mesa";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         //Comprobamos que está la oferta
         Assertions.assertEquals(checkText, result.get(0).getText());
 
@@ -566,7 +564,7 @@ class Sdi2223Entrega2TestApplicationTests {
         //Rellenamos el formulario y lo enviamos
         PO_AddOfferView.fillAddForm(driver, " ", " ", "-3");
         String checkText = "Error al añadir la oferta: Datos introducidos no válidos";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         //Comprobamos que se ve el mensaje
         Assertions.assertEquals(checkText, result.get(0).getText());
     }
@@ -672,7 +670,7 @@ class Sdi2223Entrega2TestApplicationTests {
         //Como no se puede eliminar ofertas de otro usuario navegando por la web, tengo que ir a la url directamente
         driver.navigate().to("http://localhost:3000/offers/delete/645658a1e88359d0a8519e61");
         String checkText = "No se ha podido eliminar la oferta";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         //Comprobamos el mensaje de error
         Assertions.assertEquals(checkText, result.get(0).getText());
         //Comprobamos en la bd que el número de ofertas del usuario 1 es el mismo
@@ -705,7 +703,7 @@ class Sdi2223Entrega2TestApplicationTests {
         By deleteFirst = By.xpath("//a[contains(@href,'delete')][1]");
         driver.findElement(deleteFirst).click();
         String checkText = "No se ha podido eliminar la oferta";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         //Comprobamos el mensaje de error
         Assertions.assertEquals(checkText, result.get(0).getText());
         //Comprobamos en la bd que el número de ofertas del usuario 1 es el mismo
@@ -1007,7 +1005,7 @@ class Sdi2223Entrega2TestApplicationTests {
         misOfertas.click();
 
         // buscamos la oferta que hemos destacado
-        List<WebElement> destacada = checkElementBy(driver, "text", "Destacada1");
+        List<WebElement> destacada = PO_View.checkElementBy(driver, "text", "Destacada1");
         // Comprobamos que efectivamente la hemos encontrado
         assertTrue(destacada.size() == 1);
 
@@ -1064,7 +1062,7 @@ class Sdi2223Entrega2TestApplicationTests {
         misOfertas.click();
 
         // buscamos la oferta que hemos destacado
-        List<WebElement> destacada = checkElementBy(driver, "text", nombreOferta);
+        List<WebElement> destacada = PO_View.checkElementBy(driver, "text", nombreOferta);
         // Comprobamos que efectivamente la hemos encontrado
         assertTrue(destacada.size() == 1);
 
@@ -1114,7 +1112,7 @@ class Sdi2223Entrega2TestApplicationTests {
 
         // buscamos todos los elementos que posean el texto con el mensaje de error
         String checkText = "No tienes suficiente dinero para destacar una oferta";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         //Comprobamos el mensaje de error
         Assertions.assertEquals(checkText, result.get(0).getText());
 
@@ -1135,7 +1133,7 @@ class Sdi2223Entrega2TestApplicationTests {
 
         // nos deberá mandar a la página de login
         String checkText = "Identificación de usuario";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.get(0).getText());
     }
 
@@ -1152,10 +1150,10 @@ class Sdi2223Entrega2TestApplicationTests {
 
         // nos deberá mandar a la página de login
         String checkText = "Email:";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.get(0).getText());
         checkText = "Password:";
-        List<WebElement> result2 = checkElementBy(driver, "text", checkText);
+        List<WebElement> result2 = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result2.get(0).getText());
     }
 
@@ -1230,30 +1228,30 @@ class Sdi2223Entrega2TestApplicationTests {
         verLogs.click();
 
         // buscamos todos los elementos que posean el texto PET
-        List<WebElement> PET = checkElementBy(driver, "text", "PET");
+        List<WebElement> PET = PO_View.checkElementBy(driver, "text", "PET");
         // Comprobamos que hay 3 o más elementos, dos o más producidos al negar entre las páginas y otro por el filtro
         assertTrue(PET.size() >= 3);
 
         // buscamos todos los elementos que posean el texto LOGIN-EX
-        List<WebElement> LOGINEX = checkElementBy(driver, "text", "LOGIN-EX");
+        List<WebElement> LOGINEX = PO_View.checkElementBy(driver, "text", "LOGIN-EX");
         // Comprobamos que hay 3 o más elementos, dos o más producidos en el test actual más los anteriores
         // y otro por el filtro
         assertTrue(LOGINEX.size() >= 3);
 
         // buscamos todos los elementos que posean el texto LOGIN-ERR
-        List<WebElement> LOGINERR = checkElementBy(driver, "text", "LOGIN-ERR");
+        List<WebElement> LOGINERR = PO_View.checkElementBy(driver, "text", "LOGIN-ERR");
         // Comprobamos que hay 3 o más elementos, dos o más producidos en el test actual más los anteriores
         // y otro por el filtro
         assertTrue(LOGINERR.size() >= 3);
 
         // buscamos todos los elementos que posean el texto ALTA
-        List<WebElement> ALTA = checkElementBy(driver, "text", "ALTA");
+        List<WebElement> ALTA = PO_View.checkElementBy(driver, "text", "ALTA");
         // Comprobamos que hay 3 o más elementos, las dos cuentas registradas ahora y el filtro,
         // puede haber más producidos por otros test
         assertTrue(ALTA.size() >= 3);
 
         // buscamos todos los elementos que posean el texto LOGOUT
-        List<WebElement> LOGOUT = checkElementBy(driver, "text", "LOGOUT");
+        List<WebElement> LOGOUT = PO_View.checkElementBy(driver, "text", "LOGOUT");
         // Comprobamos que hay 3 o más elementos, dos o más producidos en el test actual más los anteriores
         // y otro por el filtro
         assertTrue(LOGOUT.size() >= 3);
@@ -1283,27 +1281,27 @@ class Sdi2223Entrega2TestApplicationTests {
         driver.findElement(boton).click();
 
         // buscamos todos los elementos que posean el texto PET
-        List<WebElement> PET = checkElementBy(driver, "text", "PET");
+        List<WebElement> PET = PO_View.checkElementBy(driver, "text", "PET");
         // Comprobamos que solo está el filtro y la propia petición que hace al recargar la página al eliminar
         assertTrue(PET.size() == 2);
 
         // buscamos todos los elementos que posean el texto LOGIN-EX
-        List<WebElement> LOGINEX = checkElementBy(driver, "text", "LOGIN-EX");
+        List<WebElement> LOGINEX = PO_View.checkElementBy(driver, "text", "LOGIN-EX");
         // Comprobamos que solo está el filtro
         assertTrue(LOGINEX.size() == 1);
 
         // buscamos todos los elementos que posean el texto LOGIN-ERR
-        List<WebElement> LOGINERR = checkElementBy(driver, "text", "LOGIN-ERR");
+        List<WebElement> LOGINERR = PO_View.checkElementBy(driver, "text", "LOGIN-ERR");
         // Comprobamos que solo está el filtro
         assertTrue(LOGINERR.size() == 1);
 
         // buscamos todos los elementos que posean el texto ALTA
-        List<WebElement> ALTA = checkElementBy(driver, "text", "ALTA");
+        List<WebElement> ALTA = PO_View.checkElementBy(driver, "text", "ALTA");
         // Comprobamos que solo está el filtro
         assertTrue(ALTA.size() == 1);
 
         // buscamos todos los elementos que posean el texto LOGOUT
-        List<WebElement> LOGOUT = checkElementBy(driver, "text", "LOGOUT");
+        List<WebElement> LOGOUT = PO_View.checkElementBy(driver, "text", "LOGOUT");
         // Comprobamos que solo está el filtro
         assertTrue(LOGOUT.size() == 1);
 
@@ -1627,7 +1625,7 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user01");
         // Compruebo que tras el logueo correcto nos redirecciona correctamente a las ofertas
         String checkText = "Ofertas disponibles para comprar (todas salvo las del usuario)";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         //Compruebo que haya accedido a la vista correctamente
         Assertions.assertEquals(checkText, result.get(0).getText());
     }
@@ -1645,7 +1643,7 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user");
         // Compruebo que tras el logueo correcto nos avisa correctamente del logueo INVALIDO
         String checkText = "Usuario no encontrado";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         //Compruebo que haya accedido a la vista correctamente
         Assertions.assertEquals(checkText, result.get(0).getText());
     }
@@ -1663,7 +1661,7 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", " ");
         // Compruebo que tras el logueo correcto nos avisa correctamente del logueo INVALIDO
         String checkText = "Usuario no encontrado";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         //Compruebo que haya accedido a la vista correctamente
         Assertions.assertEquals(checkText, result.get(0).getText());
     }
@@ -1693,6 +1691,7 @@ class Sdi2223Entrega2TestApplicationTests {
         }
         Assertions.assertEquals(size, table.size()); // comprobamos que sea el mismo número
     }
+
 
     /**
      * Sobre listado de ofertas disponibles (a elección de desarrollador), enviar un mensaje a una
@@ -1810,5 +1809,83 @@ class Sdi2223Entrega2TestApplicationTests {
         }
         Assertions.assertEquals(1, conversationsCount);
     }
+    /**
+     * PR55. Sobre el listado de conversaciones ya abiertas. Pinchar el enlace Eliminar en la primera y
+     * comprobar que el listado se actualiza correctamente.
+     */
+    @Test
+    @Order(55)
+    public void PR55() {
+        // navegamos a la URL
+        driver.get("http://localhost:3000/apiclient/client.html?w=login");
 
+        // introducimos los datos en el login
+        PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user01");
+
+        // creamos una conversación
+        List<WebElement> conversacion = PO_View.checkElementBy(driver, "text", "Conversación");
+        conversacion.get(3).click();
+        // enviamos un mensaje
+        By mensaje = By.xpath("//*[@id=\"msg-add\"]");
+        WebElement elemento = driver.findElement(mensaje);
+        elemento.click();
+        elemento.clear();
+        elemento.sendKeys("Hola");
+        By boton = By.className("btn");
+        driver.findElement(boton).click();
+
+        // creamos otra conversación
+        WebElement conver = driver.findElement(By.linkText("Ofertas"));
+        conver.click();
+        conversacion = PO_View.checkElementBy(driver, "text", "Conversación");
+        conversacion.get(4).click();
+        // enviamos un mensaje
+        mensaje = By.xpath("//*[@id=\"msg-add\"]");
+        elemento = driver.findElement(mensaje);
+        elemento.click();
+        elemento.clear();
+        elemento.sendKeys("Hola");
+        boton = By.className("btn");
+        driver.findElement(boton).click();
+
+        // creamos una tercera conversaión
+        conver = driver.findElement(By.linkText("Ofertas"));
+        conver.click();
+        conversacion = PO_View.checkElementBy(driver, "text", "Conversación");
+        conversacion.get(5).click();
+        // enviamos un mensaje
+        mensaje = By.xpath("//*[@id=\"msg-add\"]");
+        elemento = driver.findElement(mensaje);
+        elemento.click();
+        elemento.clear();
+        elemento.sendKeys("Hola");
+        boton = By.className("btn");
+        driver.findElement(boton).click();
+
+        // accedemos a la lista de conversaciones
+        WebElement conversaciones = driver.findElement(By.linkText("Conversaciones"));
+        conversaciones.click();
+
+        List<WebElement> eliminar = PO_View.checkElementBy(driver, "text", "Eliminar");
+
+        WebElement nombreOferta = driver.findElement(By.xpath("//*[@id=\"conversationsTableBody\"]/tr[1]/td[2]"));
+        String nombre = nombreOferta.getText();
+
+        // comprobamos que tenemos tres conversaciones, lo que significa tener un botóno eliminar por cada una.
+        // además de una cuarta coincidencia al buscar la palabra "Eliminar" debido a un script
+        assertTrue(eliminar.size() == 4);
+
+        // eliminarmos la primera conversación
+        WebElement eliminarPrimera = driver.findElement(By.xpath("/html/body/div/div/table/tbody/tr[1]/td[4]/a"));
+        eliminarPrimera.click();
+
+        eliminar = PO_View.checkElementBy(driver, "text", "Eliminar");
+
+        // comprobamos que ahora solo tenemos dos conversaciones
+        assertTrue(eliminar.size() == 3);
+
+        // además comprobamos que se ha eliminado la oferta que se encontraba primera.
+        boolean notFound = PO_HomeView.checkInvisibilityOfElement(driver, "text", nombre);
+        Assertions.assertTrue(notFound);
+    }
 }
