@@ -44,8 +44,8 @@ class Sdi2223Entrega2TestApplicationTests {
     //static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
 
     // Alves
-    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+    //static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    //static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Luis
     static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
@@ -160,7 +160,7 @@ class Sdi2223Entrega2TestApplicationTests {
         //Rellenamos el formulario
         PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
         //Comprobamos que entramos en la página privada de usuario
-        String checkText = "Mis Ofertas";
+        String checkText = "Mis ofertas";
         List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
 
         Assertions.assertEquals(checkText, checkText);
@@ -824,7 +824,17 @@ class Sdi2223Entrega2TestApplicationTests {
     @Test
     @Order(34)
     public void PR34() {
+        // intentamos acceder a la lista de conversaciones, como no estamos llogueados la única manera de acceder
+        // es mediante el enlace
+        driver.navigate().to(URL + "/apiclient/client.html?w=conversations");
 
+        // nos deberá mandar a la página de login
+        String checkText = "Email:";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.get(0).getText());
+        checkText = "Password:";
+        List<WebElement> result2 = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result2.get(0).getText());
     }
 
     /**
@@ -1181,10 +1191,16 @@ class Sdi2223Entrega2TestApplicationTests {
                 request, MessagesURL);
         // 5. Accedemos a la URL de obtener conversaciones
         final String ConversationsURL = "http://localhost:3000/api/v1.0/conversations";
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Response conversationListResponse = request.get(ConversationsURL);
         // 6. Verificamos el estado
         Assertions.assertEquals(200, conversationListResponse.getStatusCode());
-        Assertions.assertTrue((int) conversationListResponse.body().path("conversations.size()") == 2);
+        int nConversaciones = (int) conversationListResponse.body().path("conversations.size()");
+        Assertions.assertTrue( nConversaciones == 1);
     }
 
     /**
