@@ -138,6 +138,7 @@ class Sdi2223Entrega2TestApplicationTests {
         Assertions.assertEquals(checkText, result.get(0).getText());
 
 
+
     }
 
     //[Prueba3] Registro de Usuario con datos inválidos (repetición de contraseña inválida).
@@ -443,6 +444,8 @@ class Sdi2223Entrega2TestApplicationTests {
         //Pulsamos el botón de borrar
         List<WebElement> languageButton = SeleniumUtils.waitLoadElementsBy(driver, "id", "btnDelete", PO_View.getTimeout());
         languageButton.get(0).click();
+
+
 
 
         //POR SI ACASO TAMBIEN COMPRUEBO EL NUMERO DE USUARIOS ES 1 MENOS

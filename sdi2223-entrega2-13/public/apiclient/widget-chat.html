@@ -33,7 +33,6 @@
       headers: {"token": token},
       success: function (response) {
         messages = response.messages;
-        // updateMessagesTable(messages);
       },
       error: function (error) {
         $("#main-container").load("widget-login.html");
@@ -115,10 +114,16 @@
       dataType: 'json',
       headers: {"token": token},
       success: function (response) {
+        $("#errors").remove();
         console.log("Mensaje enviado: ");
       },
       error: function (error) {
-        $("#main-container").load("widget-login.html");
+        $("#errors").remove();
+        $("#widget-chat")
+                .prepend("<div id= 'errors' class='alert alert-danger'><ul id='ul-error'></ul></div>")
+        for (let i=0; i < error.responseJSON.errors.length; i++) {
+          $("#ul-error").append("<li>" + error.responseJSON.errors[i].msg + "</li>") // li -> lista de errores
+        }
       }
     });
   }
