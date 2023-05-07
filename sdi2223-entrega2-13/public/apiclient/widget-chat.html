@@ -11,6 +11,7 @@
     </thead>
     <tbody id="messagesTableBody"></tbody>
   </table>
+  <hr>
   <div class="form-group">
     <label class="control-label col-sm-2" for="msg-add">Mensaje:</label>
     <input type="text" class="form-control" name="msg-add"
@@ -63,8 +64,30 @@
 
   startAutoUpdate();
 
+  function sendOfferMessage(user, seller) {
+    $.ajax({
+      url: URLbase + "/offers/messages",
+      type: "POST",
+      data: {
+        buyer: user,
+        seller: seller,
+        offer: selectedOfferId,
+        text: $("#msg-add").val(),
+        date: Date.now(),
+        price: false
+      },
+      dataType: 'json',
+      headers: {"token": token},
+      success: function (response) {
+        console.log("Mensaje enviado: ");
+      },
+      error: function (error) {
+        $("#main-container").load("widget-login.html");
+      }
+    });
+  }
+
   function widgetSendMsg() {
-    let user;
     let sellerPromise = new Promise(function(resolve, reject) {
       $.ajax({
         url: URLbase + "/offers/" + selectedOfferId,
@@ -85,8 +108,26 @@
         type: "GET",
         headers: {"token": token},
         success: function (response) {
-          user = response.user.email;
-          sendMessage(user, seller);
+          let user = response.user.email;
+          if(user === seller){
+            $.ajax({
+              url: URLbase + "/offers/messages/" + selectedOfferId,
+              type: "GET",
+              data: {},
+              dataType: 'json',
+              headers: {"token": token},
+              success: function (response) {
+                user = response.messages[0].buyer;
+                sendOfferMessage(user, seller, selectedOfferId);
+              },
+              error: function (error) {
+                $("#main-container").load("widget-login.html");
+              }
+            });
+          } else {
+
+            sendOfferMessage(user, seller);
+          }
         },
         error: function (error) {
           $("#main-container").load("widget-login.html");
@@ -95,29 +136,7 @@
     }).catch(function(error) {
       $("#main-container").load("widget-login.html");
     });
-
-    function sendMessage(user, seller) {
-      $.ajax({
-        url: URLbase + "/offers/messages",
-        type: "POST",
-        data: {
-          buyer: user,
-          seller: seller,
-          offer: selectedOfferId,
-          text: $("#msg-add").val(),
-          date: Date.now(),
-          price: false
-        },
-        dataType: 'json',
-        headers: {"token": token},
-        success: function (response) {
-          console.log("Mensaje enviado: ");
-        },
-        error: function (error) {
-          $("#main-container").load("widget-login.html");
-        }
-      });
-    }
   }
+
 
 </script>

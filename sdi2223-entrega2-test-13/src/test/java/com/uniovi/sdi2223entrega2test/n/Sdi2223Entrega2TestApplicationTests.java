@@ -1319,4 +1319,121 @@ class Sdi2223Entrega2TestApplicationTests {
         Assertions.assertEquals(size, table.size()); // comprobamos que sea el mismo número
     }
 
+    /**
+     * Sobre listado de ofertas disponibles (a elección de desarrollador), enviar un mensaje a una
+     * oferta concreta. Se abriría dicha conversación por primera vez. Comprobar que el mensaje aparece
+     * en el listado de mensajes.
+     */
+    @Test
+    @Order(52)
+    public void PR52() {
+        // navegamos a la URL
+        driver.get("http://localhost:3000/apiclient/client.html?w=login");
+        // introducimos los datos en el login
+        PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user01");
+        //Vamos a la conversación con la primera oferta
+        By convBtn = By.xpath("//a[contains(text(),'Conversación')][1]");
+        driver.findElement(convBtn).click();
+        // introducimos un mensaje
+        WebElement input = driver.findElement(By.xpath("//*[@id=\"msg-add\"]"));
+        input.click();
+        input.clear();
+        input.sendKeys("Hola :)");
+        // Click sobre enviar
+        By boton = By.xpath("//button[@id='msg-send']");
+        driver.findElement(boton).click();
+        String checkText = "Hola :)";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.get(0).getText());
+    }
+
+    /**
+     * Sobre el listado de conversaciones enviar un mensaje a una conversación ya abierta.
+     * Comprobar que el mensaje aparece en el listado de mensajes.
+     */
+    @Test
+    @Order(53)
+    public void PR53() {
+        // navegamos a la URL
+        driver.get("http://localhost:3000/apiclient/client.html?w=login");
+        // introducimos los datos en el login
+        PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user01");
+        //Vamos a la conversación con la primera oferta
+        By convBtn = By.xpath("//a[contains(text(),'Conversación')][1]");
+        driver.findElement(convBtn).click();
+        // introducimos un mensaje
+        WebElement input = driver.findElement(By.xpath("//*[@id=\"msg-add\"]"));
+        input.click();
+        input.clear();
+        input.sendKeys("Hola :)");
+        // Click sobre enviar
+        By boton = By.xpath("//button[@id='msg-send']");
+        driver.findElement(boton).click();
+        // Volvemos a iniciar sesión
+        driver.get("http://localhost:3000/apiclient/client.html?w=login");
+        PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user01");
+        //Vamos a la conversación con la primera oferta
+        driver.findElement(convBtn).click();
+        try {
+            Thread.sleep(1100);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        //Comprobamos que se ve el mensaje de la conversación ya abierta
+        String checkText = "Hola :)";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.get(0).getText());
+        // introducimos un mensaje nuevo
+        input = driver.findElement(By.xpath("//*[@id=\"msg-add\"]"));
+        input.click();
+        input.clear();
+        input.sendKeys("Adiós :(");
+        // Click sobre enviar
+        By btn = By.xpath("//button[@id='msg-send']");
+        driver.findElement(btn).click();
+        try {
+            Thread.sleep(1100);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        //Comprobamos que se ve el mensaje nuevo
+        checkText = "Adiós :(";
+        result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.get(0).getText());
+    }
+
+    /**
+     * Mostrar el listado de conversaciones ya abiertas. Comprobar que el listado contiene la
+     * cantidad correcta de conversaciones.
+     */
+    @Test
+    @Order(54)
+    public void PR54() {
+        // navegamos a la URL
+        driver.get("http://localhost:3000/apiclient/client.html?w=login");
+        // introducimos los datos en el login
+        PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user01");
+        //Vamos a la conversación con la primera oferta
+        By convBtn = By.xpath("//a[contains(text(),'Conversación')][1]");
+        driver.findElement(convBtn).click();
+        // introducimos un mensaje
+        WebElement input = driver.findElement(By.xpath("//*[@id=\"msg-add\"]"));
+        input.click();
+        input.clear();
+        input.sendKeys("Hola :)");
+        // Click sobre enviar
+        By boton = By.xpath("//button[@id='msg-send']");
+        driver.findElement(boton).click();
+        By cnv = By.xpath("//*[@id=\"barra-menu\"]/li[2]/a");
+        driver.findElement(cnv).click();
+        WebElement tableBody = driver.findElement(By.cssSelector("#widget-conversations > table"));
+        List<WebElement> conversations = tableBody.findElements(By.tagName("tr"));
+        int conversationsCount = conversations.size();
+        // verificar si la primera fila es un encabezado y no se cuenta en el recuento
+        if (conversationsCount > 0 && conversations.get(0).findElements(By.tagName("th")).size() > 0) {
+            conversationsCount--;
+        }
+        Assertions.assertEquals(1, conversationsCount);
+    }
+
 }
