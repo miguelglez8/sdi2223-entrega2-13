@@ -63,41 +63,8 @@
 
   startAutoUpdate();
 
-  // function widgetSendMsg(){
-  //   let seller;
-  //   $.ajax({
-  //     url: URLbase + "/offers/" + selectedOfferId,
-  //     type: "GET",
-  //     headers: {"token": token},
-  //     success: function (response) {
-  //       seller = response.song.seller;
-  //     },
-  //     error: function (error) {
-  //       $("#main-container").load("widget-login.html");
-  //     }
-  //   });
-  //   $.ajax({
-  //     url: URLbase + "/offers/messages",
-  //     type: "POST",
-  //     data: {
-  //       buyer: "user01@email.com",
-  //       seller: seller,
-  //       offer: selectedOfferId,
-  //       text: $("#msg-add").val(),
-  //       date: Date.now(),
-  //       price: false
-  //     },
-  //     dataType: 'json',
-  //     headers: {"token": token},
-  //     success: function (response) {
-  //       console.log("Mensaje enviado: ");
-  //     },
-  //     error: function (error) {
-  //       $("#main-container").load("widget-login.html");
-  //     }
-  //   });
-  // }
-  function widgetSendMsg(){
+  function widgetSendMsg() {
+    let user;
     let sellerPromise = new Promise(function(resolve, reject) {
       $.ajax({
         url: URLbase + "/offers/" + selectedOfferId,
@@ -114,10 +81,27 @@
 
     sellerPromise.then(function(seller) {
       $.ajax({
+        url: URLbase + "/users/current",
+        type: "GET",
+        headers: {"token": token},
+        success: function (response) {
+          user = response.user.email;
+          sendMessage(user, seller);
+        },
+        error: function (error) {
+          $("#main-container").load("widget-login.html");
+        }
+      });
+    }).catch(function(error) {
+      $("#main-container").load("widget-login.html");
+    });
+
+    function sendMessage(user, seller) {
+      $.ajax({
         url: URLbase + "/offers/messages",
         type: "POST",
         data: {
-          buyer: "user01@email.com",
+          buyer: user,
           seller: seller,
           offer: selectedOfferId,
           text: $("#msg-add").val(),
@@ -133,9 +117,7 @@
           $("#main-container").load("widget-login.html");
         }
       });
-    }).catch(function(error) {
-      $("#main-container").load("widget-login.html");
-    });
+    }
   }
 
 </script>
