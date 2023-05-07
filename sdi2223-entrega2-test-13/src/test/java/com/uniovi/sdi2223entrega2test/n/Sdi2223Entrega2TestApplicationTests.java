@@ -34,8 +34,8 @@ import static org.junit.Assert.assertTrue;
 class Sdi2223Entrega2TestApplicationTests {
 
     // Miguel
-    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
+    // static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    // static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Raúl
     // static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
@@ -46,12 +46,12 @@ class Sdi2223Entrega2TestApplicationTests {
     //static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
 
     // Alves
-    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+    //static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    //static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Luis
-    //static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    //static String Geckodriver = "C:\\Users\\luism\\Desktop\\Clase\\SDI\\Sesión6\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    static String Geckodriver = "C:\\Users\\luism\\Desktop\\Clase\\SDI\\Sesión6\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     //static String Geckodriver = "C:\\Path\\geckodriver-v0.30.0-win64.exe";
     //static String PathFirefox = "/Applications/Firefox.app/Contents/MacOS/firefox-bin";
@@ -334,7 +334,7 @@ class Sdi2223Entrega2TestApplicationTests {
         Assertions.assertEquals(checkText, result.get(0).getText());
         List<WebElement> list = PO_View.checkElementBy(driver, "id", "cbDelete");
         //Pulso el boton borrar sobre el primer usuario
-        for (int position :  new int[]{0}) {
+        for (int position : new int[]{0}) {
             list.get(position).click();
         }
 
@@ -1514,7 +1514,7 @@ class Sdi2223Entrega2TestApplicationTests {
         Assertions.assertEquals(200, conversationListResponse.getStatusCode());
         int nConversaciones = (int) conversationListResponse.body().path("conversations.size()");
         int conversBd = mongo.getConversations("user02@email.com");
-        Assertions.assertTrue( nConversaciones == conversBd);
+        Assertions.assertTrue(nConversaciones == conversBd);
     }
 
     /**
@@ -1807,7 +1807,7 @@ class Sdi2223Entrega2TestApplicationTests {
         }
         // comprobamos en la bd
         int conversBd = mongo.getConversations("user01@email.com");
-        Assertions.assertTrue( conversationsCount == conversBd);
+        Assertions.assertTrue(conversationsCount == conversBd);
     }
 
     /**
@@ -1875,7 +1875,7 @@ class Sdi2223Entrega2TestApplicationTests {
         // comprobamos que tenemos tres conversaciones, lo que significa tener un botóno eliminar por cada una.
         // además de una cuarta coincidencia al buscar la palabra "Eliminar" debido a un script
         int conversBd = mongo.getConversations("user01@email.com");
-        Assertions.assertTrue( eliminar.size()-1 == conversBd);
+        Assertions.assertTrue(eliminar.size() - 1 == conversBd);
 
         // eliminarmos la primera conversación
         WebElement eliminarPrimera = driver.findElement(By.xpath("/html/body/div/div/table/tbody/tr[1]/td[4]/a"));
@@ -1885,7 +1885,7 @@ class Sdi2223Entrega2TestApplicationTests {
 
         // comprobamos que ahora solo tenemos dos conversaciones
         int convers = mongo.getConversations("user01@email.com");
-        Assertions.assertTrue( eliminar.size()-1 == convers);
+        Assertions.assertTrue(eliminar.size() - 1 == convers);
 
         // además comprobamos que se ha eliminado la oferta que se encontraba primera.
         boolean notFound = PO_HomeView.checkInvisibilityOfElement(driver, "text", nombre);
@@ -2024,4 +2024,51 @@ class Sdi2223Entrega2TestApplicationTests {
         By field = By.xpath("/html/body/div/div/table/tbody/tr/td[4]");
         Assertions.assertEquals("true", driver.findElement(field).getText());
     }
+
+    /**
+     * PR58. Identificarse en la aplicación y enviar tres mensajes a una oferta, validar que los mensajes
+     * enviados aparecen en el chat. Identificarse después con el usuario propietario de la oferta y validar
+     * que el número de mensajes sin leer aparece en su oferta.
+     */
+    @Test
+    @Order(58)
+    public void PR58() {
+        // navegamos a la URL
+        driver.get("http://localhost:3000/apiclient/client.html?w=login");
+
+        // introducimos los datos en el login
+        PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user01");
+
+        // creamos una conversación
+        List<WebElement> conversacion = PO_View.checkElementBy(driver, "text", "Conversación");
+        conversacion.get(3).click();
+        // enviamos tres mensajes
+        By mensaje = By.xpath("//*[@id=\"msg-add\"]");
+        WebElement elemento = driver.findElement(mensaje);
+        elemento.click();
+        elemento.clear();
+        elemento.sendKeys("Hola");
+        By boton = By.className("btn");
+        driver.findElement(boton).click();
+        driver.findElement(boton).click();
+        driver.findElement(boton).click();
+
+        // navegamos a la URL
+        driver.get("http://localhost:3000/apiclient/client.html?w=login");
+
+        // introducimos los datos en el login
+        PO_LoginAjaxView.fillLoginForm(driver, "user02@email.com", "user02");
+
+        // accedemos a la lista de conversaciones
+        WebElement conversaciones = driver.findElement(By.linkText("Conversaciones"));
+        conversaciones.click();
+
+        // buscamos el elemento con el número de mensajes no leidos
+        WebElement mensajesNoLeidos = driver.findElement(By.xpath("//*[@id=\"conversationsTableBody\"]/tr/td[5]"));
+
+        // comprobamos que son tres mensajes
+        assertEquals(mensajesNoLeidos.getText(), "3");
+
+    }
+
 }

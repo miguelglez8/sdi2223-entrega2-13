@@ -7,6 +7,7 @@
             <th>Oferta</th>
             <th></th>
             <th></th>
+            <th>Mensajes no leídos</th>
         </tr>
         </thead>
         <tbody id="conversationsTableBody"></tbody>
@@ -41,44 +42,41 @@
         let totalOffers = conversations.length;
 
         function loadOfferData(i) {
-            $.ajax({
-                url: URLbase + "/offers/" + conversations[i].offer,
-                type: "GET",
-                headers: { token: token },
-                success: function(response) {
-                    console.log("Aqui");
-                    console.log(conversations[i]);
-                    $("#conversationsTableBody").append(
-                        "<tr>" +
-                        "<td>" +
-                        conversations[i].seller +
-                        "</td>" +
-                        "<td>" +
-                        response.song.title +
-                        "</td>" +
-                        "<td><a onclick=widgetChat('" +
-                        conversations[i].offer +
-                        "')>Reanudar</a></td>" +
-                        "<td><a onclick=deleteChat('" +
-                        conversations[i]._id +
-                        "')>Eliminar</a></td>" +
-                        "</tr>"
-                    );
-                    loadedOffers++;
-                    if (loadedOffers === totalOffers) {
-                        // Se han cargado todos los datos, actualiza la tabla
-                        console.log("Carga de datos completada");
-                    }
-                    else {
-                        // Todavía hay datos por cargar, llama a la función recursivamente
-                        loadOfferData(i + 1);
-                    }
-                },
-                error: function(error) {
-                    console.log(error);
-                },
+            mensajesNoLeidos(conversations[i].offer).then((nMensajesNoLeidos) => {
+                $.ajax({
+                    url: URLbase + "/offers/" + conversations[i].offer,
+                    type: "GET",
+                    headers: {token: token},
+                    success: function (response) {
+                        $("#conversationsTableBody").append(
+                            "<tr>" +
+                            "<td>" +
+                            conversations[i].seller +
+                            "</td>" +
+                            "<td>" + response.song.title + "</td>" +
+                            "<td><a onclick=widgetChat('" + conversations[i].offer + "')>Reanudar</a></td>" +
+                            "<td><a onclick=deleteChat('" + conversations[i]._id + "')>Eliminar</a></td>" +
+                            "<td>" + nMensajesNoLeidos + "</td>" +
+                            "</tr>"
+                        );
+                        loadedOffers++;
+                        if (loadedOffers === totalOffers) {
+                            // Se han cargado todos los datos, actualiza la tabla
+                            console.log("Carga de datos completada");
+                        } else {
+                            // Todavía hay datos por cargar, llama a la función recursivamente
+                            loadOfferData(i + 1);
+                        }
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    },
+                });
+            }).catch((error) => {
+                console.log(error);
             });
         }
+
 
         if (conversations.length > 0) {
             // Inicia la carga de datos llamando a la función recursiva
@@ -87,6 +85,41 @@
     }
 
     loadConversations();
+
+    function mensajesNoLeidos(_id) {
+        return new Promise((resolve, reject) => {
+            let count = 0;
+            $.ajax({
+                url: URLbase + "/users/current",
+                type: "GET",
+                headers: {"token": token},
+                success: function (response) {
+                    let currentUser = response.user.email;
+                    $.ajax({
+                        url: URLbase + "/offers/messages/" + _id,
+                        type: "GET",
+                        data: {},
+                        dataType: 'json',
+                        headers: {"token": token},
+                        success: function (response) {
+                            for (i = 0; i < response.messages.length; i++) {
+                                console.log(response)
+                                if (response.messages[i].read == false &&
+                                    response.messages[i].author != currentUser) {
+                                    count = count + 1;
+                                }
+                            }
+                            resolve(count);
+                        },
+                        error: function (error) {
+                            reject(error);
+                        }
+                    });
+                }
+            });
+        })
+    }
+
 
     function widgetChat(_id) {
         selectedOfferId = _id;
