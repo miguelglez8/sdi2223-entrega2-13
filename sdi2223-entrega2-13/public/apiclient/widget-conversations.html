@@ -33,35 +33,33 @@
         });
     }
 
+
     function updateOffersTable(conversations) {
-        $("#conversationsTableBody").empty(); // Vaciar la tabla
-        let seller;
-        let offer;
+        $("#conversationsTableBody").empty();
         for (i = 0; i < conversations.length; i++) {
-            seller = conversations[i].seller;
-            offer = conversations[i].offer;
-            identificador = conversations[i]._id;
-            $.ajax({
-                url: URLbase + "/offers/" + conversations[i].offer,
-                type: "GET",
-                headers: {token: token},
-                success: function (response) {
-                    console.log("Aqui");
-                    console.log(identificador);
-                    console.log(conversations[i]);
-                    $("#conversationsTableBody").append(
-                        "<tr>" +
-                        "<td>" + seller + "</td>" +
-                        "<td>" + response.song.title + "</td>" +
-                        "<td><a onclick=widgetChat('" + offer + "')>Reanudar</a></td>" +
-                        "<td><a onclick=deleteChat('" + identificador + "')>Eliminar</a></td>" +
-                        "</tr>");
-                },
-                error: function (error) {
-                    console.log(error);
-                },
-            });
+            addConversationToTable(conversations[i].seller, conversations[i].offer, conversations[i]._id);
         }
+    }
+
+    function addConversationToTable(seller, offer, id) {
+        $.ajax({
+            url: URLbase + "/offers/" + offer,
+            type: "GET",
+            headers: {token: token},
+            success: function (response) {
+                $("#conversationsTableBody").append(
+                    "<tr>" +
+                    "<td>" + seller + "</td>" +
+                    "<td>" + response.song.title + "</td>" +
+                    "<td><a onclick=widgetChat('" + offer + "')>Reanudar</a></td>" +
+                    "<td><a onclick=deleteChat('" + id + "')>Eliminar</a></td>" +
+                    "</tr>"
+                );
+            },
+            error: function (error) {
+                console.log(error);
+            },
+        });
     }
 
     loadConversations();

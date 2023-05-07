@@ -1319,4 +1319,84 @@ class Sdi2223Entrega2TestApplicationTests {
         Assertions.assertEquals(size, table.size()); // comprobamos que sea el mismo número
     }
 
+    /**
+     * PR55. Sobre el listado de conversaciones ya abiertas. Pinchar el enlace Eliminar en la primera y
+     * comprobar que el listado se actualiza correctamente.
+     */
+    @Test
+    @Order(55)
+    public void PR55() {
+        // navegamos a la URL
+        driver.get("http://localhost:3000/apiclient/client.html?w=login");
+
+        // introducimos los datos en el login
+        PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user01");
+
+        // creamos una conversación
+        List<WebElement> conversacion = PO_View.checkElementBy(driver, "text", "Conversación");
+        conversacion.get(3).click();
+        // enviamos un mensaje
+        By mensaje = By.xpath("//*[@id=\"msg-add\"]");
+        WebElement elemento = driver.findElement(mensaje);
+        elemento.click();
+        elemento.clear();
+        elemento.sendKeys("Hola");
+        By boton = By.className("btn");
+        driver.findElement(boton).click();
+
+        // creamos otra conversación
+        WebElement conver = driver.findElement(By.linkText("Ofertas"));
+        conver.click();
+        conversacion = PO_View.checkElementBy(driver, "text", "Conversación");
+        conversacion.get(4).click();
+        // enviamos un mensaje
+        mensaje = By.xpath("//*[@id=\"msg-add\"]");
+        elemento = driver.findElement(mensaje);
+        elemento.click();
+        elemento.clear();
+        elemento.sendKeys("Hola");
+        boton = By.className("btn");
+        driver.findElement(boton).click();
+
+        // creamos una tercera conversaión
+        conver = driver.findElement(By.linkText("Ofertas"));
+        conver.click();
+        conversacion = PO_View.checkElementBy(driver, "text", "Conversación");
+        conversacion.get(5).click();
+        // enviamos un mensaje
+        mensaje = By.xpath("//*[@id=\"msg-add\"]");
+        elemento = driver.findElement(mensaje);
+        elemento.click();
+        elemento.clear();
+        elemento.sendKeys("Hola");
+        boton = By.className("btn");
+        driver.findElement(boton).click();
+
+        // accedemos a la lista de conversaciones
+        WebElement conversaciones = driver.findElement(By.linkText("Conversaciones"));
+        conversaciones.click();
+
+        List<WebElement> eliminar = PO_View.checkElementBy(driver, "text", "Eliminar");
+
+        WebElement nombreOferta = driver.findElement(By.xpath("//*[@id=\"conversationsTableBody\"]/tr[1]/td[2]"));
+        String nombre = nombreOferta.getText();
+
+        // comprobamos que tenemos tres conversaciones, lo que significa tener un botóno eliminar por cada una.
+        // además de una cuarta coincidencia al buscar la palabra "Eliminar" debido a un script
+        assertTrue(eliminar.size() == 4);
+
+        // eliminarmos la primera conversación
+        WebElement eliminarPrimera = driver.findElement(By.xpath("/html/body/div/div/table/tbody/tr[1]/td[4]/a"));
+        eliminarPrimera.click();
+
+        eliminar = PO_View.checkElementBy(driver, "text", "Eliminar");
+
+        // comprobamos que ahora solo tenemos dos conversaciones
+        assertTrue(eliminar.size() == 3);
+
+        // además comprobamos que se ha eliminado la oferta que se encontraba primera.
+        List<WebElement> conversacionBorrada = PO_View.checkElementBy(driver, "text", nombre);
+        assertTrue(conversacionBorrada.size() == 0);
+
+    }
 }
