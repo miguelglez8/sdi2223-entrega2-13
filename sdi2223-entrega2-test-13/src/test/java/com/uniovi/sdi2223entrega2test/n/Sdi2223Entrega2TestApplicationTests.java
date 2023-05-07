@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static com.uniovi.sdi2223entrega2test.n.pageobjects.PO_View.checkElementBy;
 import static java.lang.Thread.sleep;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -33,12 +34,12 @@ import static org.junit.Assert.assertTrue;
 class Sdi2223Entrega2TestApplicationTests {
 
     // Miguel
-    // static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    // static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
+    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Raúl
-    // static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-    // static String Geckodriver = "C:\\Users\\Aladino España\\Desktop\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+    //static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+    //static String Geckodriver = "C:\\Users\\Aladino España\\Desktop\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Ton
     //static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
@@ -49,8 +50,8 @@ class Sdi2223Entrega2TestApplicationTests {
     //static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Luis
-    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\luism\\Desktop\\Clase\\SDI\\Sesión6\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+    // static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    //static String Geckodriver = "C:\\Users\\luism\\Desktop\\Clase\\SDI\\Sesión6\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     //static String Geckodriver = "C:\\Path\\geckodriver-v0.30.0-win64.exe";
     //static String PathFirefox = "/Applications/Firefox.app/Contents/MacOS/firefox-bin";
@@ -235,7 +236,7 @@ class Sdi2223Entrega2TestApplicationTests {
 
     //[Prueba8] Inicio de sesión con datos inválidos (campo email o contraseña vacíos).
     @Test
-    @Order(10)
+    @Order(8)
     public void PR08() {
         //Vamos al formulario de inicio de sesión.
         PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
@@ -316,7 +317,7 @@ class Sdi2223Entrega2TestApplicationTests {
         List<WebElement> userList4 = SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
         usuarios += userList4.size();
         //Comprobamos que el numero de usuarios es correcto
-        Assertions.assertEquals(usuarios, 17);
+        Assertions.assertEquals(usuarios, mongo.getUsers()); // 17
     }
 
     //[Prueba12]Ir a la lista de usuarios, borrar el primer usuario de la lista, comprobar que la lista se actualiza
@@ -366,7 +367,7 @@ class Sdi2223Entrega2TestApplicationTests {
         List<WebElement> userList4 = SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
         usuarios += userList4.size();
         //Comprobamos que el numero de usuarios es correcto
-        Assertions.assertEquals(usuarios, 16);
+        Assertions.assertEquals(usuarios, mongo.getUsers()); // 16
     }
 
     //[Prueba13]Ir a la lista de usuarios, borrar el último usuario de la lista, comprobar que la lista se actualiza
@@ -390,7 +391,7 @@ class Sdi2223Entrega2TestApplicationTests {
         List<WebElement> list = PO_View.checkElementBy(driver, "id", "cbDelete");
         //Pulso el boton borrar sobre el primer usuario
 
-        list.get(1).click();
+        list.get(0).click();
 
 
         //Pulsamos el botón de borrar
@@ -420,7 +421,7 @@ class Sdi2223Entrega2TestApplicationTests {
         List<WebElement> userList4 = SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
         usuarios += userList4.size();
         //Comprobamos que el numero de usuarios es correcto
-        Assertions.assertEquals(usuarios, 16);
+        Assertions.assertEquals(usuarios, mongo.getUsers()); // 16
     }
 
     //[Prueba14]Ir a la lista de usuarios, borrar 3 usuarios, comprobar que la lista se actualiza y dichos
@@ -465,7 +466,7 @@ class Sdi2223Entrega2TestApplicationTests {
         usuarios += userList3.size();
 
         //Comprobamos que el numero de usuarios es correcto
-        Assertions.assertEquals(usuarios, 14);
+        Assertions.assertEquals(usuarios, mongo.getUsers()); // 14
     }
 
     //[Prueba15]Intentar borrar el usuario que se encuentra en sesión y comprobar que no ha sido borrado
@@ -511,7 +512,7 @@ class Sdi2223Entrega2TestApplicationTests {
         usuarios += userList3.size();
 
         //Comprobamos que el numero de usuarios es correcto
-        Assertions.assertEquals(usuarios, 14);
+        Assertions.assertEquals(usuarios, mongo.getUsers()); // 14
     }
 
 
@@ -979,6 +980,7 @@ class Sdi2223Entrega2TestApplicationTests {
 
         // guardamos el saldo antes de destacar la oferta
         double saldoA = PO_ListOfferView.wallet(driver);
+        Assertions.assertEquals(mongo.getSaldo("user07@email.com"), saldoA);
 
         // rellenamos el formulario para añadir una oferta con la opción de destacar activada
         WebElement destacar = driver.findElement(By.name("highlight"));
@@ -988,6 +990,7 @@ class Sdi2223Entrega2TestApplicationTests {
 
         // guardamos el saldo después de destacar la oferta
         double saldoB = PO_ListOfferView.wallet(driver);
+        Assertions.assertEquals(mongo.getSaldo("user07@email.com"), saldoB);
 
         // comprobamos que el saldo después de destacar es 20€ menor que el saldo antes de destacar
         assertTrue(saldoA == (saldoB + 20));
@@ -1034,6 +1037,7 @@ class Sdi2223Entrega2TestApplicationTests {
 
         // guardamos el saldo antes de destacar la oferta
         double saldoA = PO_ListOfferView.wallet(driver);
+        Assertions.assertEquals(mongo.getSaldo("user07@email.com"), saldoA);
 
         // guardamos el nombre de la oferta que vamos a destacar
         By ofertaD = By.xpath("/html/body/div/div[3]/table/tbody/tr[1]/td[1]");
@@ -1045,6 +1049,7 @@ class Sdi2223Entrega2TestApplicationTests {
 
         // guardamos el saldo después de destacar la oferta
         double saldoB = PO_ListOfferView.wallet(driver);
+        Assertions.assertEquals(mongo.getSaldo("user07@email.com"), saldoB);
 
         // comprobamos que el saldo después de destacar es 20€ menor que el saldo antes de destacar
         assertTrue(saldoA == (saldoB + 20));
@@ -1101,6 +1106,8 @@ class Sdi2223Entrega2TestApplicationTests {
         // comprobamos que efectivamente tenemos menos de 20€
         double saldo = PO_ListOfferView.wallet(driver);
         assertTrue(saldo < 20);
+        Assertions.assertEquals(mongo.getSaldo("user08@email.com"), saldo);
+
 
         // cambiamos a la segunda página, ya con menos de 20€
         By segundaPagina = By.xpath("/html/body/div/div[4]/ul/li[2]/a");
@@ -1388,6 +1395,8 @@ class Sdi2223Entrega2TestApplicationTests {
         Assertions.assertEquals(200, offersResponse.getStatusCode());
         // 6. Verificamos que no se muestran las ofertas del usuario
         Assertions.assertFalse(offersResponse.getBody().asString().contains("user01@email.com"));
+        int actualOffers = mongo.getOffers("user01@email.com");
+        Assertions.assertTrue(actualOffers == (int) offersResponse.body().path("offers.size()"));
     }
 
     /**
@@ -1483,7 +1492,8 @@ class Sdi2223Entrega2TestApplicationTests {
         Response messageListResponse = request.get(ConversationsURL);
         // 6. Verificamos el estado
         Assertions.assertEquals(200, messageListResponse.getStatusCode());
-        Assertions.assertEquals(1, (int) messageListResponse.body().path("messages.size()"));
+        int msgs = mongo.getMessages("64552593aee4ec22206d2544");
+        Assertions.assertTrue(msgs == (int) messageListResponse.body().path("messages.size()"));
     }
 
     /**
@@ -1520,7 +1530,8 @@ class Sdi2223Entrega2TestApplicationTests {
         // 6. Verificamos el estado
         Assertions.assertEquals(200, conversationListResponse.getStatusCode());
         int nConversaciones = (int) conversationListResponse.body().path("conversations.size()");
-        Assertions.assertTrue( nConversaciones == 1);
+        int conversBd = mongo.getConversations("user02@email.com");
+        Assertions.assertTrue( nConversaciones == conversBd);
     }
 
     /**
@@ -1562,8 +1573,10 @@ class Sdi2223Entrega2TestApplicationTests {
             e.printStackTrace();
         }
         Response conversationListResponse = request.get(ConversationsURL);
-        System.out.println(conversationListResponse.getBody().asString());
         final String conversationId = conversationListResponse.jsonPath().get("conversations[1]._id");
+        // tiene dos conversaciones
+        int convers = mongo.getConversations("user02@email.com");
+        Assertions.assertEquals(convers, (int) conversationListResponse.body().path("conversations.size()"));
         // 6. Accedemos a la URL de obtener conversaciones con la conversación a eliminar como parámetro
         final String DeleteConversationURL = "http://localhost:3000/api/v1.0/conversations/" + conversationId;
         // 7. Eliminamos una conversación
@@ -1572,7 +1585,8 @@ class Sdi2223Entrega2TestApplicationTests {
         System.out.println(deleteConversationResponse.getBody().asString());
         Assertions.assertEquals(200, deleteConversationResponse.getStatusCode());
         conversationListResponse = request.get(ConversationsURL);
-        Assertions.assertEquals(1, (int) conversationListResponse.body().path("conversations.size()"));
+        int conversBd = mongo.getConversations("user02@email.com");
+        Assertions.assertEquals(conversBd, (int) conversationListResponse.body().path("conversations.size()"));
     }
 
     /**
@@ -1692,7 +1706,6 @@ class Sdi2223Entrega2TestApplicationTests {
         Assertions.assertEquals(size, table.size()); // comprobamos que sea el mismo número
     }
 
-
     /**
      * Sobre listado de ofertas disponibles (a elección de desarrollador), enviar un mensaje a una
      * oferta concreta. Se abriría dicha conversación por primera vez. Comprobar que el mensaje aparece
@@ -1809,6 +1822,7 @@ class Sdi2223Entrega2TestApplicationTests {
         }
         Assertions.assertEquals(1, conversationsCount);
     }
+
     /**
      * PR55. Sobre el listado de conversaciones ya abiertas. Pinchar el enlace Eliminar en la primera y
      * comprobar que el listado se actualiza correctamente.
@@ -1888,4 +1902,5 @@ class Sdi2223Entrega2TestApplicationTests {
         boolean notFound = PO_HomeView.checkInvisibilityOfElement(driver, "text", nombre);
         Assertions.assertTrue(notFound);
     }
+
 }

@@ -1,6 +1,6 @@
 const {ObjectId} = require("mongodb");
 const {response} = require("express");
-module.exports = function (app, usersRepository, offersRepository) {
+module.exports = function (app, usersRepository, offersRepository, messagesRepository) {
 
     /**
      * Método que devuelve la lista de ofertas del usuario que está logeado
@@ -131,7 +131,16 @@ module.exports = function (app, usersRepository, offersRepository) {
                     if (result === null || result.deletedCount === 0) {
                         res.send("No se ha podido eliminar la oferta");
                     } else {
-                        res.redirect("/offers/myoffers");
+                        // eliminamos todas las conversaciones y mensajes asociados a la oferta
+                        messagesRepository.deleteConversations({offer: req.params.id}, {}).then(result => {
+                            if (result === null) {
+                                res.send("No se ha podido eliminar la conversacion");
+                            } else {
+                                res.redirect("/offers/myoffers");
+                            }
+                        }).catch(error => {
+                            res.send("Se ha producido un error al intentar borrar las coversaciones: " + error)
+                        });
                     }
                 }).catch(error => {
                     res.send("Se ha producido un error al intentar eliminar la oferta: " + error)
