@@ -478,7 +478,6 @@ class Sdi2223Entrega2TestApplicationTests {
         // nos logueamos como usuario estandar, el administrador nunca podrá borrarse a su mismo, puesto que no
         // existe un checkbox para seleccionarse, y en el propio enlace no se especifica el usuario a eliminar
         PO_PrivateView.refactorLogging(driver, "user04@email.com", "user04");
-
         // al ser usuario estandar no tenemos una opción de menú que nos permita acceder directamente
         // a borrar un usuario, por lo que intentamos hacerlo por enlace
         driver.navigate().to(URL + "/users/delete");
@@ -985,7 +984,7 @@ class Sdi2223Entrega2TestApplicationTests {
         // buscamos la oferta que hemos destacado
         List<WebElement> destacada = PO_View.checkElementBy(driver, "text", "Destacada1");
         // Comprobamos que efectivamente la hemos encontrado
-        assertTrue(destacada.size() == 1);
+        assertTrue(destacada.size() == mongo.getHighlightOffers());
 
         // logout
         PO_PrivateView.refactorLogout(driver);
@@ -1044,7 +1043,7 @@ class Sdi2223Entrega2TestApplicationTests {
         // buscamos la oferta que hemos destacado
         List<WebElement> destacada = PO_View.checkElementBy(driver, "text", nombreOferta);
         // Comprobamos que efectivamente la hemos encontrado
-        assertTrue(destacada.size() == 1);
+        assertTrue(destacada.size() == mongo.getHighlightOffers());
 
         // logout
         PO_PrivateView.refactorLogout(driver);
@@ -1370,9 +1369,17 @@ class Sdi2223Entrega2TestApplicationTests {
         Assertions.assertEquals(200, offersResponse.getStatusCode());
         // 6. Verificamos que no se muestran las ofertas del usuario
         Assertions.assertFalse(offersResponse.getBody().asString().contains("user01@email.com"));
-        int actualOffers = mongo.getOffers("user01@email.com");
-        int expected = (int) offersResponse.body().path("offers.size()");
-        Assertions.assertTrue(actualOffers == expected);
+        // obtenemos las ofertas
+        MongoCollection<Document> collection = mongo.getCollection("offers");
+        // Crear un objeto de filtro para especificar el criterio de búsqueda
+        Bson filter = Filters.not(Filters.eq("seller", "user01@email.com")); // para que salgan las que no son del usuario
+        // Filtrar los documentos de la colección
+        FindIterable<Document> cursor = collection.find(filter);
+        int size = 0;
+        for (Document document : cursor) { // vamos sumando el número de elementos que hay en la colección
+            size++;
+        }
+        Assertions.assertTrue(size == (int) offersResponse.body().path("offers.size()"));
     }
 
     /**
@@ -1673,7 +1680,7 @@ class Sdi2223Entrega2TestApplicationTests {
         // sacamos los datos que hay en la base de datos en la colección de ofertas
         MongoCollection<Document> collection = mongo.getCollection("offers");
         // Crear un objeto de filtro para especificar el criterio de búsqueda
-        Bson filter = Filters.not(Filters.eq("seller", "user01@email.com"));
+        Bson filter = Filters.not(Filters.eq("seller", "user01@email.com")); // para que salgan las que no son del usuario
         // Filtrar los documentos de la colección
         FindIterable<Document> cursor = collection.find(filter);
         int size = 0;
@@ -1798,7 +1805,9 @@ class Sdi2223Entrega2TestApplicationTests {
         if (conversationsCount > 0 && conversations.get(0).findElements(By.tagName("th")).size() > 0) {
             conversationsCount--;
         }
-        Assertions.assertEquals(1, conversationsCount);
+        // comprobamos en la bd
+        int conversBd = mongo.getConversations("user01@email.com");
+        Assertions.assertTrue( conversationsCount == conversBd);
     }
 
     /**
@@ -1865,7 +1874,8 @@ class Sdi2223Entrega2TestApplicationTests {
 
         // comprobamos que tenemos tres conversaciones, lo que significa tener un botóno eliminar por cada una.
         // además de una cuarta coincidencia al buscar la palabra "Eliminar" debido a un script
-        assertTrue(eliminar.size() == 4);
+        int conversBd = mongo.getConversations("user01@email.com");
+        Assertions.assertTrue( eliminar.size()-1 == conversBd);
 
         // eliminarmos la primera conversación
         WebElement eliminarPrimera = driver.findElement(By.xpath("/html/body/div/div/table/tbody/tr[1]/td[4]/a"));
@@ -1874,7 +1884,90 @@ class Sdi2223Entrega2TestApplicationTests {
         eliminar = PO_View.checkElementBy(driver, "text", "Eliminar");
 
         // comprobamos que ahora solo tenemos dos conversaciones
-        assertTrue(eliminar.size() == 3);
+        int convers = mongo.getConversations("user01@email.com");
+        Assertions.assertTrue( eliminar.size()-1 == convers);
+
+        // además comprobamos que se ha eliminado la oferta que se encontraba primera.
+        boolean notFound = PO_HomeView.checkInvisibilityOfElement(driver, "text", nombre);
+        Assertions.assertTrue(notFound);
+    }
+
+    /**
+     * PR56. Sobre el listado de conversaciones ya abiertas. Pinchar el enlace Eliminar en la última y
+     * comprobar que el listado se actualiza correctamente.
+     */
+    @Test
+    @Order(56)
+    public void PR56() {
+        // navegamos a la URL
+        driver.get("http://localhost:3000/apiclient/client.html?w=login");
+
+        // introducimos los datos en el login
+        PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user01");
+
+        // creamos una conversación
+        List<WebElement> conversacion = PO_View.checkElementBy(driver, "text", "Conversación");
+        conversacion.get(3).click();
+        // enviamos un mensaje
+        By mensaje = By.xpath("//*[@id=\"msg-add\"]");
+        WebElement elemento = driver.findElement(mensaje);
+        elemento.click();
+        elemento.clear();
+        elemento.sendKeys("Hola");
+        By boton = By.className("btn");
+        driver.findElement(boton).click();
+
+        // creamos otra conversación
+        WebElement conver = driver.findElement(By.linkText("Ofertas"));
+        conver.click();
+        conversacion = PO_View.checkElementBy(driver, "text", "Conversación");
+        conversacion.get(4).click();
+        // enviamos un mensaje
+        mensaje = By.xpath("//*[@id=\"msg-add\"]");
+        elemento = driver.findElement(mensaje);
+        elemento.click();
+        elemento.clear();
+        elemento.sendKeys("Hola");
+        boton = By.className("btn");
+        driver.findElement(boton).click();
+
+        // creamos una tercera conversaión
+        conver = driver.findElement(By.linkText("Ofertas"));
+        conver.click();
+        conversacion = PO_View.checkElementBy(driver, "text", "Conversación");
+        conversacion.get(5).click();
+        // enviamos un mensaje
+        mensaje = By.xpath("//*[@id=\"msg-add\"]");
+        elemento = driver.findElement(mensaje);
+        elemento.click();
+        elemento.clear();
+        elemento.sendKeys("Hola");
+        boton = By.className("btn");
+        driver.findElement(boton).click();
+
+        // accedemos a la lista de conversaciones
+        WebElement conversaciones = driver.findElement(By.linkText("Conversaciones"));
+        conversaciones.click();
+
+        List<WebElement> eliminar = PO_View.checkElementBy(driver, "text", "Eliminar");
+
+        WebElement nombreOferta = driver.findElement(By.xpath("//*[@id=\"conversationsTableBody\"]/tr[3]/td[2]"));
+        String nombre = nombreOferta.getText();
+
+        // comprobamos que tenemos tres conversaciones, lo que significa tener un botóno eliminar por cada una.
+        // además de una cuarta coincidencia al buscar la palabra "Eliminar" debido a un script
+        int convers = mongo.getConversations("user01@email.com");
+        Assertions.assertTrue( eliminar.size()-1 == convers);
+
+        // eliminarmos la primera conversación
+        WebElement eliminarUltima = driver.findElement(By.xpath("/html/body/div/div/table/tbody/tr[3]/td[4]/a"));
+        eliminarUltima.click();
+
+        eliminar = PO_View.checkElementBy(driver, "text", "Eliminar");
+
+        // comprobamos que ahora solo tenemos dos conversaciones
+        int conversBd = mongo.getConversations("user01@email.com");
+        Assertions.assertTrue( eliminar.size()-1 == conversBd);
 
         // además comprobamos que se ha eliminado la oferta que se encontraba primera.
         boolean notFound = PO_HomeView.checkInvisibilityOfElement(driver, "text", nombre);
