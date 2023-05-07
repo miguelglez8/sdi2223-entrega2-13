@@ -77,6 +77,7 @@ let userAdminRouter = require('./routes/userAdminRouter');
 let logRouter = require("./routes/logRouter");
 
 app.use("/users/list", userSessionRouter, logRouter);
+app.use("/users/current", userSessionRouter, logRouter);
 
 app.use("/offers/add",userSessionRouter);
 app.use("/offers/list",userSessionRouter);
@@ -93,6 +94,7 @@ const userTokenRouter = require('./routes/userTokenRouter');
 const {getConnection} = require("./repositories/db");
 app.use("/api/v1.0/offers/", userTokenRouter);
 app.use("/api/v1.0/offers/messages", userTokenRouter);
+app.use("/api/v1.0/users/current", userTokenRouter);
 app.use("/api/v1.0/conversations", userTokenRouter);
 
 /**
