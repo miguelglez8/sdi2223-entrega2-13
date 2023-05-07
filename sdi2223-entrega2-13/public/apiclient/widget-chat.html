@@ -33,12 +33,47 @@
       headers: {"token": token},
       success: function (response) {
         messages = response.messages;
-        updateMessagesTable(messages);
+        // updateMessagesTable(messages);
       },
       error: function (error) {
         $("#main-container").load("widget-login.html");
       }
     });
+  }
+
+  function readMessages() {
+    $.ajax({
+      url: URLbase + "/users/current",
+      type: "GET",
+      headers: {"token": token},
+      success: function (response) {
+        let currentUser = response.user.email;
+        $.ajax({
+          url: URLbase + "/offers/messages/" + selectedOfferId,
+          type: "GET",
+          data: {},
+          dataType: 'json',
+          headers: {"token": token},
+          success: function (response) {
+            let messages = response.messages;
+            for (let i = 0; i < messages.length; i++) {
+              if (messages[i].author !== currentUser && messages[i].read === false)
+                $.ajax({
+                  url: URLbase + "/conversations/" + messages[i]._id,
+                  type: "PUT",
+                  data: {},
+                  dataType: 'json',
+                  headers: {"token": token},
+                  success: function (response) {
+                    console.log("Mensaje leído ");
+                  }
+                })
+            }
+            updateMessagesTable(messages);
+          }
+        });
+      }
+    })
   }
   function updateMessagesTable(messages) {
     $("#messagesTableBody").empty(); // Vaciar la tabla
@@ -59,6 +94,7 @@
   function startAutoUpdate() {
     setInterval(function() {
       loadMessages();
+      readMessages();
     }, 1000);
   }
 
