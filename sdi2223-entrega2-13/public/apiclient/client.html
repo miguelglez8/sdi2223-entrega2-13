@@ -26,6 +26,7 @@
         <div class="collapse navbar-collapse" id="myNavbar">
             <ul class="nav navbar-nav" id="barra-menu">
                 <li><a onclick=widgetOffers()>Ofertas</a></li>
+                <li><a onclick=widgetConversations()>Conversaciones</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right" id="barra-menu-derecha">
                 <!-- Opciones de menú aqui -->
@@ -50,12 +51,22 @@
         if (w == "offers") {
             $("#main-container").load("widget-offers.html");
         }
+        if (w == "conversations") {
+            $("#main-container").load("widget-conversations.html");
+        }
+        if (w == "chat") {
+            $("#main-container").load("widget-chat.html");
+        }
     } else {
         $("#main-container").load("widget-login.html");
     }
 
     function widgetOffers() {
         $("#main-container").load("widget-offers.html");
+    }
+
+    function widgetConversations() {
+        $("#main-container").load("widget-conversations.html");
     }
 </script>
 </body>
