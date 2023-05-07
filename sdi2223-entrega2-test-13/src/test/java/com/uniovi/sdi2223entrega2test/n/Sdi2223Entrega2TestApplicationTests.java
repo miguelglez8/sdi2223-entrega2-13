@@ -1625,7 +1625,7 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user01");
         // Compruebo que tras el logueo correcto nos redirecciona correctamente a las ofertas
         String checkText = "Ofertas disponibles para comprar (todas salvo las del usuario)";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         //Compruebo que haya accedido a la vista correctamente
         Assertions.assertEquals(checkText, result.get(0).getText());
     }
@@ -1643,7 +1643,7 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user");
         // Compruebo que tras el logueo correcto nos avisa correctamente del logueo INVALIDO
         String checkText = "Usuario no encontrado";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         //Compruebo que haya accedido a la vista correctamente
         Assertions.assertEquals(checkText, result.get(0).getText());
     }
@@ -1661,7 +1661,7 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", " ");
         // Compruebo que tras el logueo correcto nos avisa correctamente del logueo INVALIDO
         String checkText = "Usuario no encontrado";
-        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         //Compruebo que haya accedido a la vista correctamente
         Assertions.assertEquals(checkText, result.get(0).getText());
     }
