@@ -66,6 +66,9 @@ module.exports = {
             const collectionName = 'conversations';
             const conversationsWithMessages = await database.collection(collectionName).aggregate([
                 // Join the conversations and messages collections
+                { $match: {
+                    $or: [ {seller: filter.user}, {buyer: filter.user} ]
+                } },
                 {
                     $lookup: {
                         from: 'messages',
@@ -77,7 +80,7 @@ module.exports = {
                                                     [
                                                         { $eq: [ "$buyer",  "$$buyer" ] },
                                                         { $eq: [ "$seller",  "$$seller" ] },
-                                                        { $eq: [ "$offer",  "$$offer" ] },
+                                                        { $eq: [ "$offer",  "$$offer" ] }
                                                     ]
                                             }
                                     }
