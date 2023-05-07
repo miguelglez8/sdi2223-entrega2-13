@@ -33,18 +33,15 @@
                         <img src="/images/logo.png" alt="logo"/>
                     </li>
                     <li class="nav-item dropdown active">
-                        <a class="nav-link dropdown-toggle" href="#" id="usersDropdown"
-                           role="button" data-toggle="dropdown" aria-haspopup="true"
-                           aria-expanded="false">Usuarios
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            {% if session.user != null and session.user == "admin@email.com" %}
-                                <a class="dropdown-item" id="adminList" href="/users/admin/list">Borrar Usuarios</a>
-                            {% else %}
-                                <a class="dropdown-item" href="/users/list">Listar Usuarios</a>
-                            {% endif %}
-                        </div>
-
+                        {% if session.user != null and session.user == "admin@email.com" %}
+                            <a class="nav-link dropdown-toggle" href="#" id="usersDropdown"
+                               role="button" data-toggle="dropdown" aria-haspopup="true"
+                               aria-expanded="false">Usuarios
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" id="adminList" href="/users/admin/list">Ver Usuarios</a>
+                            </div>
+                        {% endif %}
                     </li>
                     <li class="nav-item dropdown">
                         {% if session.user != null and session.user == "admin@email.com" %}
@@ -68,9 +65,6 @@
                         </div>
                         {% endif %}
                     </li>
-{#                    <li id="myoffers"><a href="/offers/myoffers">Mis Ofertas</a></li>#}
-{#                    <li id="list"><a href="/offers/searchOffers">Busca ofertas</a></li>#}
-{#                    <li id="buy"><a href="/offers/buy">Ofertas compradas</a></li>#}
                 </ul>
             {% endif %}
 
