@@ -1615,6 +1615,59 @@ class Sdi2223Entrega2TestApplicationTests {
     // ###############################################################################################
 
     /**
+     * TEST 48. Inicio de sesión con datos válidos.
+     */
+    @Test
+    @Order(48)
+    public void PR48() {
+        // navegamos a la URL
+        driver.get("http://localhost:3000/apiclient/client.html?w=login");
+        // introducimos los datos en el login
+        PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user01");
+        // Compruebo que tras el logueo correcto nos redirecciona correctamente a las ofertas
+        String checkText = "Ofertas disponibles para comprar (todas salvo las del usuario)";
+        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        //Compruebo que haya accedido a la vista correctamente
+        Assertions.assertEquals(checkText, result.get(0).getText());
+    }
+
+
+    /**
+     * TEST 49.  Inicio de sesión con datos inválidos (email existente, pero contraseña incorrecta).
+     */
+    @Test
+    @Order(49)
+    public void PR49() {
+        // navegamos a la URL
+        driver.get("http://localhost:3000/apiclient/client.html?w=login");
+        // introducimos los datos en el login
+        PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user");
+        // Compruebo que tras el logueo correcto nos avisa correctamente del logueo INVALIDO
+        String checkText = "Usuario no encontrado";
+        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        //Compruebo que haya accedido a la vista correctamente
+        Assertions.assertEquals(checkText, result.get(0).getText());
+    }
+
+
+    /**
+     * TEST 50.  Inicio de sesión con datos inválidos (campo email o contraseña vacíos)..
+     */
+    @Test
+    @Order(50)
+    public void PR50() {
+        // navegamos a la URL
+        driver.get("http://localhost:3000/apiclient/client.html?w=login");
+        // introducimos los datos en el login
+        PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", " ");
+        // Compruebo que tras el logueo correcto nos avisa correctamente del logueo INVALIDO
+        String checkText = "Usuario no encontrado";
+        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        //Compruebo que haya accedido a la vista correctamente
+        Assertions.assertEquals(checkText, result.get(0).getText());
+    }
+
+    /**
      * PR51. Mostrar el listado de ofertas disponibles y comprobar que se muestran todas las que existen,
      * menos las del usuario identificado
      */
