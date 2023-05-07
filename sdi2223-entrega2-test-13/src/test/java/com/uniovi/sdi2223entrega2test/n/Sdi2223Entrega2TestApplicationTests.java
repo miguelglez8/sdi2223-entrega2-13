@@ -34,8 +34,8 @@ import static org.junit.Assert.assertTrue;
 class Sdi2223Entrega2TestApplicationTests {
 
     // Miguel
-    // static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    // static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
+    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Raúl
     // static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
@@ -50,8 +50,8 @@ class Sdi2223Entrega2TestApplicationTests {
     static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Luis
-    // static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    // static String Geckodriver = "C:\\Users\\luism\\Desktop\\Clase\\SDI\\Sesión6\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+    //static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    //static String Geckodriver = "C:\\Users\\luism\\Desktop\\Clase\\SDI\\Sesión6\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     //static String Geckodriver = "C:\\Path\\geckodriver-v0.30.0-win64.exe";
     //static String PathFirefox = "/Applications/Firefox.app/Contents/MacOS/firefox-bin";
