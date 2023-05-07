@@ -33,8 +33,8 @@ import static org.junit.Assert.assertTrue;
 class Sdi2223Entrega2TestApplicationTests {
 
     // Miguel
-    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
+    // static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    // static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Raúl
     // static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
@@ -45,7 +45,8 @@ class Sdi2223Entrega2TestApplicationTests {
     //static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
 
     // Alves
-    //static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Luis
     //static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
@@ -1776,16 +1777,17 @@ class Sdi2223Entrega2TestApplicationTests {
         // Click sobre enviar
         By boton = By.xpath("//button[@id='msg-send']");
         driver.findElement(boton).click();
+        // Volvemos al menú de conversaciones
         By cnv = By.xpath("//*[@id=\"barra-menu\"]/li[2]/a");
         driver.findElement(cnv).click();
         WebElement tableBody = driver.findElement(By.cssSelector("#widget-conversations > table"));
         List<WebElement> conversations = tableBody.findElements(By.tagName("tr"));
+        // Esperamos a que se muestre el mensaje en la tabla
         int conversationsCount = conversations.size();
         // verificar si la primera fila es un encabezado y no se cuenta en el recuento
         if (conversationsCount > 0 && conversations.get(0).findElements(By.tagName("th")).size() > 0) {
             conversationsCount--;
         }
-        // comprobamos en la bd
         int conversBd = mongo.getConversations("user01@email.com");
         Assertions.assertTrue(conversationsCount == conversBd);
     }
@@ -1998,10 +2000,8 @@ class Sdi2223Entrega2TestApplicationTests {
         conversacion.get(0).click();
 
         // comprobamos que el estado de "leído" se ha actualizado a "true"
-        List<WebElement> res = SeleniumUtils.waitLoadElementsByXpath(driver, "/html/body/div/div/table/tbody/tr/td[4]", 20000);
+        List<WebElement> res = SeleniumUtils.waitLoadElementsBy(driver, "text", "true", 5000);
         Assertions.assertEquals("true", res.get(0).getText());
-
-
     }
 
     /**
