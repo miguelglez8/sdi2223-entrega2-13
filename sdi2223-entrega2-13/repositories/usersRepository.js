@@ -76,7 +76,7 @@ module.exports = {
             const database = client.db("entrega2");
             const collectionName = 'users';
             const usersCollection = database.collection(collectionName);
-            const usersCollectionCount = await usersCollection.find(filter, options).count();
+            const usersCollectionCount = await usersCollection.countDocuments(filter);
             const cursor = usersCollection.find(filter, options).skip((page - 1) * limit).limit(limit)
             const users = await cursor.toArray();
             return {users: users, total: usersCollectionCount };
