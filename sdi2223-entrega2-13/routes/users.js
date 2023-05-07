@@ -250,7 +250,7 @@ module.exports = function (app, usersRepository, logsRepository) {
                     description: req.session.user
                 };
                 logsRepository.insertLog(log);
-                res.redirect("/users/list");
+                res.redirect("/offers/myoffers");
             }
         }).catch(() => {
             let now = new Date();

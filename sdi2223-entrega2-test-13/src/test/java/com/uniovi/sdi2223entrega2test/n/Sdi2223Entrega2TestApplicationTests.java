@@ -40,16 +40,16 @@ class Sdi2223Entrega2TestApplicationTests {
     // static String Geckodriver = "C:\\Users\\Aladino España\\Desktop\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Ton
-    //static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-    //static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
+    static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+    static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
 
     // Alves
-    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+//    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+//    static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Luis
-    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\luism\\Desktop\\Clase\\SDI\\Sesión6\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+//    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+//    static String Geckodriver = "C:\\Users\\luism\\Desktop\\Clase\\SDI\\Sesión6\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     //static String Geckodriver = "C:\\Path\\geckodriver-v0.30.0-win64.exe";
     //static String PathFirefox = "/Applications/Firefox.app/Contents/MacOS/firefox-bin";
@@ -1226,14 +1226,12 @@ class Sdi2223Entrega2TestApplicationTests {
             e.printStackTrace();
         }
         Response conversationListResponse = request.get(ConversationsURL);
-        System.out.println(conversationListResponse.getBody().asString());
         final String conversationId = conversationListResponse.jsonPath().get("conversations[1]._id");
         // 6. Accedemos a la URL de obtener conversaciones con la conversación a eliminar como parámetro
         final String DeleteConversationURL = "http://localhost:3000/api/v1.0/conversations/" + conversationId;
         // 7. Eliminamos una conversación
         Response deleteConversationResponse = request.delete(DeleteConversationURL);
         // 8. Verificamos el estado. Ahora sólo debería haber una conversación.
-        System.out.println(deleteConversationResponse.getBody().asString());
         Assertions.assertEquals(200, deleteConversationResponse.getStatusCode());
         conversationListResponse = request.get(ConversationsURL);
         Assertions.assertEquals(1, (int) conversationListResponse.body().path("conversations.size()"));
@@ -1301,6 +1299,44 @@ class Sdi2223Entrega2TestApplicationTests {
             size++;
         }
         Assertions.assertEquals(size, table.size()); // comprobamos que sea el mismo número
+    }
+
+    /**
+     * Sobre listado de ofertas disponibles (a elección de desarrollador), enviar un mensaje a una
+     * oferta concreta. Se abriría dicha conversación por primera vez. Comprobar que el mensaje aparece
+     * en el listado de mensajes.
+     */
+    @Test
+    @Order(52)
+    public void PR52() {
+        // navegamos a la URL
+        driver.get("http://localhost:3000/apiclient/client.html?w=login");
+        // introducimos los datos en el login
+        PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user01");
+        //Vamos a la conversación con la primera oferta
+        By convBtn = By.xpath("//a[contains(text(),'Conversación')][1]");
+        driver.findElement(convBtn).click();
+        // introducimos un mensaje
+        WebElement input = driver.findElement(By.xpath("//*[@id=\"msg-add\"]"));
+        input.click();
+        input.clear();
+        input.sendKeys("Hola :)");
+        // Click sobre enviar
+        By boton = By.xpath("//button[@id='msg-send']");
+        driver.findElement(boton).click();
+        String checkText = "Hola :)";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.get(0).getText());
+    }
+
+    /**
+     * Sobre el listado de conversaciones enviar un mensaje a una conversación ya abierta.
+     * Comprobar que el mensaje aparece en el listado de mensajes.
+     */
+    @Test
+    @Order(53)
+    public void PR53() {
+
     }
 
 }

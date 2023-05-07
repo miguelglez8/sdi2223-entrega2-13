@@ -63,26 +63,78 @@
 
   startAutoUpdate();
 
+  // function widgetSendMsg(){
+  //   let seller;
+  //   $.ajax({
+  //     url: URLbase + "/offers/" + selectedOfferId,
+  //     type: "GET",
+  //     headers: {"token": token},
+  //     success: function (response) {
+  //       seller = response.song.seller;
+  //     },
+  //     error: function (error) {
+  //       $("#main-container").load("widget-login.html");
+  //     }
+  //   });
+  //   $.ajax({
+  //     url: URLbase + "/offers/messages",
+  //     type: "POST",
+  //     data: {
+  //       buyer: "user01@email.com",
+  //       seller: seller,
+  //       offer: selectedOfferId,
+  //       text: $("#msg-add").val(),
+  //       date: Date.now(),
+  //       price: false
+  //     },
+  //     dataType: 'json',
+  //     headers: {"token": token},
+  //     success: function (response) {
+  //       console.log("Mensaje enviado: ");
+  //     },
+  //     error: function (error) {
+  //       $("#main-container").load("widget-login.html");
+  //     }
+  //   });
+  // }
   function widgetSendMsg(){
-    $.ajax({
-      url: URLbase + "/offers/messages",
-      type: "POST",
-      data: {
-        buyer: "user01@email.com",
-        seller: "user02@email.com",
-        offer: selectedOfferId,
-        text: $("#msg-add").val(),
-        date: Date.now(),
-        price: false
-      },
-      dataType: 'json',
-      headers: {"token": token},
-      success: function (response) {
-        console.log("Mensaje enviado: ");
-      },
-      error: function (error) {
-        $("#main-container").load("widget-login.html");
-      }
+    let sellerPromise = new Promise(function(resolve, reject) {
+      $.ajax({
+        url: URLbase + "/offers/" + selectedOfferId,
+        type: "GET",
+        headers: {"token": token},
+        success: function (response) {
+          resolve(response.song.seller);
+        },
+        error: function (error) {
+          reject(error);
+        }
+      });
+    });
+
+    sellerPromise.then(function(seller) {
+      $.ajax({
+        url: URLbase + "/offers/messages",
+        type: "POST",
+        data: {
+          buyer: "user01@email.com",
+          seller: seller,
+          offer: selectedOfferId,
+          text: $("#msg-add").val(),
+          date: Date.now(),
+          price: false
+        },
+        dataType: 'json',
+        headers: {"token": token},
+        success: function (response) {
+          console.log("Mensaje enviado: ");
+        },
+        error: function (error) {
+          $("#main-container").load("widget-login.html");
+        }
+      });
+    }).catch(function(error) {
+      $("#main-container").load("widget-login.html");
     });
   }
 
