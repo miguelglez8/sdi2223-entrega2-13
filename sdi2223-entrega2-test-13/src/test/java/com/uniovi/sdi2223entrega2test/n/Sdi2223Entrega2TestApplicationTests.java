@@ -34,8 +34,8 @@ import static org.junit.Assert.assertTrue;
 class Sdi2223Entrega2TestApplicationTests {
 
     // Miguel
-    // static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    // static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
+    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Raúl
     // static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
@@ -50,8 +50,8 @@ class Sdi2223Entrega2TestApplicationTests {
     //static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Luis
-    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\luism\\Desktop\\Clase\\SDI\\Sesión6\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+    //static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    //static String Geckodriver = "C:\\Users\\luism\\Desktop\\Clase\\SDI\\Sesión6\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     //static String Geckodriver = "C:\\Path\\geckodriver-v0.30.0-win64.exe";
     //static String PathFirefox = "/Applications/Firefox.app/Contents/MacOS/firefox-bin";
@@ -1972,5 +1972,58 @@ class Sdi2223Entrega2TestApplicationTests {
         // además comprobamos que se ha eliminado la oferta que se encontraba primera.
         boolean notFound = PO_HomeView.checkInvisibilityOfElement(driver, "text", nombre);
         Assertions.assertTrue(notFound);
+    }
+
+    /**
+     * PR57. Identificarse en la aplicación y enviar un mensaje a una oferta. Validar que el mensaje enviado aparece en
+     * el chat. Identificarse después con el usuario propietario de la oferta y validar que tiene un mensaje sin leer,
+     * entrar en el chat y comprobar que el mensaje pasa a tener el estado leído.
+     */
+    @Test
+    @Order(57)
+    public void PR57() {
+        // navegamos a la URL
+        driver.get("http://localhost:3000/apiclient/client.html?w=login");
+
+        // introducimos los datos en el login
+        PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user01");
+
+        // creamos una conversación
+        List<WebElement> conversacion = PO_View.checkElementBy(driver, "text", "Conversación");
+        conversacion.get(3).click();
+        // enviamos un mensaje
+        By mensaje = By.xpath("//*[@id=\"msg-add\"]");
+        WebElement elemento = driver.findElement(mensaje);
+        elemento.click();
+        elemento.clear();
+        elemento.sendKeys("Hola :/");
+        By boton = By.className("btn");
+        driver.findElement(boton).click();
+
+        // comprobamos que se ha enviado correctamente
+        String checkText = "Hola :/";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.get(0).getText());
+
+        // navegamos a la URL
+        driver.get("http://localhost:3000/apiclient/client.html?w=login");
+
+        // nos logueamos con otro usuario
+        PO_LoginAjaxView.fillLoginForm(driver, "user02@email.com", "user02");
+
+        // accedemos a la ventana de conversaciones
+        WebElement conver = driver.findElement(By.linkText("Conversaciones"));
+        conver.click();
+        conversacion = PO_View.checkElementBy(driver, "text", "Reanudar");
+        conversacion.get(0).click();
+        try {
+            Thread.sleep(2500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        // comprobamos que el estado de "leído" se ha actualizado a "true"
+        By field = By.xpath("/html/body/div/div/table/tbody/tr/td[4]");
+        Assertions.assertEquals("true", driver.findElement(field).getText());
     }
 }
