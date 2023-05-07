@@ -469,6 +469,52 @@ class Sdi2223Entrega2TestApplicationTests {
         Assertions.assertEquals(usuarios, 14);
     }
 
+    //[Prueba15]Intentar borrar el usuario que se encuentra en sesión y comprobar que no ha sido borrado
+    //(porque no es un usuario administrador o bien, porque, no se puede borrar a sí mismo, si está
+    //autenticado).
+    @Test
+    @Order(15)
+    public void PR15() {
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        //Rellenamos el formulario para iniciar sesion como administrador
+        PO_LoginView.fillLoginForm(driver, "admin@email.com", "admin");
+        //Comprobamos que entramos en la página privada del administrador
+        String checkText = "Listado de usuarios";
+        List<WebElement> result = checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.get(0).getText());
+        List<WebElement> list = checkElementBy(driver, "id", "cbDelete");
+        //Pulso el boton borrar sobre el primer usuario
+        list.get(0).click();
+        list.get(1).click();
+        list.get(2).click();
+        //Pulsamos el botón de borrar
+        List<WebElement> languageButton = SeleniumUtils.waitLoadElementsBy(driver, "id", "btnDelete", PO_View.getTimeout());
+        languageButton.get(0).click();
+
+
+
+
+        //POR SI ACASO TAMBIEN COMPRUEBO EL NUMERO DE USUARIOS ES 1 MENOS
+        //Comprobamos el numero de usuarios es correcto
+        List<WebElement> userList = SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
+        //Preparo el contador de usuarios
+        int usuarios = userList.size();
+
+        // cambiamos a la segunda página y contamos los usuarios
+        By segundaPagina = By.xpath("//*[@id=\"pi-2\"]/a");
+        driver.findElement(segundaPagina).click();
+        List<WebElement> userList2 = SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
+        usuarios += userList2.size();
+        // cambiamos a la tercera página y contamos los usuarios
+        By terceraPagina = By.xpath("//*[@id=\"pi-3\"]/a");
+        driver.findElement(terceraPagina).click();
+        List<WebElement> userList3 = SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
+        usuarios += userList3.size();
+
+        //Comprobamos que el numero de usuarios es correcto
+        Assertions.assertEquals(usuarios, 14);
+    }
+
 
     /**
      * PR16. Ir al formulario de alta de oferta, rellenarla con datos válidos y pulsar el botón Submit.
