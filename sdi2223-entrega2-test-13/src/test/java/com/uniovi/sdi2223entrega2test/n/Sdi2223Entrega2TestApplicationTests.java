@@ -25,7 +25,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static com.uniovi.sdi2223entrega2test.n.pageobjects.PO_View.checkElementBy;
-import static java.lang.Thread.sleep;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -34,23 +33,23 @@ import static org.junit.Assert.assertTrue;
 class Sdi2223Entrega2TestApplicationTests {
 
     // Miguel
-    // static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    // static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
+    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Raúl
     // static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
     // static String Geckodriver = "C:\\Users\\Aladino España\\Desktop\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Ton
-    static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
+    //static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+    //static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
 
     // Alves
     //static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
 
     // Luis
-    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\luism\\Desktop\\Clase\\SDI\\Sesión6\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+    //static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    //static String Geckodriver = "C:\\Users\\luism\\Desktop\\Clase\\SDI\\Sesión6\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     //static String Geckodriver = "C:\\Path\\geckodriver-v0.30.0-win64.exe";
     //static String PathFirefox = "/Applications/Firefox.app/Contents/MacOS/firefox-bin";
@@ -1503,11 +1502,7 @@ class Sdi2223Entrega2TestApplicationTests {
                 request, MessagesURL);
         // 5. Accedemos a la URL de obtener conversaciones
         final String ConversationsURL = "http://localhost:3000/api/v1.0/conversations";
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
         Response conversationListResponse = request.get(ConversationsURL);
         // 6. Verificamos el estado
         Assertions.assertEquals(200, conversationListResponse.getStatusCode());
@@ -1549,13 +1544,8 @@ class Sdi2223Entrega2TestApplicationTests {
         // 5. Obtenemos el listado de conversaciones. En este punto deberían ser una.
         final String ConversationsURL = "http://localhost:3000/api/v1.0/conversations";
         // Esperamos a que cargue las conversaciones.
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
         Response conversationListResponse = request.get(ConversationsURL);
-        System.out.println(conversationListResponse.getBody().asString());
         final String conversationId = conversationListResponse.jsonPath().get("conversations[1]._id");
         // tiene dos conversaciones
         int convers = mongo.getConversations("user02@email.com");
@@ -1565,7 +1555,6 @@ class Sdi2223Entrega2TestApplicationTests {
         // 7. Eliminamos una conversación
         Response deleteConversationResponse = request.delete(DeleteConversationURL);
         // 8. Verificamos el estado. Ahora sólo debería haber una conversación.
-        System.out.println(deleteConversationResponse.getBody().asString());
         Assertions.assertEquals(200, deleteConversationResponse.getStatusCode());
         conversationListResponse = request.get(ConversationsURL);
         int conversBd = mongo.getConversations("user02@email.com");
@@ -1746,14 +1735,9 @@ class Sdi2223Entrega2TestApplicationTests {
         //Vamos a la conversación con la primera oferta
         By conversationBtn = By.xpath("//a[contains(text(),'Conversación')][1]");
         driver.findElement(conversationBtn).click();
-        try {
-            Thread.sleep(1100);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         //Comprobamos que se ve el mensaje de la conversación ya abierta
         String checkText = "Hola :)";
-        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        List<WebElement> result = SeleniumUtils.waitLoadElementsBy(driver, "text", checkText, 1100);
         Assertions.assertEquals(checkText, result.get(0).getText());
         // introducimos un mensaje nuevo
         WebElement input2 = driver.findElement(By.xpath("//*[@id=\"msg-add\"]"));
@@ -1764,14 +1748,9 @@ class Sdi2223Entrega2TestApplicationTests {
         // Click sobre enviar
         By btn = By.xpath("//button[@id='msg-send']");
         driver.findElement(btn).click();
-        try {
-            Thread.sleep(1100);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         //Comprobamos que se ve el mensaje nuevo
         String checkText2 = "Adiós :(";
-        result = PO_View.checkElementBy(driver, "text", checkText2);
+        result = SeleniumUtils.waitLoadElementsBy(driver, "text", checkText2, 1100);
         Assertions.assertEquals(checkText2, result.get(0).getText());
     }
 
@@ -1957,7 +1936,8 @@ class Sdi2223Entrega2TestApplicationTests {
 
         // comprobamos que tenemos tres conversaciones, lo que significa tener un botóno eliminar por cada una.
         // además de una cuarta coincidencia al buscar la palabra "Eliminar" debido a un script
-        assertTrue(eliminar.size() == 4);
+        int convers = mongo.getConversations("user01@email.com");
+        Assertions.assertTrue(eliminar.size() - 1 == convers);
 
         // eliminarmos la primera conversación
         WebElement eliminarUltima = driver.findElement(By.xpath("/html/body/div/div/table/tbody/tr[3]/td[4]/a"));
@@ -1966,7 +1946,8 @@ class Sdi2223Entrega2TestApplicationTests {
         eliminar = PO_View.checkElementBy(driver, "text", "Eliminar");
 
         // comprobamos que ahora solo tenemos dos conversaciones
-        assertTrue(eliminar.size() == 3);
+        int conversBD = mongo.getConversations("user01@email.com");
+        Assertions.assertTrue(eliminar.size() - 1 == conversBD);
 
         // además comprobamos que se ha eliminado la oferta que se encontraba primera.
         boolean notFound = PO_HomeView.checkInvisibilityOfElement(driver, "text", nombre);
@@ -2015,15 +1996,12 @@ class Sdi2223Entrega2TestApplicationTests {
         conver.click();
         conversacion = PO_View.checkElementBy(driver, "text", "Reanudar");
         conversacion.get(0).click();
-        try {
-            Thread.sleep(2500);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
 
         // comprobamos que el estado de "leído" se ha actualizado a "true"
-        By field = By.xpath("/html/body/div/div/table/tbody/tr/td[4]");
-        Assertions.assertEquals("true", driver.findElement(field).getText());
+        List<WebElement> res = SeleniumUtils.waitLoadElementsByXpath(driver, "/html/body/div/div/table/tbody/tr/td[4]", 20000);
+        Assertions.assertEquals("true", res.get(0).getText());
+
+
     }
 
     /**
@@ -2069,7 +2047,6 @@ class Sdi2223Entrega2TestApplicationTests {
 
         // comprobamos que son tres mensajes
         assertEquals(mensajesNoLeidos.getText(), "3");
-
     }
 
 }
