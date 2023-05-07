@@ -34,20 +34,20 @@ import static org.junit.Assert.assertTrue;
 class Sdi2223Entrega2TestApplicationTests {
 
     // Miguel
-    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
+//    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+//    static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Raúl
     // static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
     // static String Geckodriver = "C:\\Users\\Aladino España\\Desktop\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Ton
-    //static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-    //static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
+    static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+    static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
 
     // Alves
-    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+//    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+//    static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Luis
     //static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
@@ -1745,7 +1745,8 @@ class Sdi2223Entrega2TestApplicationTests {
         driver.navigate().to("http://localhost:3000/apiclient/client.html?w=login");
         PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user01");
         //Vamos a la conversación con la primera oferta
-        driver.findElement(convBtn).click();
+        By conversationBtn = By.xpath("//a[contains(text(),'Conversación')][1]");
+        driver.findElement(conversationBtn).click();
         try {
             Thread.sleep(1100);
         } catch (InterruptedException e) {
@@ -1756,10 +1757,11 @@ class Sdi2223Entrega2TestApplicationTests {
         List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.get(0).getText());
         // introducimos un mensaje nuevo
-        input = driver.findElement(By.xpath("//*[@id=\"msg-add\"]"));
-        input.click();
-        input.clear();
-        input.sendKeys("Adiós :(");
+        WebElement input2 = driver.findElement(By.xpath("//*[@id=\"msg-add\"]"));
+        input2 = driver.findElement(By.xpath("//*[@id=\"msg-add\"]"));
+        input2.click();
+        input2.clear();
+        input2.sendKeys("Adiós :(");
         // Click sobre enviar
         By btn = By.xpath("//button[@id='msg-send']");
         driver.findElement(btn).click();
@@ -1769,9 +1771,9 @@ class Sdi2223Entrega2TestApplicationTests {
             throw new RuntimeException(e);
         }
         //Comprobamos que se ve el mensaje nuevo
-        checkText = "Adiós :(";
-        result = PO_View.checkElementBy(driver, "text", checkText);
-        Assertions.assertEquals(checkText, result.get(0).getText());
+        String checkText2 = "Adiós :(";
+        result = PO_View.checkElementBy(driver, "text", checkText2);
+        Assertions.assertEquals(checkText2, result.get(0).getText());
     }
 
     /**
