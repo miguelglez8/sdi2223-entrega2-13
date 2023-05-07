@@ -46,8 +46,8 @@ class Sdi2223Entrega2TestApplicationTests {
     //static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
 
     // Alves
-    //static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    //static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Luis
     //static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
@@ -1956,8 +1956,7 @@ class Sdi2223Entrega2TestApplicationTests {
 
         // comprobamos que tenemos tres conversaciones, lo que significa tener un botóno eliminar por cada una.
         // además de una cuarta coincidencia al buscar la palabra "Eliminar" debido a un script
-        int convers = mongo.getConversations("user01@email.com");
-        Assertions.assertTrue( eliminar.size()-1 == convers);
+        assertTrue(eliminar.size() == 4);
 
         // eliminarmos la primera conversación
         WebElement eliminarUltima = driver.findElement(By.xpath("/html/body/div/div/table/tbody/tr[3]/td[4]/a"));
@@ -1966,8 +1965,7 @@ class Sdi2223Entrega2TestApplicationTests {
         eliminar = PO_View.checkElementBy(driver, "text", "Eliminar");
 
         // comprobamos que ahora solo tenemos dos conversaciones
-        int conversBd = mongo.getConversations("user01@email.com");
-        Assertions.assertTrue( eliminar.size()-1 == conversBd);
+        assertTrue(eliminar.size() == 3);
 
         // además comprobamos que se ha eliminado la oferta que se encontraba primera.
         boolean notFound = PO_HomeView.checkInvisibilityOfElement(driver, "text", nombre);
