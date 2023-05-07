@@ -279,7 +279,7 @@ module.exports = function (app, usersRepository, logsRepository) {
      * Registro de usuarios POST
      */
     app.post('/users/signup', async function (req, res) {
-        let birthdate = new Date(req.body.birthdate);
+        let birthdate = req.body.birthdate;
 
         let securePassword = app.get("crypto").createHmac('sha256', app.get('clave'))
             .update(req.body.password).digest('hex');
@@ -346,7 +346,7 @@ module.exports = function (app, usersRepository, logsRepository) {
             errors.push("El email ya existe");
         }
         //check that the birthdate format is correct
-        let birthdateRegex = /^(\d{2})-(\d{2})-(\d{4})$/;
+        let birthdateRegex = /^(\d{4})-(\d{2})-(\d{2})$/;
         if (!birthdateRegex.test(user.birthdate)) {
             errors.push("La fecha de nacimiento no tiene un formato correcto. El formato debe ser DD-MM-YYYY");
         } else {
