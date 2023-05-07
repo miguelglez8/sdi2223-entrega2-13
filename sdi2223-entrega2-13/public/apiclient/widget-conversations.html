@@ -33,33 +33,57 @@
         });
     }
 
-
     function updateOffersTable(conversations) {
-        $("#conversationsTableBody").empty();
-        for (i = 0; i < conversations.length; i++) {
-            addConversationToTable(conversations[i].seller, conversations[i].offer, conversations[i]._id);
-        }
-    }
+        $("#conversationsTableBody").empty(); // Vaciar la tabla
+        let offerSeller;
+        let offer;
+        let loadedOffers = 0;
+        let totalOffers = conversations.length;
 
-    function addConversationToTable(seller, offer, id) {
-        $.ajax({
-            url: URLbase + "/offers/" + offer,
-            type: "GET",
-            headers: {token: token},
-            success: function (response) {
-                $("#conversationsTableBody").append(
-                    "<tr>" +
-                    "<td>" + seller + "</td>" +
-                    "<td>" + response.song.title + "</td>" +
-                    "<td><a onclick=widgetChat('" + offer + "')>Reanudar</a></td>" +
-                    "<td><a onclick=deleteChat('" + id + "')>Eliminar</a></td>" +
-                    "</tr>"
-                );
-            },
-            error: function (error) {
-                console.log(error);
-            },
-        });
+        function loadOfferData(i) {
+            $.ajax({
+                url: URLbase + "/offers/" + conversations[i].offer,
+                type: "GET",
+                headers: { token: token },
+                success: function(response) {
+                    console.log("Aqui");
+                    console.log(conversations[i]);
+                    $("#conversationsTableBody").append(
+                        "<tr>" +
+                        "<td>" +
+                        conversations[i].seller +
+                        "</td>" +
+                        "<td>" +
+                        response.song.title +
+                        "</td>" +
+                        "<td><a onclick=widgetChat('" +
+                        conversations[i].offer +
+                        "')>Reanudar</a></td>" +
+                        "<td><a onclick=deleteChat('" +
+                        conversations[i]._id +
+                        "')>Eliminar</a></td>" +
+                        "</tr>"
+                    );
+                    loadedOffers++;
+                    if (loadedOffers === totalOffers) {
+                        // Se han cargado todos los datos, actualiza la tabla
+                        console.log("Carga de datos completada");
+                    }
+                    else {
+                        // Todavía hay datos por cargar, llama a la función recursivamente
+                        loadOfferData(i + 1);
+                    }
+                },
+                error: function(error) {
+                    console.log(error);
+                },
+            });
+        }
+
+        if (conversations.length > 0) {
+            // Inicia la carga de datos llamando a la función recursiva
+            loadOfferData(0);
+        }
     }
 
     loadConversations();

@@ -4,6 +4,8 @@ import com.uniovi.sdi2223entrega2test.n.util.SeleniumUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
 
@@ -65,6 +67,12 @@ public class PO_HomeView extends PO_NavView {
 
         // devolver la lista de elementos
         return elementos;
+    }
+
+    public static boolean checkInvisibilityOfElement(WebDriver driver, String criterio, String element) {
+        return (new WebDriverWait(driver, 2))
+                .until(ExpectedConditions.invisibilityOfElementLocated(
+                        By.xpath("//*[contains('" + criterio + "','" + element + "'logout')]")));
     }
 
 }

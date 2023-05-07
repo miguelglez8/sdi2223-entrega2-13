@@ -11,6 +11,7 @@
     </thead>
     <tbody id="messagesTableBody"></tbody>
   </table>
+  <hr>
   <div class="form-group">
     <label class="control-label col-sm-2" for="msg-add">Mensaje:</label>
     <input type="text" class="form-control" name="msg-add"
@@ -63,13 +64,13 @@
 
   startAutoUpdate();
 
-  function widgetSendMsg(){
+  function sendOfferMessage(user, seller) {
     $.ajax({
       url: URLbase + "/offers/messages",
       type: "POST",
       data: {
-        buyer: "user01@email.com",
-        seller: "user02@email.com",
+        buyer: user,
+        seller: seller,
         offer: selectedOfferId,
         text: $("#msg-add").val(),
         date: Date.now(),
@@ -85,5 +86,57 @@
       }
     });
   }
+
+  function widgetSendMsg() {
+    let sellerPromise = new Promise(function(resolve, reject) {
+      $.ajax({
+        url: URLbase + "/offers/" + selectedOfferId,
+        type: "GET",
+        headers: {"token": token},
+        success: function (response) {
+          resolve(response.song.seller);
+        },
+        error: function (error) {
+          reject(error);
+        }
+      });
+    });
+
+    sellerPromise.then(function(seller) {
+      $.ajax({
+        url: URLbase + "/users/current",
+        type: "GET",
+        headers: {"token": token},
+        success: function (response) {
+          let user = response.user.email;
+          if(user === seller){
+            $.ajax({
+              url: URLbase + "/offers/messages/" + selectedOfferId,
+              type: "GET",
+              data: {},
+              dataType: 'json',
+              headers: {"token": token},
+              success: function (response) {
+                user = response.messages[0].buyer;
+                sendOfferMessage(user, seller, selectedOfferId);
+              },
+              error: function (error) {
+                $("#main-container").load("widget-login.html");
+              }
+            });
+          } else {
+
+            sendOfferMessage(user, seller);
+          }
+        },
+        error: function (error) {
+          $("#main-container").load("widget-login.html");
+        }
+      });
+    }).catch(function(error) {
+      $("#main-container").load("widget-login.html");
+    });
+  }
+
 
 </script>
