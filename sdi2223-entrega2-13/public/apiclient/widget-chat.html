@@ -23,7 +23,7 @@
 </div>
 <script>
   window.history.pushState("", "", "/apiclient/client.html?w=chat");
-  function loadMessagess() {
+  function loadMessages() {
     $.ajax({
       url: URLbase + "/offers/messages/" + selectedOfferId,
       type: "GET",
@@ -41,33 +41,35 @@
   }
   function updateMessagesTable(messages) {
     $("#messagesTableBody").empty(); // Vaciar la tabla
-    for (i = 0; i < offers.length; i++) {
+    for (i = 0; i < messages.length; i++) {
+      const timestamp = messages[i].date;
+      const date = new Date(timestamp);
+      const dateHour = date.toLocaleString();
       $("#messagesTableBody").append(
               "<tr>" +
               "<td>" + messages[i].author + "</td>" +
-              "<td>" + messages[i].date + "</td>" +
+              "<td>" + dateHour + "</td>" +
               "<td>" + messages[i].text + "</td>" +
               "<td>" + messages[i].read + "</td>" +
               "</tr>");
-      // Mucho cuidado con las comillas del eliminarCancion
-      //la id tiene que ir entre comillas ' '
     }
   }
-  loadMessagess();
+
+  function startAutoUpdate() {
+    setInterval(function() {
+      loadMessages();
+    }, 1000);
+  }
+
+  startAutoUpdate();
 
   function widgetSendMsg(){
     $.ajax({
       url: URLbase + "/offers/messages",
       type: "POST",
       data: {
-        // buyer: res.user,
-        // seller: req.body.seller,
-        // offer: req.body.offer,
-        // text: req.body.text,
-        // date: Date.now(),
-        // read: false
-        buyer: 1,
-        seller: 2,
+        buyer: "user01@email.com",
+        seller: "user02@email.com",
         offer: selectedOfferId,
         text: $("#msg-add").val(),
         date: Date.now(),
@@ -76,8 +78,7 @@
       dataType: 'json',
       headers: {"token": token},
       success: function (response) {
-        console.log("Canción eliminada: ");
-        // $("#" + _id).remove(); // eliminar el <tr> de la canción
+        console.log("Mensaje enviado: ");
       },
       error: function (error) {
         $("#main-container").load("widget-login.html");

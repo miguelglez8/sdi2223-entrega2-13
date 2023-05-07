@@ -3,7 +3,7 @@ const {response} = require("express");
 module.exports = function (app, usersRepository, offersRepository) {
 
     /**
-     *
+     * Método que devuelve la lista de ofertas del usuario que está logeado
      */
     app.get('/offers/myoffers', function (req, res) {
         let filter = {seller: req.session.user}
@@ -60,15 +60,14 @@ module.exports = function (app, usersRepository, offersRepository) {
                     res.render("offers/myoffers.twig", response);
                 })
             })
-            // volvemos a la vista de ofertas compradas
 
         }).catch(error => {
-            res.send("Se ha producido un error al listar las compras del usuario:" + error)
+            res.send("Se ha producido un error al listar las ofertas del usuario:" + error)
         });
     })
 
     /**
-     *
+     * Método get para la vista del formulario de añadir oferta
      */
     app.get('/offers/add', function (req, res) {
         usersRepository.findUser({email: req.session.user}, {}).then(user => {
@@ -81,7 +80,7 @@ module.exports = function (app, usersRepository, offersRepository) {
     });
 
     /**
-     *
+     * Añade oferta nueva
      */
     app.post('/offers/add', function (req, res) {
         let highlight = false;
@@ -120,7 +119,8 @@ module.exports = function (app, usersRepository, offersRepository) {
     });
 
     /**
-     *
+     * Elimina una oferta al pasarle un id
+     * Debe comprobar que la oferta es del usuario que la quiere borrar y no ha sido comprada
      */
     app.get('/offers/delete/:id', function (req, res) {
         let filter = {_id: new ObjectId(req.params.id)};
@@ -383,9 +383,12 @@ module.exports = function (app, usersRepository, offersRepository) {
         functionCallback(true);
     }
 
-    function canDelete(user, offer, functionCallback) {
-        offersRepository.findOffer(offer, {}).then(offer2 => {
-            if (offer2 && (offer2.seller !== user || offer2.isBuy)) {
+    /**
+     * Comprueba si se cumplen las condiciones para poder borrar una oferta
+     */
+    function canDelete(user, offer, functionCallback){
+        offersRepository.findOffer(offer,{}).then( offer2 => {
+            if(offer2 && (offer2.seller !== user || offer2.isBuy)){
                 functionCallback(false);
             } else {
                 functionCallback(true);
