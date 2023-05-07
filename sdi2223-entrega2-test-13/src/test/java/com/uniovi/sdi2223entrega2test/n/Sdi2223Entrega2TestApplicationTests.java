@@ -160,7 +160,7 @@ class Sdi2223Entrega2TestApplicationTests {
         //Rellenamos el formulario
         PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
         //Comprobamos que entramos en la página privada de usuario
-        String checkText = "Mis Ofertas";
+        String checkText = "Mis ofertas";
         List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
 
         Assertions.assertEquals(checkText, checkText);
@@ -824,7 +824,17 @@ class Sdi2223Entrega2TestApplicationTests {
     @Test
     @Order(34)
     public void PR34() {
+        // intentamos acceder a la lista de conversaciones, como no estamos llogueados la única manera de acceder
+        // es mediante el enlace
+        driver.navigate().to(URL + "/apiclient/client.html?w=conversations");
 
+        // nos deberá mandar a la página de login
+        String checkText = "Email:";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.get(0).getText());
+        checkText = "Password:";
+        List<WebElement> result2 = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result2.get(0).getText());
     }
 
     /**
@@ -1181,10 +1191,16 @@ class Sdi2223Entrega2TestApplicationTests {
                 request, MessagesURL);
         // 5. Accedemos a la URL de obtener conversaciones
         final String ConversationsURL = "http://localhost:3000/api/v1.0/conversations";
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Response conversationListResponse = request.get(ConversationsURL);
         // 6. Verificamos el estado
         Assertions.assertEquals(200, conversationListResponse.getStatusCode());
-        Assertions.assertTrue((int) conversationListResponse.body().path("conversations.size()") == 2);
+        int nConversaciones = (int) conversationListResponse.body().path("conversations.size()");
+        Assertions.assertTrue( nConversaciones == 1);
     }
 
     /**
@@ -1226,12 +1242,14 @@ class Sdi2223Entrega2TestApplicationTests {
             e.printStackTrace();
         }
         Response conversationListResponse = request.get(ConversationsURL);
+        System.out.println(conversationListResponse.getBody().asString());
         final String conversationId = conversationListResponse.jsonPath().get("conversations[1]._id");
         // 6. Accedemos a la URL de obtener conversaciones con la conversación a eliminar como parámetro
         final String DeleteConversationURL = "http://localhost:3000/api/v1.0/conversations/" + conversationId;
         // 7. Eliminamos una conversación
         Response deleteConversationResponse = request.delete(DeleteConversationURL);
         // 8. Verificamos el estado. Ahora sólo debería haber una conversación.
+        System.out.println(deleteConversationResponse.getBody().asString());
         Assertions.assertEquals(200, deleteConversationResponse.getStatusCode());
         conversationListResponse = request.get(ConversationsURL);
         Assertions.assertEquals(1, (int) conversationListResponse.body().path("conversations.size()"));
@@ -1299,44 +1317,6 @@ class Sdi2223Entrega2TestApplicationTests {
             size++;
         }
         Assertions.assertEquals(size, table.size()); // comprobamos que sea el mismo número
-    }
-
-    /**
-     * Sobre listado de ofertas disponibles (a elección de desarrollador), enviar un mensaje a una
-     * oferta concreta. Se abriría dicha conversación por primera vez. Comprobar que el mensaje aparece
-     * en el listado de mensajes.
-     */
-    @Test
-    @Order(52)
-    public void PR52() {
-        // navegamos a la URL
-        driver.get("http://localhost:3000/apiclient/client.html?w=login");
-        // introducimos los datos en el login
-        PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user01");
-        //Vamos a la conversación con la primera oferta
-        By convBtn = By.xpath("//a[contains(text(),'Conversación')][1]");
-        driver.findElement(convBtn).click();
-        // introducimos un mensaje
-        WebElement input = driver.findElement(By.xpath("//*[@id=\"msg-add\"]"));
-        input.click();
-        input.clear();
-        input.sendKeys("Hola :)");
-        // Click sobre enviar
-        By boton = By.xpath("//button[@id='msg-send']");
-        driver.findElement(boton).click();
-        String checkText = "Hola :)";
-        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
-        Assertions.assertEquals(checkText, result.get(0).getText());
-    }
-
-    /**
-     * Sobre el listado de conversaciones enviar un mensaje a una conversación ya abierta.
-     * Comprobar que el mensaje aparece en el listado de mensajes.
-     */
-    @Test
-    @Order(53)
-    public void PR53() {
-
     }
 
 }

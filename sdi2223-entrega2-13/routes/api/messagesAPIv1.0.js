@@ -88,7 +88,7 @@ module.exports = function (app, offersRepository, messagesRepository) {
      *     vendedor o el interesado.
      */
     app.get("/api/v1.0/conversations", function (req, res) {
-        let filter = {$or: [ {seller: res.user}, {buyer: res.user} ]};
+        let filter = {user: res.user};
         let options = {};
         messagesRepository.getConversations(filter, options).then(conversations => {
             res.status(200);
