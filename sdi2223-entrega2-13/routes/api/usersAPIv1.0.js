@@ -1,4 +1,7 @@
 module.exports = function (app, songsRepository, usersRepository) {
+    /**
+     * Permite al usuario loguearse con un token
+     */
     app.post('/api/v1.0/users/login', function (req, res) {
         try {
             let securePassword = app.get("crypto").createHmac('sha256', app.get('clave'))
@@ -40,5 +43,22 @@ module.exports = function (app, songsRepository, usersRepository) {
                 authenticated: false
             })
         }
+    });
+
+    /**
+     * Retorna el usuario actualmente logueado
+     */
+    app.get("/api/v1.0/users/current", function (req, res) {
+        let filter = {
+            email: res.user
+        };
+        let options = {};
+        usersRepository.findUser(filter, options).then(user => {
+            res.status(200);
+            res.send({user: user})
+        }).catch(error => {
+            res.status(500);
+            res.json({ error: "Se ha producido un error inesperado." })
+        });
     });
 }
