@@ -34,12 +34,12 @@ import static org.junit.Assert.assertTrue;
 class Sdi2223Entrega2TestApplicationTests {
 
     // Miguel
-    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
+    // static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    // static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Raúl
-    //static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-    //static String Geckodriver = "C:\\Users\\Aladino España\\Desktop\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+    // static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+    // static String Geckodriver = "C:\\Users\\Aladino España\\Desktop\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Ton
     //static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
@@ -50,8 +50,8 @@ class Sdi2223Entrega2TestApplicationTests {
     //static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Luis
-    // static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
-    //static String Geckodriver = "C:\\Users\\luism\\Desktop\\Clase\\SDI\\Sesión6\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    static String Geckodriver = "C:\\Users\\luism\\Desktop\\Clase\\SDI\\Sesión6\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     //static String Geckodriver = "C:\\Path\\geckodriver-v0.30.0-win64.exe";
     //static String PathFirefox = "/Applications/Firefox.app/Contents/MacOS/firefox-bin";
@@ -1556,6 +1556,7 @@ class Sdi2223Entrega2TestApplicationTests {
             e.printStackTrace();
         }
         Response conversationListResponse = request.get(ConversationsURL);
+        System.out.println(conversationListResponse.getBody().asString());
         final String conversationId = conversationListResponse.jsonPath().get("conversations[1]._id");
         // tiene dos conversaciones
         int convers = mongo.getConversations("user02@email.com");
@@ -1688,6 +1689,7 @@ class Sdi2223Entrega2TestApplicationTests {
         }
         Assertions.assertEquals(size, table.size()); // comprobamos que sea el mismo número
     }
+
 
     /**
      * Sobre listado de ofertas disponibles (a elección de desarrollador), enviar un mensaje a una
@@ -1972,4 +1974,83 @@ class Sdi2223Entrega2TestApplicationTests {
         Assertions.assertTrue(notFound);
     }
 
+    /**
+     * PR56. Sobre el listado de conversaciones ya abiertas. Pinchar el enlace Eliminar en la última y
+     * comprobar que el listado se actualiza correctamente.
+     */
+    @Test
+    @Order(56)
+    public void PR56() {
+        // navegamos a la URL
+        driver.get("http://localhost:3000/apiclient/client.html?w=login");
+
+        // introducimos los datos en el login
+        PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user01");
+
+        // creamos una conversación
+        List<WebElement> conversacion = PO_View.checkElementBy(driver, "text", "Conversación");
+        conversacion.get(3).click();
+        // enviamos un mensaje
+        By mensaje = By.xpath("//*[@id=\"msg-add\"]");
+        WebElement elemento = driver.findElement(mensaje);
+        elemento.click();
+        elemento.clear();
+        elemento.sendKeys("Hola");
+        By boton = By.className("btn");
+        driver.findElement(boton).click();
+
+        // creamos otra conversación
+        WebElement conver = driver.findElement(By.linkText("Ofertas"));
+        conver.click();
+        conversacion = PO_View.checkElementBy(driver, "text", "Conversación");
+        conversacion.get(4).click();
+        // enviamos un mensaje
+        mensaje = By.xpath("//*[@id=\"msg-add\"]");
+        elemento = driver.findElement(mensaje);
+        elemento.click();
+        elemento.clear();
+        elemento.sendKeys("Hola");
+        boton = By.className("btn");
+        driver.findElement(boton).click();
+
+        // creamos una tercera conversaión
+        conver = driver.findElement(By.linkText("Ofertas"));
+        conver.click();
+        conversacion = PO_View.checkElementBy(driver, "text", "Conversación");
+        conversacion.get(5).click();
+        // enviamos un mensaje
+        mensaje = By.xpath("//*[@id=\"msg-add\"]");
+        elemento = driver.findElement(mensaje);
+        elemento.click();
+        elemento.clear();
+        elemento.sendKeys("Hola");
+        boton = By.className("btn");
+        driver.findElement(boton).click();
+
+        // accedemos a la lista de conversaciones
+        WebElement conversaciones = driver.findElement(By.linkText("Conversaciones"));
+        conversaciones.click();
+
+        List<WebElement> eliminar = PO_View.checkElementBy(driver, "text", "Eliminar");
+
+        WebElement nombreOferta = driver.findElement(By.xpath("//*[@id=\"conversationsTableBody\"]/tr[3]/td[2]"));
+        String nombre = nombreOferta.getText();
+
+        // comprobamos que tenemos tres conversaciones, lo que significa tener un botóno eliminar por cada una.
+        // además de una cuarta coincidencia al buscar la palabra "Eliminar" debido a un script
+        assertTrue(eliminar.size() == 4);
+
+        // eliminarmos la primera conversación
+        WebElement eliminarUltima = driver.findElement(By.xpath("/html/body/div/div/table/tbody/tr[3]/td[4]/a"));
+        eliminarUltima.click();
+
+        eliminar = PO_View.checkElementBy(driver, "text", "Eliminar");
+
+        // comprobamos que ahora solo tenemos dos conversaciones
+        assertTrue(eliminar.size() == 3);
+
+        // además comprobamos que se ha eliminado la oferta que se encontraba primera.
+        boolean notFound = PO_HomeView.checkInvisibilityOfElement(driver, "text", nombre);
+        Assertions.assertTrue(notFound);
+    }
 }
