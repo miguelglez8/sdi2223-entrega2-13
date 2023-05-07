@@ -1,5 +1,5 @@
 const {ObjectId} = require("mongodb");
-module.exports = function (app, usersRepository) {
+module.exports = function (app, usersRepository, logsRepository) {
 
     /**
      * Funcionalidad listado de usuarios con busqueda y paginacion
@@ -108,6 +108,34 @@ module.exports = function (app, usersRepository) {
     });
 
     /**
+     * Listado de logs
+     */
+    app.get("/users/admin/log", function (req, res) {
+        let filter = {};
+        let options = {sort: {date: -1}};
+
+        logsRepository.getLogs(filter, options)
+            .then(result => {
+                usersRepository.findUser({email: req.session.user}, options).then(user => {
+                    let response = {
+                        logs: result.logs,
+                        session: req.session,
+                        search: req.query.search,
+                        money: user.money,
+                    }
+                    res.render("users/admin/log.twig", response);
+                });
+            })
+            .catch(() => {
+                    res.redirect("/" +
+                        "?message=Ha ocurrido un error al listar los logs." +
+                        "&messageType=alert-danger ");
+                }
+            );
+    });
+
+
+    /**
      * Funcionalidad borrado de usuarios
      */
     app.get('/users/delete', function (req, res) {
@@ -125,6 +153,50 @@ module.exports = function (app, usersRepository) {
         }
 
         res.redirect("/users/admin/list");
+    });
+
+    /**
+     * Funcionalidad borrado de todos los logs
+     */
+    app.get('/users/logAction', function (req, res) {
+        let filter = {};
+        let options = {};
+
+        if (req.query.action === "deleteLogs") {
+            logsRepository.deleteLogs(filter, options);
+            res.redirect("/users/admin/log");
+        } else {
+            if(req.query.action !== "Todos"){
+                filter = {type: req.query.action};
+            }
+            options = {sort: {date: -1}};
+
+            //For pagination
+            let page = parseInt(req.query.page); // Es String !!!
+            if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") { //
+                page = 1;
+            }
+
+            logsRepository.getLogs(filter, options)
+                .then(result => {
+
+                    usersRepository.findUser({email: req.session.user}, options).then(user => {
+                        let response = {
+                            logs: result.logs,
+                            session: req.session,
+                            search: req.query.search,
+                            money: user.money,
+                        }
+                        res.render("users/admin/log.twig", response);
+                    });
+                })
+                .catch(() => {
+                        res.redirect("/" +
+                            "?message=Ha ocurrido un error al listar los logs." +
+                            "&messageType=alert-danger ");
+                    }
+                );
+        }
     });
 
     /**
@@ -158,15 +230,36 @@ module.exports = function (app, usersRepository) {
         let options = {}
         usersRepository.findUser(filter, options).then(user => {
             if (user == null) {
+                let now = new Date();
+                log = {
+                    type: "LOGIN-ERR",
+                    date: now.toISOString().replace(/T/, ' ').replace(/\..+/, ''),
+                    description: req.body.email
+                };
+                logsRepository.insertLog(log);
                 req.session.user = null;
                 res.redirect("/users/login" +
                     "?message=Email o password incorrecto" +
                     "&messageType=alert-danger ");
             } else {
                 req.session.user = user.email;
-                res.redirect("/offers/myoffers");
+                let now = new Date();
+                log = {
+                    type: "LOGIN-EX",
+                    date: now.toISOString().replace(/T/, ' ').replace(/\..+/, ''),
+                    description: req.session.user
+                };
+                logsRepository.insertLog(log);
+                res.redirect("/users/list");
             }
         }).catch(() => {
+            let now = new Date();
+            log = {
+                type: "LOGIN-ERR",
+                date: now.toISOString().replace(/T/, ' ').replace(/\..+/, ''),
+                description: req.session.user
+            };
+            logsRepository.insertLog(log);
             req.session.user = null;
             res.redirect("/users/login" +
                 "?message=Se ha producido un error al buscar el usuario" +
@@ -191,7 +284,7 @@ module.exports = function (app, usersRepository) {
      * Registro de usuarios POST
      */
     app.post('/users/signup', async function (req, res) {
-        let birthdate = new Date(req.body.birthdate);
+        let birthdate = req.body.birthdate;
 
         let securePassword = app.get("crypto").createHmac('sha256', app.get('clave'))
             .update(req.body.password).digest('hex');
@@ -216,6 +309,13 @@ module.exports = function (app, usersRepository) {
                 return
             }
             usersRepository.insertUser(user).then(() => {
+                let now = new Date();
+                log = {
+                    type: "ALTA",
+                    date: now.toISOString().replace(/T/, ' ').replace(/\..+/, ''),
+                    description: user.email
+                };
+                logsRepository.insertLog(log);
                 res.redirect("/users/login?message=Nuevo usuario registrado&messageType=alert-info");
             }).catch(() => {
                 res.redirect("/users/signup?message=Se ha producido un error al registrar usuario&messageType=alert-danger");
@@ -251,7 +351,7 @@ module.exports = function (app, usersRepository) {
             errors.push("El email ya existe");
         }
         //check that the birthdate format is correct
-        let birthdateRegex = /^(\d{2})-(\d{2})-(\d{4})$/;
+        let birthdateRegex = /^(\d{4})-(\d{2})-(\d{2})$/;
         if (!birthdateRegex.test(user.birthdate)) {
             errors.push("La fecha de nacimiento no tiene un formato correcto. El formato debe ser DD-MM-YYYY");
         } else {
@@ -267,8 +367,14 @@ module.exports = function (app, usersRepository) {
         return errors;
     }
 
-
     app.get('/users/logout', function (req, res) {
+        let now = new Date();
+        log = {
+            type: "LOGOUT",
+            date: now.toISOString().replace(/T/, ' ').replace(/\..+/, ''),
+            description: req.session.user
+        };
+        logsRepository.insertLog(log);
         req.session.user = null;
         res.redirect("/users/login?message=Usuario desconectado correctamente&messageType=alert-info");
     });

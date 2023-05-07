@@ -20,7 +20,7 @@ public class PO_AddOfferView {
         price.clear();
         price.sendKeys(pricep);
         //Pulsar el boton de login.
-        By boton = By.xpath("/html/body/div/form/div[4]/div/button");
+        By boton = By.xpath("/html/body/div/form/div[5]/div/button");
         driver.findElement(boton).click();
     }
 }

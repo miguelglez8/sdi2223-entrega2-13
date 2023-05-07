@@ -47,6 +47,14 @@
 
                     </li>
                     <li class="nav-item dropdown">
+                        {% if session.user != null and session.user == "admin@email.com" %}
+                            <a class="nav-link dropdown-toggle" href="#" id="usersDropdown"
+                               role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Logs</a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" id="myoffers" href="/users/admin/log">Ver logs</a>
+                                <br>
+                            </div>
+                        {% else %}
                         <a class="nav-link dropdown-toggle" href="#" id="usersDropdown"
                             role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Ofertas</a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -58,6 +66,7 @@
                             <br>
                             <a class="dropdown-item" id="buy" href="/offers/buy">Ofertas compradas</a>
                         </div>
+                        {% endif %}
                     </li>
 {#                    <li id="myoffers"><a href="/offers/myoffers">Mis Ofertas</a></li>#}
 {#                    <li id="list"><a href="/offers/searchOffers">Busca ofertas</a></li>#}

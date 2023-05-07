@@ -65,19 +65,29 @@ let offersRepository = require("./repositories/offersRepository.js");
 offersRepository.init(app, MongoClient);
 let messagesRepository = require("./repositories/messagesRepository.js");
 messagesRepository.init(app, MongoClient);
+let logRepository = require("./repositories/logRepository");
+logRepository.init(app, MongoClient);
 
 /**
  * INDEX
  */
 let indexRouter = require('./routes/index');
 let userSessionRouter = require('./routes/userSessionRouter');
+let userAdminRouter = require('./routes/userAdminRouter');
+let logRouter = require("./routes/logRouter");
 
-app.use("/users/list", userSessionRouter);
+app.use("/users/list", userSessionRouter, logRouter);
 
 app.use("/offers/add",userSessionRouter);
 app.use("/offers/list",userSessionRouter);
 app.use("/offers/buy",userSessionRouter);
 app.use("/offers/myoffers",userSessionRouter);
+app.use("/offers/*", userSessionRouter, logRouter);
+app.use("/users/admin/list", userAdminRouter, logRouter);
+app.use("/users/admin/log", userAdminRouter, logRouter);
+app.use("/users/delete", userAdminRouter, logRouter);
+app.use("/users/logAction", userAdminRouter, logRouter);
+
 
 const userTokenRouter = require('./routes/userTokenRouter');
 const {getConnection} = require("./repositories/db");
@@ -262,7 +272,7 @@ app.set('view engine', 'twig');
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
-require("./routes/users.js")(app, usersRepository);
+require("./routes/users.js")(app, usersRepository, logRepository);
 
 require("./routes/offers.js")(app, usersRepository, offersRepository);
 

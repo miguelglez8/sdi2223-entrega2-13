@@ -25,12 +25,13 @@ import java.util.List;
 
 import static java.lang.Thread.sleep;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class Sdi2223Entrega2TestApplicationTests {
-    // Miguel
 
+    // Miguel
     // static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
     // static String Geckodriver = "C:\\Users\\migue\\Desktop\\SDI\\LABORATORIO\\spring\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesio╠ün5-material\\geckodriver-v0.30.0-win64.exe";
 
@@ -39,12 +40,16 @@ class Sdi2223Entrega2TestApplicationTests {
     // static String Geckodriver = "C:\\Users\\Aladino España\\Desktop\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     // Ton
-     //static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-     //static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
+    //static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+    //static String Geckodriver = "C:\\Users\\tonpm\\OneDrive\\Documentos\\MisDocumentos\\Clase\\2022\\SDI\\geckodriver-v0.30.0-win64.exe";
 
     // Alves
     static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
     static String Geckodriver = "C:\\Users\\Alves\\Desktop\\selenium-test\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+
+    // Luis
+    static String PathFirefox = "C:\\Archivos de programa\\Mozilla Firefox\\firefox.exe";
+    static String Geckodriver = "C:\\Users\\luism\\Desktop\\Clase\\SDI\\Sesión6\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     //static String Geckodriver = "C:\\Path\\geckodriver-v0.30.0-win64.exe";
     //static String PathFirefox = "/Applications/Firefox.app/Contents/MacOS/firefox-bin";
@@ -132,7 +137,6 @@ class Sdi2223Entrega2TestApplicationTests {
     }
 
 
-
     //Prueba5] Inicio de sesión con datos válidos (administrador)
     @Test
     @Order(7)
@@ -191,16 +195,13 @@ class Sdi2223Entrega2TestApplicationTests {
     }
 
 
-
-
-
     /**
      * PR16. Ir al formulario de alta de oferta, rellenarla con datos válidos y pulsar el botón Submit.
      * Comprobar que la oferta sale en el listado de ofertas de dicho usuario.
      */
     @Test
     @Order(16)
-    public void PR16(){
+    public void PR16() {
         //Vamos al formulario de inicio de sesión.
         PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
         //Rellenamos el formulario
@@ -230,7 +231,7 @@ class Sdi2223Entrega2TestApplicationTests {
      */
     @Test
     @Order(17)
-    public void PR17(){
+    public void PR17() {
         //Vamos al formulario de inicio de sesión.
         PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
         //Rellenamos el formulario
@@ -254,7 +255,7 @@ class Sdi2223Entrega2TestApplicationTests {
      */
     @Test
     @Order(18)
-    public void PR18(){
+    public void PR18() {
         //Vamos al formulario de inicio de sesión.
         PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
         //Rellenamos el formulario
@@ -269,7 +270,7 @@ class Sdi2223Entrega2TestApplicationTests {
         WebElement tableBody = driver.findElement(By.cssSelector("table.table tbody"));
         List<WebElement> rows = tableBody.findElements(By.tagName("tr"));
         int rowCount = rows.size();
-        int webOffers = rowCount + (currentPageNumber-1)*5;
+        int webOffers = rowCount + (currentPageNumber - 1) * 5;
         //Comprobamos que el número de ofertas en la bd y en la web sean las mismas
         Assertions.assertEquals(webOffers, dbOffers);
     }
@@ -280,7 +281,7 @@ class Sdi2223Entrega2TestApplicationTests {
      */
     @Test
     @Order(19)
-    public void PR19(){
+    public void PR19() {
         //Vamos al formulario de inicio de sesión.
         PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
         //Rellenamos el formulario
@@ -299,7 +300,7 @@ class Sdi2223Entrega2TestApplicationTests {
         //Comparamos y vemos que la borrada ya no aparece la primera
         Assertions.assertNotEquals(newFirstValue, firstValue);
         //Comprobamos que el número de ofertas en la bd ha disminuido
-        Assertions.assertEquals(dbOffers-1, mongo.getOffers("user16@email.com"));
+        Assertions.assertEquals(dbOffers - 1, mongo.getOffers("user16@email.com"));
     }
 
     /**
@@ -308,7 +309,7 @@ class Sdi2223Entrega2TestApplicationTests {
      */
     @Test
     @Order(20)
-    public void PR20(){
+    public void PR20() {
         //Vamos al formulario de inicio de sesión.
         PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
         //Rellenamos el formulario
@@ -330,7 +331,7 @@ class Sdi2223Entrega2TestApplicationTests {
         //Comparamos y vemos que la borrada ya no aparece la primera
         Assertions.assertNotEquals(newFirstValue, firstValue);
         //Comprobamos que el número de ofertas en la bd ha disminuido
-        Assertions.assertEquals(dbOffers-1, mongo.getOffers("user16@email.com"));
+        Assertions.assertEquals(dbOffers - 1, mongo.getOffers("user16@email.com"));
     }
 
     /**
@@ -339,7 +340,7 @@ class Sdi2223Entrega2TestApplicationTests {
      */
     @Test
     @Order(21)
-    public void PR21(){
+    public void PR21() {
         //Vamos al formulario de inicio de sesión.
         PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
         //Rellenamos el formulario
@@ -362,7 +363,7 @@ class Sdi2223Entrega2TestApplicationTests {
      */
     @Test
     @Order(22)
-    public void PR22(){
+    public void PR22() {
         //Vamos al formulario de inicio de sesión.
         PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
         //Rellenamos el formulario
@@ -634,6 +635,346 @@ class Sdi2223Entrega2TestApplicationTests {
         PO_BuyOfferView.goToPage(driver);
         List<WebElement> tableAfter = PO_HomeView.checkElementTableBody(driver, "buy-offers");
         Assertions.assertEquals(mongo.getBuys("user03@email.com"), tableAfter.size());
+        // logout
+        PO_PrivateView.refactorLogout(driver);
+    }
+
+    /**
+     * PR30. Al crear una oferta, marcar dicha oferta como destacada y a continuación comprobar: i)
+     * que aparece en el listado de ofertas destacadas para los usuarios y que el saldo del usuario se
+     * actualiza adecuadamente en la vista del ofertante (comprobar saldo antes y después, que deberá
+     * diferir en 20€).
+     */
+    @Test
+    @Order(30)
+    public void PR30() {
+        // nos logueamos
+        PO_PrivateView.refactorLogging(driver, "user07@email.com", "user07");
+
+        // accedemos al formulario para dar de alta una oferta
+        WebElement ofertas = driver.findElement(By.linkText("Ofertas"));
+        ofertas.click();
+        WebElement aOFertas = driver.findElement(By.linkText("Añadir ofertas"));
+        aOFertas.click();
+
+        // guardamos el saldo antes de destacar la oferta
+        double saldoA = PO_ListOfferView.wallet(driver);
+
+        // rellenamos el formulario para añadir una oferta con la opción de destacar activada
+        WebElement destacar = driver.findElement(By.name("highlight"));
+        destacar.click();
+        PO_AddOfferView.fillAddForm(driver, "Destacada1", "Esta oferta está destacada",
+                "10");
+
+        // guardamos el saldo después de destacar la oferta
+        double saldoB = PO_ListOfferView.wallet(driver);
+
+        // comprobamos que el saldo después de destacar es 20€ menor que el saldo antes de destacar
+        assertTrue(saldoA == (saldoB + 20));
+
+        // logout
+        PO_PrivateView.refactorLogout(driver);
+
+        // nos logueamos con otro usuario
+        PO_PrivateView.refactorLogging(driver, "user08@email.com", "user08");
+
+        // accedemos a la lista de ofertas privada
+        WebElement ofertas2 = driver.findElement(By.linkText("Ofertas"));
+        ofertas2.click();
+        WebElement misOfertas = driver.findElement(By.linkText("Mis Ofertas"));
+        misOfertas.click();
+
+        // buscamos la oferta que hemos destacado
+        List<WebElement> destacada = PO_View.checkElementBy(driver, "text", "Destacada1");
+        // Comprobamos que efectivamente la hemos encontrado
+        assertTrue(destacada.size() == 1);
+
+        // logout
+        PO_PrivateView.refactorLogout(driver);
+
+    }
+
+    /**
+     * PR31. Sobre el listado de ofertas de un usuario con más de 20 euros de saldo, pinchar en el enlace
+     * Destacada y a continuación comprobar: i) que aparece en el listado de ofertas destacadas para los
+     * usuarios y que el saldo del usuario se actualiza adecuadamente en la vista del ofertante (comprobar
+     * saldo antes y después, que deberá diferir en 20€ ).
+     */
+    @Test
+    @Order(31)
+    public void PR31() {
+        // nos logueamos
+        PO_PrivateView.refactorLogging(driver, "user07@email.com", "user07");
+
+        // accedemos al formulario para dar de alta una oferta
+        WebElement ofertas = driver.findElement(By.linkText("Ofertas"));
+        ofertas.click();
+        WebElement aOFertas = driver.findElement(By.linkText("Mis Ofertas"));
+        aOFertas.click();
+
+        // guardamos el saldo antes de destacar la oferta
+        double saldoA = PO_ListOfferView.wallet(driver);
+
+        // guardamos el nombre de la oferta que vamos a destacar
+        By ofertaD = By.xpath("/html/body/div/div[3]/table/tbody/tr[1]/td[1]");
+        String nombreOferta = driver.findElement(ofertaD).getText();
+
+        // pulsamos el botón para destacar la oferta
+        By highButton = By.xpath("/html/body/div/div[3]/table/tbody/tr[1]/td[5]/a");
+        driver.findElement(highButton).click();
+
+        // guardamos el saldo después de destacar la oferta
+        double saldoB = PO_ListOfferView.wallet(driver);
+
+        // comprobamos que el saldo después de destacar es 20€ menor que el saldo antes de destacar
+        assertTrue(saldoA == (saldoB + 20));
+
+        // logout
+        PO_PrivateView.refactorLogout(driver);
+
+        // nos logueamos con otro usuario
+        PO_PrivateView.refactorLogging(driver, "user08@email.com", "user08");
+
+        // accedemos a la lista de ofertas privada
+        WebElement ofertas2 = driver.findElement(By.linkText("Ofertas"));
+        ofertas2.click();
+        WebElement misOfertas = driver.findElement(By.linkText("Mis Ofertas"));
+        misOfertas.click();
+
+        // buscamos la oferta que hemos destacado
+        List<WebElement> destacada = PO_View.checkElementBy(driver, "text", nombreOferta);
+        // Comprobamos que efectivamente la hemos encontrado
+        assertTrue(destacada.size() == 1);
+
+        // logout
+        PO_PrivateView.refactorLogout(driver);
+    }
+
+    /**
+     * PR32. Sobre el listado de ofertas de un usuario con menos de 20 euros de saldo, pinchar en el
+     * enlace Destacada y a continuación comprobar que se muestra el mensaje de saldo no suficiente.
+     */
+    @Test
+    @Order(32)
+    public void PR32() {
+        // nos logueamos
+        PO_PrivateView.refactorLogging(driver, "user08@email.com", "user08");
+
+        // accedemos a la lista de ofertas privada
+        WebElement ofertas2 = driver.findElement(By.linkText("Ofertas"));
+        ofertas2.click();
+        WebElement misOfertas = driver.findElement(By.linkText("Mis Ofertas"));
+        misOfertas.click();
+
+        // destacamos ofertas hasta tener menos de 20€
+        By highButton = By.xpath("/html/body/div/div[3]/table/tbody/tr[1]/td[5]/a");
+        driver.findElement(highButton).click();
+        highButton = By.xpath("/html/body/div/div[3]/table/tbody/tr[2]/td[5]/a");
+        driver.findElement(highButton).click();
+        highButton = By.xpath("/html/body/div/div[3]/table/tbody/tr[3]/td[5]/a");
+        driver.findElement(highButton).click();
+        highButton = By.xpath("/html/body/div/div[3]/table/tbody/tr[4]/td[5]/a");
+        driver.findElement(highButton).click();
+        highButton = By.xpath("/html/body/div/div[3]/table/tbody/tr[5]/td[5]/a");
+        driver.findElement(highButton).click();
+
+        // comprobamos que efectivamente tenemos menos de 20€
+        double saldo = PO_ListOfferView.wallet(driver);
+        assertTrue(saldo < 20);
+
+        // cambiamos a la segunda página, ya con menos de 20€
+        By segundaPagina = By.xpath("/html/body/div/div[4]/ul/li[2]/a");
+        driver.findElement(segundaPagina).click();
+
+        // intentamos destacar una nueva oferta
+        highButton = By.xpath("/html/body/div/div[3]/table/tbody/tr[1]/td[5]/a");
+        driver.findElement(highButton).click();
+
+        // buscamos todos los elementos que posean el texto con el mensaje de error
+        String checkText = "No tienes suficiente dinero para destacar una oferta";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        //Comprobamos el mensaje de error
+        Assertions.assertEquals(checkText, result.get(0).getText());
+
+        // logout
+        PO_PrivateView.refactorLogout(driver);
+    }
+
+    /**
+     * PR33. Intentar acceder sin estar autenticado a la opción de listado de usuarios. Se deberá volver
+     * al formulario de login.
+     */
+    @Test
+    @Order(33)
+    public void PR33() {
+        // puesto que no existe la forma directa de acceder a las secciones para las que no estás autorizado
+        // la única forma de intentar acceder a una sección prohibida para tu rol es buscando el enlace directamente
+        driver.navigate().to(URL + "/users/list");
+
+        // nos deberá mandar a la página de login
+        String checkText = "Identificación de usuario";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.get(0).getText());
+    }
+
+    /**
+     * PR34. Intentar acceder sin estar autenticado a la opción de listado de conversaciones
+     * [REQUISITO OBLIGATORIO S5]. Se deberá volver al formulario de login.
+     */
+    @Test
+    @Order(34)
+    public void PR34() {
+
+    }
+
+    /**
+     * PR35. Estando autenticado como usuario estándar intentar acceder a una opción disponible solo
+     * para usuarios administradores (Añadir menú de auditoria (visualizar logs)). Se deberá indicar un
+     * mensaje de acción prohibida.
+     */
+    @Test
+    @Order(35)
+    public void PR35() {
+        // nos logueamos
+        PO_PrivateView.refactorLogging(driver, "user04@email.com", "user04");
+
+        // al ser usuario estandar no tenemos una opción de menú que nos permita acceder directamente
+        // a una sección prohibida, por lo que la única manera de acceder es a través de un enlace
+        driver.navigate().to(URL + "/users/admin/log");
+
+        // comprobamos que nos ha redirigido a la página con el aviso de acceso denegado.
+        String checkText = "Sin autorización";
+        WebElement newFirstRow = driver.findElement(By.xpath("/html/body/div/h1"));
+        String newFirstValue = newFirstRow.getText();
+        Assertions.assertEquals(checkText, newFirstValue);
+
+    }
+
+    /**
+     * PE36. Estando autenticado como usuario administrador visualizar todos los logs generados en
+     * una serie de interacciones. Esta prueba deberá generar al menos dos interacciones de cada tipo y
+     * comprobar que el listado incluye los logs correspondientes.
+     */
+    @Test
+    @Order(36)
+    public void PR36() {
+        // nos logueamos como usuario estandar dos veces "LOGIN-EX"
+        PO_PrivateView.refactorLogging(driver, "user04@email.com", "user04");
+        // logout
+        PO_PrivateView.refactorLogout(driver);
+
+        // nos logueamos de nuevo "LOGIN-EX"
+        PO_PrivateView.refactorLogging(driver, "user04@email.com", "user04");
+        // logout
+        PO_PrivateView.refactorLogout(driver);
+
+        // nos logueamos con errores "LOGIN-ERR"
+        PO_PrivateView.refactorLogging(driver, "user05@email.com", "x");
+
+        // nos logueamos con errores de nuevo "LOGIN-ERR"
+        PO_PrivateView.refactorLogging(driver, "user06@email.com", "x");
+
+        // vamos al formulario para crear una cuenta
+        PO_PrivateView.refactorSignup(driver);
+
+        // nos registramos con un usuario de prueba "ALTA"
+        PO_SignUpView.fillForm(driver, "prueba1@email.com", "Nombre1", "Apellido1",
+                "2005-06-07", "prueba1", "prueba1");
+
+        // vamos al formulario para crear una cuenta
+        PO_PrivateView.refactorSignup(driver);
+
+        // nos registramos con otro usuario de prueba "ALTA"
+        PO_SignUpView.fillForm(driver, "prueba2@email.com", "Nombre2", "Apellido2",
+                "2005-06-07", "prueba2", "prueba2");
+
+        // nos logueamos como admin
+        PO_PrivateView.refactorLogging(driver, "admin@email.com", "admin");
+
+        // entramos al registro de logs
+        WebElement log = driver.findElement(By.linkText("Logs"));
+        log.click();
+        WebElement verLogs = driver.findElement(By.linkText("Ver logs"));
+        verLogs.click();
+
+        // buscamos todos los elementos que posean el texto PET
+        List<WebElement> PET = PO_View.checkElementBy(driver, "text", "PET");
+        // Comprobamos que hay 3 o más elementos, dos o más producidos al negar entre las páginas y otro por el filtro
+        assertTrue(PET.size() >= 3);
+
+        // buscamos todos los elementos que posean el texto LOGIN-EX
+        List<WebElement> LOGINEX = PO_View.checkElementBy(driver, "text", "LOGIN-EX");
+        // Comprobamos que hay 3 o más elementos, dos o más producidos en el test actual más los anteriores
+        // y otro por el filtro
+        assertTrue(LOGINEX.size() >= 3);
+
+        // buscamos todos los elementos que posean el texto LOGIN-ERR
+        List<WebElement> LOGINERR = PO_View.checkElementBy(driver, "text", "LOGIN-ERR");
+        // Comprobamos que hay 3 o más elementos, dos o más producidos en el test actual más los anteriores
+        // y otro por el filtro
+        assertTrue(LOGINERR.size() >= 3);
+
+        // buscamos todos los elementos que posean el texto ALTA
+        List<WebElement> ALTA = PO_View.checkElementBy(driver, "text", "ALTA");
+        // Comprobamos que hay 3 o más elementos, las dos cuentas registradas ahora y el filtro,
+        // puede haber más producidos por otros test
+        assertTrue(ALTA.size() >= 3);
+
+        // buscamos todos los elementos que posean el texto LOGOUT
+        List<WebElement> LOGOUT = PO_View.checkElementBy(driver, "text", "LOGOUT");
+        // Comprobamos que hay 3 o más elementos, dos o más producidos en el test actual más los anteriores
+        // y otro por el filtro
+        assertTrue(LOGOUT.size() >= 3);
+
+        // logout
+        PO_PrivateView.refactorLogout(driver);
+    }
+
+    /**
+     * PR37. Estando autenticado como usuario administrador, ir a visualización de logs, pulsar el
+     * botón/enlace borrar logs y comprobar que se eliminan los logs de la base de datos.
+     */
+    @Test
+    @Order(37)
+    public void PR37() {
+        // nos logueamos como admin
+        PO_PrivateView.refactorLogging(driver, "admin@email.com", "admin");
+
+        // entramos al registro de logs
+        WebElement log = driver.findElement(By.linkText("Logs"));
+        log.click();
+        WebElement verLogs = driver.findElement(By.linkText("Ver logs"));
+        verLogs.click();
+
+        // pulsamos el botón eliminar
+        By boton = By.xpath("/html/body/div/form/div/button[1]");
+        driver.findElement(boton).click();
+
+        // buscamos todos los elementos que posean el texto PET
+        List<WebElement> PET = PO_View.checkElementBy(driver, "text", "PET");
+        // Comprobamos que solo está el filtro y la propia petición que hace al recargar la página al eliminar
+        assertTrue(PET.size() == 2);
+
+        // buscamos todos los elementos que posean el texto LOGIN-EX
+        List<WebElement> LOGINEX = PO_View.checkElementBy(driver, "text", "LOGIN-EX");
+        // Comprobamos que solo está el filtro
+        assertTrue(LOGINEX.size() == 1);
+
+        // buscamos todos los elementos que posean el texto LOGIN-ERR
+        List<WebElement> LOGINERR = PO_View.checkElementBy(driver, "text", "LOGIN-ERR");
+        // Comprobamos que solo está el filtro
+        assertTrue(LOGINERR.size() == 1);
+
+        // buscamos todos los elementos que posean el texto ALTA
+        List<WebElement> ALTA = PO_View.checkElementBy(driver, "text", "ALTA");
+        // Comprobamos que solo está el filtro
+        assertTrue(ALTA.size() == 1);
+
+        // buscamos todos los elementos que posean el texto LOGOUT
+        List<WebElement> LOGOUT = PO_View.checkElementBy(driver, "text", "LOGOUT");
+        // Comprobamos que solo está el filtro
+        assertTrue(LOGOUT.size() == 1);
+
         // logout
         PO_PrivateView.refactorLogout(driver);
     }

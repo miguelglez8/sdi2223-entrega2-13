@@ -40,6 +40,13 @@ public class PO_PrivateView extends PO_NavView {
         link.click();
     }
 
+    static public void refactorSignup(WebDriver driver) {
+        //Vamos al formulario de logueo.
+        WebElement link = driver.findElement(By.linkText("Regístrate"));
+        // Hacer clic en el enlace
+        link.click();
+    }
+
     public static void clickElement(WebDriver driver, String s, int i) {
         List<WebElement> elements = PO_View.checkElementBy(driver, "free", s);
         elements.get(i).click();
