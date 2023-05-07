@@ -76,7 +76,7 @@ module.exports = function (app, usersRepository, logsRepository) {
 
         usersRepository.getUsersPg(filter, options, page)
             .then(result => {
-                let lastPage = Math.ceil(result.total / 5);
+                let lastPage = result.total / 5;
                 if (result.total % 5 > 0) { // Decimales
                     lastPage = lastPage + 1;
                 }

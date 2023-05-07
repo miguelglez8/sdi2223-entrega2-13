@@ -474,44 +474,19 @@ class Sdi2223Entrega2TestApplicationTests {
     @Test
     @Order(15)
     public void PR15() {
-        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-        //Rellenamos el formulario para iniciar sesion como administrador
-        PO_LoginView.fillLoginForm(driver, "admin@email.com", "admin");
-        //Comprobamos que entramos en la página privada del administrador
-        String checkText = "Listado de usuarios";
-        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
-        Assertions.assertEquals(checkText, result.get(0).getText());
-        List<WebElement> list = PO_View.checkElementBy(driver, "id", "cbDelete");
-        //Pulso el boton borrar sobre el primer usuario
-        list.get(0).click();
-        list.get(1).click();
-        list.get(2).click();
-        //Pulsamos el botón de borrar
-        List<WebElement> languageButton = SeleniumUtils.waitLoadElementsBy(driver, "id", "btnDelete", PO_View.getTimeout());
-        languageButton.get(0).click();
+        // nos logueamos como usuario estandar, el administrador nunca podrá borrarse a su mismo, puesto que no
+        // existe un checkbox para seleccionarse, y en el propio enlace no se especifica el usuario a eliminar
+        PO_PrivateView.refactorLogging(driver, "user04@email.com", "user04");
 
+        // al ser usuario estandar no tenemos una opción de menú que nos permita acceder directamente
+        // a borrar un usuario, por lo que intentamos hacerlo por enlace
+        driver.navigate().to(URL + "/users/delete");
 
-
-
-        //POR SI ACASO TAMBIEN COMPRUEBO EL NUMERO DE USUARIOS ES 1 MENOS
-        //Comprobamos el numero de usuarios es correcto
-        List<WebElement> userList = SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
-        //Preparo el contador de usuarios
-        int usuarios = userList.size();
-
-        // cambiamos a la segunda página y contamos los usuarios
-        By segundaPagina = By.xpath("//*[@id=\"pi-2\"]/a");
-        driver.findElement(segundaPagina).click();
-        List<WebElement> userList2 = SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
-        usuarios += userList2.size();
-        // cambiamos a la tercera página y contamos los usuarios
-        By terceraPagina = By.xpath("//*[@id=\"pi-3\"]/a");
-        driver.findElement(terceraPagina).click();
-        List<WebElement> userList3 = SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
-        usuarios += userList3.size();
-
-        //Comprobamos que el numero de usuarios es correcto
-        Assertions.assertEquals(usuarios, 14);
+        // comprobamos que nos ha redirigido a la página con el aviso de acceso denegado.
+        String checkText = "Sin autorización";
+        WebElement newFirstRow = driver.findElement(By.xpath("/html/body/div/h1"));
+        String newFirstValue = newFirstRow.getText();
+        Assertions.assertEquals(checkText, newFirstValue);
     }
 
 
@@ -1744,7 +1719,7 @@ class Sdi2223Entrega2TestApplicationTests {
         By boton = By.xpath("//button[@id='msg-send']");
         driver.findElement(boton).click();
         // Volvemos a iniciar sesión
-        driver.get("http://localhost:3000/apiclient/client.html?w=login");
+        driver.navigate().to("http://localhost:3000/apiclient/client.html?w=login");
         PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user01");
         //Vamos a la conversación con la primera oferta
         driver.findElement(convBtn).click();
@@ -1878,6 +1853,86 @@ class Sdi2223Entrega2TestApplicationTests {
         // eliminarmos la primera conversación
         WebElement eliminarPrimera = driver.findElement(By.xpath("/html/body/div/div/table/tbody/tr[1]/td[4]/a"));
         eliminarPrimera.click();
+
+        eliminar = PO_View.checkElementBy(driver, "text", "Eliminar");
+
+        // comprobamos que ahora solo tenemos dos conversaciones
+        assertTrue(eliminar.size() == 3);
+
+        // además comprobamos que se ha eliminado la oferta que se encontraba primera.
+        boolean notFound = PO_HomeView.checkInvisibilityOfElement(driver, "text", nombre);
+        Assertions.assertTrue(notFound);
+    }
+
+    /**
+     * PR56. Sobre el listado de conversaciones ya abiertas. Pinchar el enlace Eliminar en la última y
+     * comprobar que el listado se actualiza correctamente.
+     */
+    @Test
+    @Order(56)
+    public void PR56() {
+        // navegamos a la URL
+        driver.get("http://localhost:3000/apiclient/client.html?w=login");
+
+        // introducimos los datos en el login
+        PO_LoginAjaxView.fillLoginForm(driver, "user01@email.com", "user01");
+
+        // creamos una conversación
+        List<WebElement> conversacion = PO_View.checkElementBy(driver, "text", "Conversación");
+        conversacion.get(3).click();
+        // enviamos un mensaje
+        By mensaje = By.xpath("//*[@id=\"msg-add\"]");
+        WebElement elemento = driver.findElement(mensaje);
+        elemento.click();
+        elemento.clear();
+        elemento.sendKeys("Hola");
+        By boton = By.className("btn");
+        driver.findElement(boton).click();
+
+        // creamos otra conversación
+        WebElement conver = driver.findElement(By.linkText("Ofertas"));
+        conver.click();
+        conversacion = PO_View.checkElementBy(driver, "text", "Conversación");
+        conversacion.get(4).click();
+        // enviamos un mensaje
+        mensaje = By.xpath("//*[@id=\"msg-add\"]");
+        elemento = driver.findElement(mensaje);
+        elemento.click();
+        elemento.clear();
+        elemento.sendKeys("Hola");
+        boton = By.className("btn");
+        driver.findElement(boton).click();
+
+        // creamos una tercera conversaión
+        conver = driver.findElement(By.linkText("Ofertas"));
+        conver.click();
+        conversacion = PO_View.checkElementBy(driver, "text", "Conversación");
+        conversacion.get(5).click();
+        // enviamos un mensaje
+        mensaje = By.xpath("//*[@id=\"msg-add\"]");
+        elemento = driver.findElement(mensaje);
+        elemento.click();
+        elemento.clear();
+        elemento.sendKeys("Hola");
+        boton = By.className("btn");
+        driver.findElement(boton).click();
+
+        // accedemos a la lista de conversaciones
+        WebElement conversaciones = driver.findElement(By.linkText("Conversaciones"));
+        conversaciones.click();
+
+        List<WebElement> eliminar = PO_View.checkElementBy(driver, "text", "Eliminar");
+
+        WebElement nombreOferta = driver.findElement(By.xpath("//*[@id=\"conversationsTableBody\"]/tr[3]/td[2]"));
+        String nombre = nombreOferta.getText();
+
+        // comprobamos que tenemos tres conversaciones, lo que significa tener un botóno eliminar por cada una.
+        // además de una cuarta coincidencia al buscar la palabra "Eliminar" debido a un script
+        assertTrue(eliminar.size() == 4);
+
+        // eliminarmos la primera conversación
+        WebElement eliminarUltima = driver.findElement(By.xpath("/html/body/div/div/table/tbody/tr[3]/td[4]/a"));
+        eliminarUltima.click();
 
         eliminar = PO_View.checkElementBy(driver, "text", "Eliminar");
 
