@@ -391,7 +391,7 @@ class Sdi2223Entrega2TestApplicationTests {
         List<WebElement> list = checkElementBy(driver, "id", "cbDelete");
         //Pulso el boton borrar sobre el primer usuario
 
-        list.get(0).click();
+        list.get(1).click();
 
 
         //Pulsamos el botón de borrar
