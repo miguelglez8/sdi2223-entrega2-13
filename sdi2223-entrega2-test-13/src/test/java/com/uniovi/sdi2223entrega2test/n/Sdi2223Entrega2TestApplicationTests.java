@@ -1350,7 +1350,7 @@ class Sdi2223Entrega2TestApplicationTests {
     }
 
     /**
-     * PR41. Mostrar el listado de ofertas para el usuario registrado. Comprobar que se muestran toads las ofertas
+     * PR41. Mostrar el listado de ofertas para el usuario registrado. Comprobar que se muestran todas las ofertas
      * que existen para dicho usuario.
      */
     @Test
@@ -1371,7 +1371,8 @@ class Sdi2223Entrega2TestApplicationTests {
         // 6. Verificamos que no se muestran las ofertas del usuario
         Assertions.assertFalse(offersResponse.getBody().asString().contains("user01@email.com"));
         int actualOffers = mongo.getOffers("user01@email.com");
-        Assertions.assertTrue(actualOffers == (int) offersResponse.body().path("offers.size()"));
+        int expected = (int) offersResponse.body().path("offers.size()");
+        Assertions.assertTrue(actualOffers == expected);
     }
 
     /**
