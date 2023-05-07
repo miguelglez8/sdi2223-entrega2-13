@@ -75,12 +75,36 @@ public class MongoDB {
 
 	//Busca el número de ofertas de un usuario
 	public int getOffers(String user) {
-		MongoCollection<Document> users = getCollection("offers");
+		MongoCollection<Document> offers = getCollection("offers");
 		Bson filter = Filters.eq("seller", user);
-		FindIterable<Document> document = users.find(filter);
+		FindIterable<Document> document = offers.find(filter);
 		int size = 0;
 		for (Document docum : document) {
       size++;
+		}
+		return size;
+	}
+
+	//Busca el número de msgs de un id conocido
+	public int getMessages(String id) {
+		MongoCollection<Document> msgs = getCollection("messages");
+		Bson filter = Filters.eq("offer", id);
+		FindIterable<Document> document = msgs.find(filter);
+		int size = 0;
+		for (Document docum : document) {
+			size++;
+		}
+		return size;
+	}
+
+	//Busca el número de msgs de un user
+	public int getConversations(String user) {
+		MongoCollection<Document> convers = getCollection("conversations");
+		Bson filter = Filters.or(Filters.eq("buyer", user), Filters.eq("seller", user));
+		FindIterable<Document> document = convers.find(filter);
+		int size = 0;
+		for (Document docum : document) {
+			size++;
 		}
 		return size;
 	}
@@ -98,6 +122,12 @@ public class MongoDB {
 		return size;
 	}
 
+	// Busca el número de usuarios registrados
+	public int getUsers() {
+		MongoCollection<Document> users = getCollection("users");
+		return (int) users.count();
+	}
+
 	/**
 	 * Vaciamos todas las colecciones de la base de datos
 	 */
@@ -106,6 +136,7 @@ public class MongoDB {
 		mongodb.getCollection("offers").drop();
 		mongodb.getCollection("buys").drop();
 		mongodb.getCollection("messages").drop();
+		mongodb.getCollection("logs").drop();
 		mongodb.getCollection("conversations").drop();
 	}
 

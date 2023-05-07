@@ -120,6 +120,29 @@ module.exports = {
             throw (error);
         }
     },
+    deleteConversations: async function (filter, options) {
+        try {
+            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+            const database = client.db("entrega2");
+            const collectionName = 'conversations';
+            const conversationsCollection = database.collection(collectionName);
+            const conversationToDelete = await conversationsCollection.findOne(filter, options);
+            const result = await conversationsCollection.deleteMany(filter, options);
+            // Si se ha encontrado la conversación
+            // Borramos todos los mensajes asociados
+            if (conversationToDelete !== null) {
+                const messagesCollectionName = 'messages';
+                const messagesCollection = database.collection(messagesCollectionName)
+                const messageFilter = {
+                    offer: conversationToDelete.offer
+                }
+                await messagesCollection.deleteMany(messageFilter, {});
+            }
+            return result;
+        } catch (error) {
+            throw (error);
+        }
+    },
     updateMessage: async function (newMessage, filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));

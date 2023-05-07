@@ -263,6 +263,24 @@ async function loadConversationData() {
     }
 }
 
+async function loadLogsData() {
+    try {
+        const client = await MongoClient.connect(url);
+        const db = client.db("entrega2");
+
+        const collections = await db.listCollections().toArray();
+        const logs = collections.some((collection) => collection.name === "logs");
+
+        if (logs) {
+            const logsCollection = db.collection("logs");
+            await logsCollection.drop();
+            console.log("Deleted 'logs' collection");
+        }
+
+    } catch (err) {
+        console.error(`Failed to delete logs: ${err}`);
+    }
+}
 
 /**
  * Motor de vistas twig
@@ -276,7 +294,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 require("./routes/users.js")(app, usersRepository, logRepository);
 
-require("./routes/offers.js")(app, usersRepository, offersRepository);
+require("./routes/offers.js")(app, usersRepository, offersRepository, messagesRepository);
 
 app.use('/', indexRouter);
 
@@ -293,7 +311,8 @@ require("./routes/api/messagesAPIv1.0")(app, offersRepository, messagesRepositor
 loadUsersData(); // users
 loadOffersData(); // offers
 loadBuyData(); // buyOffers
-loadConversationData();
+loadConversationData(); // conversations & messages
+loadLogsData(); // logs
 
 /**
  * Manejar errores 404

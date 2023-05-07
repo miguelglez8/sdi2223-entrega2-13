@@ -206,8 +206,9 @@ module.exports = function (app, usersRepository, logsRepository) {
         usersRepository.deleteUser({_id: new ObjectId(userId)}, {}).then(result => {
             if (result == null || result.deletedCount == 0) {
                 res.write("No se ha podido eliminar el registro");
+            } else {
+                res.end();
             }
-            res.end();
         }).catch( () => {
             res.redirect("/" +
                 "?message=Ha ocurrido un error al eliminar usuarios." +
