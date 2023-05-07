@@ -85,6 +85,19 @@ public class MongoDB {
 		return size;
 	}
 
+	//Busca el número de ofertas destacadas de un usuario
+	public int getHighlightOffers() {
+		MongoCollection<Document> offers = getCollection("offers");
+		Bson filter = Filters.eq("isHighlight", true);
+
+		FindIterable<Document> document = offers.find(filter);
+		int size = 0;
+		for (Document docum : document) {
+			size++;
+		}
+		return size;
+	}
+
 	//Busca el número de msgs de un id conocido
 	public int getMessages(String id) {
 		MongoCollection<Document> msgs = getCollection("messages");
@@ -100,7 +113,7 @@ public class MongoDB {
 	//Busca el número de msgs de un user
 	public int getConversations(String user) {
 		MongoCollection<Document> convers = getCollection("conversations");
-		Bson filter = Filters.eq("buyer", user);
+		Bson filter = Filters.or(Filters.eq("buyer", user), Filters.eq("seller", user));
 		FindIterable<Document> document = convers.find(filter);
 		int size = 0;
 		for (Document docum : document) {
@@ -108,7 +121,7 @@ public class MongoDB {
 		}
 		return size;
 	}
-  
+
 	// Busca el número de ofertas con ese titulo
 	public int getOffer(String title) {
 		MongoCollection<Document> offers = getCollection("offers");

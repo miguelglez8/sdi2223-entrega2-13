@@ -42,7 +42,7 @@
     let URLbase = "http://localhost:3000/api/v1.0";
     if (Cookies.get('token') != null) {
         token = Cookies.get('token');
-        $("#main-container").load("widget-offers.html");
+        $("#main-container").load("widget-login.html");
         let url = new URL(window.location.href);
         let w = url.searchParams.get("w");
         if (w == "login") {
