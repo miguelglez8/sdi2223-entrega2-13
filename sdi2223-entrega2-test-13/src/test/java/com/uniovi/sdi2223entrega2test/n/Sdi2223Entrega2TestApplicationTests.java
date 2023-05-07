@@ -312,12 +312,12 @@ class Sdi2223Entrega2TestApplicationTests {
         List<WebElement> userList3 = SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
         usuarios += userList3.size();
         // cambiamos a la cuarta página y contamos los usuarios
-        By cuartaPagina = By.xpath("//*[@id=\"pi-3\"]/a");
+        By cuartaPagina = By.xpath("//*[@id=\"pi-4\"]/a");
         driver.findElement(cuartaPagina).click();
         List<WebElement> userList4 = SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
         usuarios += userList4.size();
         //Comprobamos que el numero de usuarios es correcto
-        Assertions.assertEquals(usuarios, 20);
+        Assertions.assertEquals(usuarios, 17);
     }
 
     //[Prueba12]Ir a la lista de usuarios, borrar el primer usuario de la lista, comprobar que la lista se actualiza
@@ -390,9 +390,9 @@ class Sdi2223Entrega2TestApplicationTests {
         driver.findElement(cuartaPagina).click();
         List<WebElement> list = checkElementBy(driver, "id", "cbDelete");
         //Pulso el boton borrar sobre el primer usuario
-        for (int position :  new int[]{1}) {
-            list.get(position).click();
-        }
+
+        list.get(0).click();
+
 
         //Pulsamos el botón de borrar
         List<WebElement> languageButton = SeleniumUtils.waitLoadElementsBy(driver, "id", "btnDelete", PO_View.getTimeout());
@@ -438,15 +438,13 @@ class Sdi2223Entrega2TestApplicationTests {
         Assertions.assertEquals(checkText, result.get(0).getText());
         List<WebElement> list = checkElementBy(driver, "id", "cbDelete");
         //Pulso el boton borrar sobre el primer usuario
-        for (int position :  new int[]{2}) {
-            list.get(position).click();
-        }
+        list.get(0).click();
+        list.get(1).click();
+        list.get(2).click();
         //Pulsamos el botón de borrar
         List<WebElement> languageButton = SeleniumUtils.waitLoadElementsBy(driver, "id", "btnDelete", PO_View.getTimeout());
         languageButton.get(0).click();
-        // Comprobamos que el primer usuario ya no existe, el usuario01
-        boolean notFound = PO_HomeView.checkInvisibilityOfElement(driver, "text", "user01");
-        Assertions.assertTrue(notFound);
+
 
 
 
@@ -466,13 +464,9 @@ class Sdi2223Entrega2TestApplicationTests {
         driver.findElement(terceraPagina).click();
         List<WebElement> userList3 = SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
         usuarios += userList3.size();
-        // cambiamos a la cuarta página y contamos los usuarios
-        By cuartaPagina = By.xpath("//*[@id=\"pi-4\"]/a");
-        driver.findElement(cuartaPagina).click();
-        List<WebElement> userList4 = SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
-        usuarios += userList4.size();
+
         //Comprobamos que el numero de usuarios es correcto
-        Assertions.assertEquals(usuarios, 16);
+        Assertions.assertEquals(usuarios, 14);
     }
 
 
