@@ -1,64 +1,88 @@
 <div id="widget-conversations">
-  <h1>Conversaciones</h1>
-  <table className="table table-hover">
-    <thead>
-    <tr>
-      <th>Ofertante</th>
-      <th>Oferta</th>
-      <th></th>
-    </tr>
-    </thead>
-    <tbody id="conversationsTableBody"></tbody>
-  </table>
+    <h1>Conversaciones</h1>
+    <table className="table table-hover">
+        <thead>
+        <tr>
+            <th>Ofertante</th>
+            <th>Oferta</th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody id="conversationsTableBody"></tbody>
+    </table>
 </div>
 <script>
-  window.history.pushState("", "", "/apiclient/client.html?w=conversations");
-  var selectedOfferId;
-  function loadConversations() {
-    $.ajax({
-      url: URLbase + "/conversations",
-      type: "GET",
-      data: {},
-      dataType: 'json',
-      headers: {"token": token},
-      success: function (response) {
-        conversations = response.conversations;
-        updateOffersTable(conversations);
-      },
-      error: function (error) {
-        $("#main-container").load("widget-login.html");
-      }
-    });
-  }
-  function updateOffersTable(conversations) {
-    $("#conversationsTableBody").empty(); // Vaciar la tabla
-    let seller;
-    let offer;
-    for (i = 0; i < conversations.length; i++) {
-      seller = conversations[i].seller;
-      offer = conversations[i].offer;
-      $.ajax({
-        url: URLbase + "/offers/" + conversations[i].offer,
-        type: "GET",
-        headers: { token: token },
-        success: function (response) {
-        $("#conversationsTableBody").append(
-                "<tr>" +
-                "<td>" + seller + "</td>" +
-                "<td>" + response.song.title + "</td>" +
-                "<td><a onclick=widgetChat('" + offer + "')>Reanudar</a></td>" +
-                "</tr>");
-          },
-          error: function (error) {
-            console.log(error);
-          },
+    window.history.pushState("", "", "/apiclient/client.html?w=conversations");
+    var selectedOfferId;
+
+    function loadConversations() {
+        $.ajax({
+            url: URLbase + "/conversations",
+            type: "GET",
+            data: {},
+            dataType: 'json',
+            headers: {"token": token},
+            success: function (response) {
+                conversations = response.conversations;
+                updateOffersTable(conversations);
+            },
+            error: function (error) {
+                $("#main-container").load("widget-login.html");
+            }
         });
     }
-  }
-  loadConversations();
 
-  function widgetChat(_id){
-    selectedOfferId = _id;
-    $("#main-container").load("widget-chat.html");
-  }
+    function updateOffersTable(conversations) {
+        $("#conversationsTableBody").empty(); // Vaciar la tabla
+        let seller;
+        let offer;
+        for (i = 0; i < conversations.length; i++) {
+            seller = conversations[i].seller;
+            offer = conversations[i].offer;
+            identificador = conversations[i]._id;
+            $.ajax({
+                url: URLbase + "/offers/" + conversations[i].offer,
+                type: "GET",
+                headers: {token: token},
+                success: function (response) {
+                    console.log("Aqui");
+                    console.log(identificador);
+                    console.log(conversations[i]);
+                    $("#conversationsTableBody").append(
+                        "<tr>" +
+                        "<td>" + seller + "</td>" +
+                        "<td>" + response.song.title + "</td>" +
+                        "<td><a onclick=widgetChat('" + offer + "')>Reanudar</a></td>" +
+                        "<td><a onclick=deleteChat('" + identificador + "')>Eliminar</a></td>" +
+                        "</tr>");
+                },
+                error: function (error) {
+                    console.log(error);
+                },
+            });
+        }
+    }
+
+    loadConversations();
+
+    function widgetChat(_id) {
+        selectedOfferId = _id;
+        $("#main-container").load("widget-chat.html");
+    }
+
+    function deleteChat(_id) {
+        $.ajax({
+            url: URLbase + "/conversations/" + _id,
+            type: "DELETE",
+            headers: {"token": token},
+            success: function (response) {
+                loadConversations();
+            },
+            error: function (error) {
+                $("#main-container").load("widget-login.html");
+            }
+        });
+    }
+
 </script>
